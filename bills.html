@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bill</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        .total {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>🧾 Bill</h2>
+
+    <p><b>User:</b> <span id="username"></span></p>
+
+    <h3>Items:</h3>
+    <ul id="items"></ul>
+
+    <div class="total">
+        Total: ₹<span id="total"></span>
+    </div>
+</div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${id}`)
+        .then(res => res.json())
+        .then(data => {
+
+            document.getElementById("username").innerText = data.username;
+            document.getElementById("total").innerText = data.total;
+
+            const itemsList = document.getElementById("items");
+            data.items.forEach(item => {
+                const li = document.createElement("li");
+                li.innerText = item;
+                itemsList.appendChild(li);
+            });
+        });
+</script>
+
+</body>
+</html>

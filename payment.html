@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <h2>Scan QR to Pay</h2>
+
+    <div class="container">
+
+        <!-- QR Display -->
+        <div id="qrcode"></div>
+
+        <br>
+
+        <h3>Total: ₹ <span id="payTotal"></span></h3>
+
+        <br>
+
+        <!-- Simulate Biller -->
+        <button onclick="generateQR()">Generate QR</button>
+
+    </div>
+
+    <!-- QR Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
