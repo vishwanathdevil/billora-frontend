@@ -14,9 +14,11 @@
     <div id="productBox" style="display:none; border:1px solid #ccc; padding:10px;">
         <h3 id="productName"></h3>
         <p>Price: ₹ <span id="productPrice"></span></p>
-        <button onclick="addScannedToCart()">Add to Cart</button>
-        <button onclick="scanAgain()">Scan Again</button>
-        <button onclick="goToCart()">Go to Cart</button>
+        <div id="actionButtons" style="display:block;">
+            <button onclick="addScannedToCart()">Add to Cart</button>
+            <button onclick="scanAgain()">Scan Again</button>
+            <button onclick="goToCart()">Go to Cart</button>
+        </div>
     </div>
 </div>
 <script src="https://unpkg.com/quagga/dist/quagga.min.js"></script>

@@ -364,31 +364,35 @@ function startScanner() {
         })
         .then(product => {
 
-            if (!product || !product.name) {
-                alert("Product not found in DB");
-                restartScanner();   // ✅ IMPORTANT
-                return;
-            }
+    if (!product || !product.name) {
+        alert("Product not found in DB");
+        restartScanner();
+        return;
+    }
 
-            scannedProduct = product;
+    scannedProduct = product;
 
-            document.getElementById("productBox").style.display = "block";
-            document.getElementById("productName").innerText = product.name;
-            document.getElementById("productPrice").innerText = "₹ " + product.price;
+    // ✅ SHOW PRODUCT BOX (THIS IS THE LINE YOU ASKED)
+    document.getElementById("productBox").style.display = "block";
 
-            document.getElementById("actionButtons").style.display = "block";
-        })
-        .catch(err => {
-            console.error(err);
-            alert("Error fetching product");
+    document.getElementById("productName").innerText = product.name;
+    document.getElementById("productPrice").innerText = "₹ " + product.price;
 
-            restartScanner();   // ✅ IMPORTANT FIX
-        });
+})
+.catch(err => {
+    console.error(err);
+    alert("Error fetching product");
+    restartScanner();
+});
 });
 function restartScanner() {
     document.getElementById("productBox").style.display = "none";
     document.getElementById("actionButtons").style.display = "none";
 
+    startScanner(); // restart camera
+}
+function restartScanner() {
+    document.getElementById("productBox").style.display = "none";
     startScanner(); // restart camera
 }
 }
