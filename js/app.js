@@ -322,6 +322,7 @@ function clearCart() {
 }
 
 // 📷 START CAMERA SCANNER
+
 function startScanner() {
 
     let isProcessing = false;
@@ -331,9 +332,7 @@ function startScanner() {
             name: "Live",
             type: "LiveStream",
             target: document.querySelector('#scanner'),
-            constraints: {
-                facingMode: "environment"
-            }
+            constraints: { facingMode: "environment" }
         },
         decoder: {
             readers: ["ean_reader", "code_128_reader", "upc_reader"]
@@ -346,6 +345,7 @@ function startScanner() {
         Quagga.start();
     });
 
+    Quagga.offDetected(); // 🔥 IMPORTANT
     Quagga.onDetected(function (data) {
 
         if (isProcessing) return;
@@ -353,17 +353,11 @@ function startScanner() {
 
         let code = data.codeResult.code.replace(/^0+/, '');
 
-        console.log("Final Code:", code);
-
         Quagga.stop();
 
         fetch(`https://billora-backend-9kyk.onrender.com/api/products/${code}`)
             .then(async (res) => {
-
-                if (!res.ok) {
-                    throw new Error("Product not found");
-                }
-
+                if (!res.ok) throw new Error();
                 return res.json();
             })
             .then(product => {
@@ -377,9 +371,8 @@ function startScanner() {
                 document.getElementById("productPrice").innerText = product.price;
 
             })
-            .catch(err => {
-                console.error(err);
-                alert("Product not found in DB");
+            .catch(() => {
+                alert("Product not found");
                 restartScanner();
             });
     });
@@ -392,19 +385,18 @@ function restartScanner() {
     document.getElementById("productBox").style.display = "none";
     document.getElementById("actionButtons").style.display = "none";
 
-    Quagga.offDetected();
     Quagga.stop();
+    Quagga.offDetected();
 
     setTimeout(() => {
         startScanner();
     }, 500);
 }
 
-// ✅ ADD THIS FUNCTION (YOU WERE MISSING THIS)
 function addScannedToCart() {
 
     if (!scannedProduct) {
-        alert("No product scanned");
+        alert("Scan product first");
         return;
     }
 
@@ -420,7 +412,7 @@ function addScannedToCart() {
 
     localStorage.setItem("cart", JSON.stringify(cart));
 
-    alert("Added to cart!");
+    alert("Added to cart");
 }
 // function startScanner() {
 
