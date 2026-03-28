@@ -359,9 +359,13 @@ function startScanner() {
         Quagga.stop();
 
         // 🔥 NORMALIZE CODE (REMOVE LEADING ZEROS)
-        let normalizedCode = code.replace(/^0+/, "");
+        let rawCode=data.codeResult.code;
+        let Code = code.replace(/^0+/, '');
 
-        fetch(`https://billora-backend-9kyk.onrender.com/api/products/${normalizedCode}`)
+        console.log("RAW:", rawCode);
+        console.log("TRIMMED:", Code);
+
+        fetch(`https://billora-backend-9kyk.onrender.com/api/products/${Code}`)
             .then(res => res.json())
             .then(product => {
 
