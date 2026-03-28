@@ -1,0 +1,29 @@
+/* FIX CAMERA SIZE */
+#scanner video {
+    width: 300px !important;
+    height: auto !important;
+    position: relative !important;
+}
+
+/* CONTAINER FIX */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* PRODUCT BOX MUST BE ABOVE */
+#productBox {
+    display: none;
+    margin-top: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    z-index: 999;
+}
+
+/* BUTTON VISIBILITY */
+#actionButtons button {
+    margin: 5px;
+    padding: 10px;
+}
