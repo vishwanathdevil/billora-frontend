@@ -324,7 +324,7 @@ function clearCart() {
 // 📷 START CAMERA SCANNER
 function startScanner() {
 
-    let isProcessing = false; // 🔥 prevent multiple scans
+    let isProcessing = false;
 
     Quagga.init({
         inputStream: {
@@ -348,56 +348,79 @@ function startScanner() {
 
     Quagga.onDetected(function (data) {
 
-        if (isProcessing) return; // 🔥 stop duplicate calls
+        if (isProcessing) return;
         isProcessing = true;
 
-        let code = data.codeResult.code;
+        let code = data.codeResult.code.replace(/^0+/, '');
 
-        console.log("Scanned Code:", code);
-        alert("Scanned Code: " + code);
+        console.log("Final Code:", code);
 
         Quagga.stop();
 
-        // 🔥 NORMALIZE CODE (REMOVE LEADING ZEROS)
-        let rawCode=data.codeResult.code;
-        let Code = code.replace(/^0+/, '');
+        fetch(`https://billora-backend-9kyk.onrender.com/api/products/${code}`)
+            .then(async (res) => {
 
-        console.log("RAW:", rawCode);
-        console.log("TRIMMED:", Code);
-
-        fetch(`https://billora-backend-9kyk.onrender.com/api/products/${Code}`)
-            .then(res => res.json())
-            .then(product => {
-
-                if (!product || !product.name) {
-                    alert("Product not found in DB");
-                    restartScanner();
-                    return;
+                if (!res.ok) {
+                    throw new Error("Product not found");
                 }
+
+                return res.json();
+            })
+            .then(product => {
 
                 scannedProduct = product;
 
-                document.getElementById("actionButtons").style.display = "block";
                 document.getElementById("productBox").style.display = "block";
+                document.getElementById("actionButtons").style.display = "block";
+
                 document.getElementById("productName").innerText = product.name;
                 document.getElementById("productPrice").innerText = product.price;
 
             })
             .catch(err => {
                 console.error(err);
-                alert("Error fetching product");
+                alert("Product not found in DB");
                 restartScanner();
             });
     });
 }
+
 function restartScanner() {
 
-    document.getElementById("productBox").style.display = "none";
+    scannedProduct = null;
 
-    Quagga.offDetected(); // 🔥 remove old listeners
+    document.getElementById("productBox").style.display = "none";
+    document.getElementById("actionButtons").style.display = "none";
+
+    Quagga.offDetected();
     Quagga.stop();
 
-    startScanner(); // restart clean
+    setTimeout(() => {
+        startScanner();
+    }, 500);
+}
+
+// ✅ ADD THIS FUNCTION (YOU WERE MISSING THIS)
+function addScannedToCart() {
+
+    if (!scannedProduct) {
+        alert("No product scanned");
+        return;
+    }
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    let existing = cart.find(item => item.code === scannedProduct.code);
+
+    if (existing) {
+        existing.quantity++;
+    } else {
+        cart.push({ ...scannedProduct, quantity: 1 });
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    alert("Added to cart!");
 }
 // function startScanner() {
 

@@ -5,23 +5,34 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
 <h2>Scan Product</h2>
+
 <div class="container">
+
     <!-- CAMERA -->
     <div id="scanner" style="width:300px;"></div>
     <br>
-    <!-- RESULT BOX -->
+
+    <!-- PRODUCT RESULT -->
     <div id="productBox" style="display:none;">
         <h3 id="productName"></h3>
         <p>Price: ₹ <span id="productPrice"></span></p>
-        <div id="actionButtons">
-            <button onclick="addToCart(scannedProduct.code)">Add to Cart</button>
-            <button onclick="scanAgain()">Scan Again</button>
+
+        <!-- ACTION BUTTONS -->
+        <div id="actionButtons" style="display:none;">
+            <button onclick="addScannedToCart()">Add to Cart</button>
+            <button onclick="restartScanner()">Scan Again</button>
             <button onclick="goToCart()">Go to Cart</button>
         </div>
     </div>
+
 </div>
+
+<!-- LIBRARIES -->
 <script src="https://unpkg.com/quagga/dist/quagga.min.js"></script>
+
+<!-- YOUR JS -->
 <script src="js/app.js"></script>
 
 </body>
