@@ -324,6 +324,8 @@ function clearCart() {
 // 📷 START CAMERA SCANNER
 function startScanner() {
 
+    let isProcessing = false; // 🔥 prevent multiple scans
+
     Quagga.init({
         inputStream: {
             name: "Live",
@@ -346,55 +348,51 @@ function startScanner() {
 
     Quagga.onDetected(function (data) {
 
-    let code = data.codeResult.code;
+        if (isProcessing) return; // 🔥 stop duplicate calls
+        isProcessing = true;
 
-    console.log("Scanned Code:", code);
-    alert("Scanned Code: " + code); // 🔥 TEMP DEBUG
+        let code = data.codeResult.code;
 
+        console.log("Scanned Code:", code);
+        alert("Scanned Code: " + code);
+
+        Quagga.stop();
+
+        // 🔥 NORMALIZE CODE (REMOVE LEADING ZEROS)
+        let normalizedCode = code.replace(/^0+/, "");
+
+        fetch(`https://billora-backend-9kyk.onrender.com/api/products/${normalizedCode}`)
+            .then(res => res.json())
+            .then(product => {
+
+                if (!product || !product.name) {
+                    alert("Product not found in DB");
+                    restartScanner();
+                    return;
+                }
+
+                scannedProduct = product;
+
+                document.getElementById("productBox").style.display = "block";
+                document.getElementById("productName").innerText = product.name;
+                document.getElementById("productPrice").innerText = product.price;
+
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Error fetching product");
+                restartScanner();
+            });
+    });
+}
+function restartScanner() {
+
+    document.getElementById("productBox").style.display = "none";
+
+    Quagga.offDetected(); // 🔥 remove old listeners
     Quagga.stop();
 
-    fetch(`https://billora-backend-9kyk.onrender.com/api/products/${code}`)
-        .then(res => {
-
-            if (!res.ok) {
-                throw new Error("API failed");
-            }
-
-            return res.json();
-        })
-        .then(product => {
-
-    if (!product || !product.name) {
-        alert("Product not found in DB");
-        restartScanner();
-        return;
-    }
-
-    scannedProduct = product;
-
-    // ✅ SHOW PRODUCT BOX (THIS IS THE LINE YOU ASKED)
-    document.getElementById("productBox").style.display = "block";
-
-    document.getElementById("productName").innerText = product.name;
-    document.getElementById("productPrice").innerText = "₹ " + product.price;
-
-})
-.catch(err => {
-    console.error(err);
-    alert("Error fetching product");
-    restartScanner();
-});
-});
-function restartScanner() {
-    document.getElementById("productBox").style.display = "none";
-    document.getElementById("actionButtons").style.display = "none";
-
-    startScanner(); // restart camera
-}
-function restartScanner() {
-    document.getElementById("productBox").style.display = "none";
-    startScanner(); // restart camera
-}
+    startScanner(); // restart clean
 }
 // function startScanner() {
 
