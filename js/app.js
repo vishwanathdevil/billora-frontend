@@ -373,6 +373,7 @@ function startScanner() {
 
                 scannedProduct = product;
 
+                document.getElementById("actionButtons").style.display = "block";
                 document.getElementById("productBox").style.display = "block";
                 document.getElementById("productName").innerText = product.name;
                 document.getElementById("productPrice").innerText = product.price;
