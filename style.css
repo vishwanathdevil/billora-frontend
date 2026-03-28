@@ -14,7 +14,7 @@
 
 /* PRODUCT BOX MUST BE ABOVE */
 #productBox {
-    display: none;
+    display: block;
     margin-top: 20px;
     background: white;
     padding: 15px;
@@ -23,7 +23,8 @@
 }
 
 /* BUTTON VISIBILITY */
-#actionButtons button {
+#actionButtons  {
+    display: block;
     margin: 5px;
     padding: 10px;
 }

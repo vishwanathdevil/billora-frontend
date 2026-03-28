@@ -233,13 +233,22 @@ function generateQR() {
 
         let cartId = data.id;
 
-        let qrUrl = `https://billoraa.netlify.app/cart.html?id=${cartId}`;
+        let qrUrl = `${window.location.origin}/cart.html?id=${cartId}`;
 
         let container = document.getElementById("qrContainer");
+
+        if (!container) {
+            alert("QR container not found");
+            return;
+        }
+
         container.innerHTML = "";
 
         QRCode.toCanvas(qrUrl, function (err, canvas) {
-            if (err) return alert("QR Error");
+            if (err) {
+                alert("QR error");
+                return;
+            }
             container.appendChild(canvas);
         });
 
