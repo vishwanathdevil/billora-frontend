@@ -138,7 +138,7 @@ function addToCart(code) {
             }
 
             localStorage.setItem("cart", JSON.stringify(cart));
-            updateTotal();
+            loadCart();
         });
 }
 
@@ -157,7 +157,7 @@ function decreaseQty(code) {
     }
 
     localStorage.setItem("cart", JSON.stringify(cart));
-    updateTotal();
+    loadCart();
 }
 
 // ❌ REMOVE ITEM
@@ -175,7 +175,7 @@ function updateTotal() {
     let total = 0;
     cart.forEach(item => total += item.price * item.quantity);
 
-    let el = document.getElementById("totalAmount");
+    let el = document.getElementById("cartTotal");
     if (el) el.innerText = total;
 }
 
