@@ -1,0 +1,50 @@
+/* PAGE TITLE */
+h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* LOGOUT BUTTON (TOP RIGHT) */
+button[onclick="logout()"] {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #dc3545;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+}
+
+button[onclick="logout()"]:hover {
+    background: #b02a37;
+}
+
+/* MAIN CONTAINER */
+.container {
+    margin-top: 50px;
+}
+
+/* HOME BUTTONS */
+.container button {
+    width: 100%;
+    padding: 15px;
+    margin: 15px 0;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #2196f3, #00c6ff);
+    color: white;
+    transition: 0.3s;
+}
+
+/* HOVER EFFECT */
+.container button:hover {
+    transform: scale(1.03);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* SECOND BUTTON DIFFERENT COLOR */
+.container button:last-child {
+    background: linear-gradient(135deg, #28a745, #5ddf85);
+}

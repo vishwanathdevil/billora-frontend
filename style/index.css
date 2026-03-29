@@ -1,0 +1,75 @@
+/* BODY CENTER */
+body {
+    background: linear-gradient(135deg, #2196f3, #00c6ff);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* LOGIN CONTAINER */
+.container {
+    width: 90%;
+    max-width: 350px;
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+/* TITLE */
+h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* INPUT FIELDS */
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+/* INPUT FOCUS */
+input:focus {
+    border-color: #2196f3;
+    outline: none;
+    box-shadow: 0 0 5px rgba(33,150,243,0.5);
+}
+
+/* BUTTON BASE */
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 10px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* LOGIN BUTTON */
+button:first-of-type {
+    background: #2196f3;
+    color: white;
+}
+
+button:first-of-type:hover {
+    background: #1769aa;
+}
+
+/* REGISTER BUTTON */
+button:last-of-type {
+    background: #28a745;
+    color: white;
+}
+
+button:last-of-type:hover {
+    background: #1e7e34;
+}

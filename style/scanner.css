@@ -1,0 +1,21 @@
+/* CAMERA */
+#scanner {
+    width: 100%;
+    max-width: 350px;
+    margin: auto;
+}
+
+/* PRODUCT BOX */
+#productBox {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+}
+
+/* BUTTONS */
+#actionButtons button {
+    width: 90%;
+    margin: 5px;
+}
