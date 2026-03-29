@@ -60,3 +60,25 @@ canvas.drawingBuffer {
 #actionButtons {
     margin-top: 10px;
 }
+
+#scanner {
+    position: relative;
+    z-index: 1;
+}
+
+#scanner video,
+#scanner canvas {
+    width: 100%;
+    height: auto;
+    position: relative;
+    z-index: 1;
+}
+
+/* 🔥 UI always on top */
+#productBox {
+    position: relative;
+    z-index: 999;
+    background: white;
+    padding: 10px;
+    margin-top: 10px;
+}

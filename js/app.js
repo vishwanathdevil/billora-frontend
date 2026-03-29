@@ -412,17 +412,20 @@ function restartScanner() {
     scannedProduct = null;
     isProcessing = false;
 
+    // Hide product UI
     document.getElementById("productBox").style.display = "none";
 
-    let scanner = document.getElementById("scanner");
-    scanner.innerHTML = "";
-
+    // 🔥 FULL RESET
     Quagga.stop();
     Quagga.offDetected();
 
+    let scanner = document.getElementById("scanner");
+    scanner.innerHTML = ""; // remove old video + canvas
+
+    // 🔥 small delay then restart
     setTimeout(() => {
         startScanner();
-    }, 500);
+    }, 300);
 }
 
 // 🛒 ADD TO CART
