@@ -1,19 +1,29 @@
-/* FIX CAMERA OVERLAP */
-#scanner video {
-    width: 300px !important;
-    height: auto !important;
+/* 🔥 FORCE CAMERA TO STAY IN BOX */
+#scanner {
+    width: 300px;
+    height: auto;
+    position: relative;
 }
 
-/* SHOW PRODUCT BOX PROPERLY */
+/* 🔥 FIX QUAGGA VIDEO OVERLAY ISSUE */
+#scanner video {
+    width: 100% !important;
+    height: auto !important;
+    position: relative !important;
+}
+
+/* 🔥 PRODUCT BOX MUST BE BELOW CAMERA */
 #productBox {
     display: none;
+    position: relative;
+    z-index: 10;
     margin-top: 20px;
     background: white;
     padding: 15px;
     border-radius: 10px;
 }
 
-/* KEEP BUTTONS VISIBLE */
-#actionButtons {
-    margin-top: 10px;
+/* 🔥 PREVENT CAMERA FROM COVERING PAGE */
+canvas.drawingBuffer {
+    display: none !important;
 }
