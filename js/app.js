@@ -335,18 +335,21 @@ function clearCart() {
 let isProcessing = false;
 
 // 🚀 START SCANNER
+let scannerRunning = false;
+
+// 🚀 START SCANNER (ONLY ONCE)
 function startScanner() {
 
-    isProcessing = false;
+    if (scannerRunning) return; // 🔥 prevent re-init
 
-    let scanner = document.getElementById("scanner");
-    scanner.innerHTML = ""; // clear old camera
+    scannerRunning = true;
+    isProcessing = false;
 
     Quagga.init({
         inputStream: {
             name: "Live",
             type: "LiveStream",
-            target: scanner,
+            target: document.querySelector('#scanner'),
             constraints: {
                 facingMode: "environment"
             }
@@ -362,70 +365,70 @@ function startScanner() {
         Quagga.start();
     });
 
-    // remove old listeners
-    Quagga.offDetected();
-
-    // add detection
-    Quagga.onDetected(function (data) {
-
-        if (isProcessing) return;
-        isProcessing = true;
-
-        let code = data.codeResult.code.replace(/^0+/, '');
-
-        console.log("Scanned:", code);
-
-        Quagga.stop();
-
-        fetch(`https://billora-backend-9kyk.onrender.com/api/products/${code}`)
-            .then(res => {
-                if (!res.ok) throw new Error();
-                return res.json();
-            })
-            .then(product => {
-
-                if (!product || !product.name) {
-                    alert("Product not found");
-                    restartScanner();
-                    return;
-                }
-
-                scannedProduct = product;
-
-                // show UI
-                document.getElementById("productBox").style.display = "block";
-
-                document.getElementById("productName").innerText = product.name;
-                document.getElementById("productPrice").innerText = product.price;
-
-            })
-            .catch(() => {
-                alert("Error fetching product");
-                restartScanner();
-            });
-    });
+    // 🔥 attach ONLY ONCE
+    Quagga.onDetected(handleScan);
 }
 
-// 🔁 RESTART SCANNER
+// 🎯 HANDLE SCAN
+function handleScan(data) {
+
+    if (isProcessing) return;
+    isProcessing = true;
+
+    let code = data.codeResult.code.replace(/^0+/, '');
+
+    console.log("Scanned:", code);
+
+    Quagga.stop(); // pause scanning
+
+    fetch(`https://billora-backend-9kyk.onrender.com/api/products/${code}`)
+        .then(res => {
+            if (!res.ok) throw new Error();
+            return res.json();
+        })
+        .then(product => {
+
+            if (!product || !product.name) {
+                alert("Product not found");
+                resumeScanner();
+                return;
+            }
+
+            scannedProduct = product;
+
+            document.getElementById("productBox").style.display = "block";
+            document.getElementById("productName").innerText = product.name;
+            document.getElementById("productPrice").innerText = product.price;
+
+        })
+        .catch(() => {
+            alert("Error fetching product");
+            resumeScanner();
+        });
+}
+
+// 🔁 SCAN AGAIN (NO RE-INIT)
 function restartScanner() {
 
     scannedProduct = null;
-    isProcessing = false;
 
-    // Hide product UI
     document.getElementById("productBox").style.display = "none";
 
-    // 🔥 FULL RESET
-    Quagga.stop();
-    Quagga.offDetected();
+    resumeScanner();
+}
 
-    let scanner = document.getElementById("scanner");
-    scanner.innerHTML = ""; // remove old video + canvas
+// 🔄 RESUME CAMERA (NO RESET)
+function resumeScanner() {
 
-    // 🔥 small delay then restart
-    setTimeout(() => {
+    isProcessing = false;
+
+    try {
+        Quagga.start(); // 🔥 JUST RESUME (NO REINIT)
+    } catch (e) {
+        console.log("Restart fallback");
+        scannerRunning = false;
         startScanner();
-    }, 300);
+    }
 }
 
 // 🛒 ADD TO CART
