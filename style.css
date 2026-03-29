@@ -1,84 +1,34 @@
-/* 🔥 FORCE CAMERA TO STAY IN BOX */
+/* CAMERA */
 #scanner {
-    width: 300px;
-    height: auto;
-    position: relative;
-}
-
-/* 🔥 FIX QUAGGA VIDEO OVERLAY ISSUE */
-#scanner video {
-    width: 100% !important;
-    height: auto !important;
-    position: relative !important;
-}
-
-/* 🔥 PRODUCT BOX MUST BE BELOW CAMERA */
-#productBox {
-    display: none;
-    position: relative;
-    z-index: 10;
-    margin-top: 20px;
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-}
-
-/* 🔥 PREVENT CAMERA FROM COVERING PAGE */
-canvas.drawingBuffer {
-    display: none !important;
-}
-
-#scanner video, #scanner canvas {
-    max-width: 100%;
-    height: auto;
-}
-
-.scanner-box {
     position: relative;
     width: 100%;
     max-width: 350px;
     margin: auto;
-}
-
-/* 🔥 Camera video fix */
-#scanner video {
-    width: 100%;
-    height: auto;
-}
-
-/* 🔥 Product UI ABOVE camera */
-.product-box {
-    position: relative;
-    z-index: 10;   /* THIS IS THE FIX */
-    background: white;
-    padding: 10px;
-    margin-top: 10px;
-    border-radius: 10px;
-}
-
-/* Buttons visible always */
-#actionButtons {
-    margin-top: 10px;
-}
-
-#scanner {
-    position: relative;
     z-index: 1;
 }
 
+/* video + canvas */
 #scanner video,
 #scanner canvas {
     width: 100%;
     height: auto;
-    position: relative;
-    z-index: 1;
+    display: block;
 }
 
-/* 🔥 UI always on top */
+/* 🔥 UI ALWAYS ON TOP */
 #productBox {
-    position: relative;
-    z-index: 999;
+    position: fixed;   /* 🔥 THIS IS THE MAGIC */
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    
+    width: 90%;
+    max-width: 350px;
+
     background: white;
-    padding: 10px;
-    margin-top: 10px;
+    padding: 15px;
+    border-radius: 10px;
+
+    z-index: 9999;   /* ALWAYS ABOVE CAMERA */
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
 }
