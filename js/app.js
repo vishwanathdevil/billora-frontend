@@ -332,16 +332,24 @@ function clearCart() {
 
 // 📷 START CAMERA SCANNER
 
+let isProcessing = false;
+
+// 🚀 START SCANNER
 function startScanner() {
 
-    let isProcessing = false;
+    isProcessing = false;
+
+    let scanner = document.getElementById("scanner");
+    scanner.innerHTML = ""; // clear old camera
 
     Quagga.init({
         inputStream: {
             name: "Live",
             type: "LiveStream",
-            target: document.querySelector('#scanner'),
-            constraints: { facingMode: "environment" }
+            target: scanner,
+            constraints: {
+                facingMode: "environment"
+            }
         },
         decoder: {
             readers: ["ean_reader", "code_128_reader", "upc_reader"]
@@ -354,7 +362,10 @@ function startScanner() {
         Quagga.start();
     });
 
-    Quagga.offDetected(); // 🔥 IMPORTANT
+    // remove old listeners
+    Quagga.offDetected();
+
+    // add detection
     Quagga.onDetected(function (data) {
 
         if (isProcessing) return;
@@ -362,52 +373,59 @@ function startScanner() {
 
         let code = data.codeResult.code.replace(/^0+/, '');
 
+        console.log("Scanned:", code);
+
         Quagga.stop();
 
         fetch(`https://billora-backend-9kyk.onrender.com/api/products/${code}`)
-            .then(async (res) => {
+            .then(res => {
                 if (!res.ok) throw new Error();
                 return res.json();
             })
             .then(product => {
 
+                if (!product || !product.name) {
+                    alert("Product not found");
+                    restartScanner();
+                    return;
+                }
+
                 scannedProduct = product;
 
+                // show UI
                 document.getElementById("productBox").style.display = "block";
-                document.getElementById("actionButtons").style.display = "block";
 
                 document.getElementById("productName").innerText = product.name;
                 document.getElementById("productPrice").innerText = product.price;
 
             })
             .catch(() => {
-                alert("Product not found");
+                alert("Error fetching product");
                 restartScanner();
             });
     });
 }
 
+// 🔁 RESTART SCANNER
 function restartScanner() {
 
     scannedProduct = null;
+    isProcessing = false;
 
-    // Hide product UI
     document.getElementById("productBox").style.display = "none";
 
-    // 🔥 REMOVE OLD CAMERA COMPLETELY
     let scanner = document.getElementById("scanner");
     scanner.innerHTML = "";
 
-    // Stop old instance
     Quagga.stop();
     Quagga.offDetected();
 
-    // Restart clean
     setTimeout(() => {
         startScanner();
     }, 500);
 }
 
+// 🛒 ADD TO CART
 function addScannedToCart() {
 
     if (!scannedProduct) {
@@ -429,51 +447,15 @@ function addScannedToCart() {
 
     alert("Added to cart");
 }
-// function startScanner() {
 
-//     Quagga.init({
-//         inputStream: {
-//             name: "Live",
-//             type: "LiveStream",
-//             target: document.querySelector('#scanner'),
-//             constraints: {
-//                 facingMode: "environment"
-//             }
-//         },
-//         decoder: {
-//             readers: ["ean_reader", "code_128_reader", "upc_reader"]
-//         }
-//     }, function (err) {
-//         if (err) {
-//             alert("Camera error");
-//             return;
-//         }
-//         Quagga.start();
-//     });
+// 🔗 GO TO CART
+function goToCart() {
+    window.location.href = "cart.html";
+}
 
-//     Quagga.onDetected(function (data) {
-
-//         let code = data.codeResult.code;
-
-//         // 👉 Stop scanner after one scan
-//         Quagga.stop();
-
-//         // 👉 Fetch product from backend
-//         fetch(`https://billora-backend-9kyk.onrender.com/api/products/${code}`)
-//             .then(res => res.json())
-//             .then(product => {
-
-//                 scannedProduct = product;
-
-//                 // 👉 Show product UI
-//                 document.getElementById("productBox").style.display = "block";
-//                 document.getElementById("productName").innerText = product.name;
-//                 document.getElementById("productPrice").innerText = product.price;
-
-//             })
-//             .catch(() => {
-//                 alert("Product not found");
-//                 scanAgain();
-//             });
-//     });
-// }
+// 🚀 AUTO START
+window.onload = function () {
+    if (document.getElementById("scanner")) {
+        startScanner();
+    }
+};

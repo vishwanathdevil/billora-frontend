@@ -15,16 +15,18 @@
 
     <br>
 
-    <!-- RESULT -->
-    <div id="productBox">
+    <!-- PRODUCT BOX -->
+    <div id="productBox" style="display:none; margin-top:20px;">
+
         <h3 id="productName"></h3>
         <p>Price: ₹ <span id="productPrice"></span></p>
 
-        <div id="actionButtons">
+        <div id="actionButtons" style="margin-top:10px;">
             <button onclick="addScannedToCart()">Add to Cart</button>
-            <button onclick="restartScanner()">Scan Again</button> <!-- ✅ FIX -->
+            <button onclick="restartScanner()">Scan Again</button>
             <button onclick="goToCart()">Go to Cart</button>
         </div>
+
     </div>
 
 </div>
