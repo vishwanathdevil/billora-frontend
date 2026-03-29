@@ -32,3 +32,31 @@ canvas.drawingBuffer {
     max-width: 100%;
     height: auto;
 }
+
+.scanner-box {
+    position: relative;
+    width: 100%;
+    max-width: 350px;
+    margin: auto;
+}
+
+/* 🔥 Camera video fix */
+#scanner video {
+    width: 100%;
+    height: auto;
+}
+
+/* 🔥 Product UI ABOVE camera */
+.product-box {
+    position: relative;
+    z-index: 10;   /* THIS IS THE FIX */
+    background: white;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 10px;
+}
+
+/* Buttons visible always */
+#actionButtons {
+    margin-top: 10px;
+}

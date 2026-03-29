@@ -11,17 +11,15 @@
 <div class="container">
 
     <!-- CAMERA -->
-    <div id="scanner" style="width:300px;"></div>
+    <div id="scanner" class="scanner-box"></div>
 
-    <br>
-
-    <!-- PRODUCT BOX -->
-    <div id="productBox" style="display:none; margin-top:20px;">
+    <!-- PRODUCT UI -->
+    <div id="productBox" class="product-box">
 
         <h3 id="productName"></h3>
         <p>Price: ₹ <span id="productPrice"></span></p>
 
-        <div id="actionButtons" style="margin-top:10px;">
+        <div id="actionButtons">
             <button onclick="addScannedToCart()">Add to Cart</button>
             <button onclick="restartScanner()">Scan Again</button>
             <button onclick="goToCart()">Go to Cart</button>
