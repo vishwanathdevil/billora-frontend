@@ -391,12 +391,18 @@ function restartScanner() {
 
     scannedProduct = null;
 
+    // Hide product UI
     document.getElementById("productBox").style.display = "none";
-    document.getElementById("actionButtons").style.display = "none";
 
+    // 🔥 REMOVE OLD CAMERA COMPLETELY
+    let scanner = document.getElementById("scanner");
+    scanner.innerHTML = "";
+
+    // Stop old instance
     Quagga.stop();
     Quagga.offDetected();
 
+    // Restart clean
     setTimeout(() => {
         startScanner();
     }, 500);

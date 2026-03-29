@@ -27,3 +27,8 @@
 canvas.drawingBuffer {
     display: none !important;
 }
+
+#scanner video, #scanner canvas {
+    max-width: 100%;
+    height: auto;
+}
