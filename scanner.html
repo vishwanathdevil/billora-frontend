@@ -13,18 +13,15 @@
     <!-- CAMERA -->
     <div id="scanner"></div>
 
-    <!-- ✅ PRODUCT BOX (FIXED) -->
-    <div id="productBox" style="display:none;">
+    <!-- PRODUCT INFO -->
+    <h3 id="productName">Scan a product</h3>
+    <p>Price: ₹ <span id="productPrice">0</span></p>
 
-        <h3 id="productName"></h3>
-        <p>Price: ₹ <span id="productPrice"></span></p>
-
-        <div id="actionButtons">
-            <button onclick="addScannedToCart()">Add to Cart</button>
-            <button onclick="restartScanner()">Scan Again</button>
-            <button onclick="goToCart()">Go to Cart</button>
-        </div>
-
+    <!-- BUTTONS (ALWAYS VISIBLE) -->
+    <div id="actionButtons">
+        <button onclick="addScannedToCart()">Add to Cart</button>
+        <button onclick="restartScanner()">Scan Again</button>
+        <button onclick="goToCart()">Go to Cart</button>
     </div>
 
 </div>
@@ -34,4 +31,3 @@
 
 </body>
 </html>
-

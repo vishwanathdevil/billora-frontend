@@ -233,7 +233,7 @@ function generateQR() {
 
         let cartId = data.id;
 
-        let qrUrl = `${window.location.origin}/cart.html?id=${cartId}`;
+        let qrUrl = `${window.location.origin}/bills.html?id=${cartId}`;
 
         let container = document.getElementById("qrContainer");
 
@@ -331,16 +331,12 @@ function clearCart() {
 }
 
 // 📷 START CAMERA SCANNER
-
 let isProcessing = false;
-
-// 🚀 START SCANNER
 let scannerRunning = false;
 
-// 🚀 START SCANNER (ONLY ONCE)
 function startScanner() {
 
-    if (scannerRunning) return; // 🔥 prevent re-init
+    if (scannerRunning) return;
 
     scannerRunning = true;
     isProcessing = false;
@@ -350,9 +346,7 @@ function startScanner() {
             name: "Live",
             type: "LiveStream",
             target: document.querySelector('#scanner'),
-            constraints: {
-                facingMode: "environment"
-            }
+            constraints: { facingMode: "environment" }
         },
         decoder: {
             readers: ["ean_reader", "code_128_reader", "upc_reader"]
@@ -365,11 +359,10 @@ function startScanner() {
         Quagga.start();
     });
 
-    // 🔥 attach ONLY ONCE
+    Quagga.offDetected();
     Quagga.onDetected(handleScan);
 }
 
-// 🎯 HANDLE SCAN
 function handleScan(data) {
 
     if (isProcessing) return;
@@ -377,15 +370,10 @@ function handleScan(data) {
 
     let code = data.codeResult.code.replace(/^0+/, '');
 
-    console.log("Scanned:", code);
-
-    Quagga.stop(); // pause scanning
+    Quagga.stop();
 
     fetch(`https://billora-backend-9kyk.onrender.com/api/products/${code}`)
-        .then(res => {
-            if (!res.ok) throw new Error();
-            return res.json();
-        })
+        .then(res => res.json())
         .then(product => {
 
             if (!product || !product.name) {
@@ -396,7 +384,6 @@ function handleScan(data) {
 
             scannedProduct = product;
 
-            document.getElementById("productBox").style.display = "block";
             document.getElementById("productName").innerText = product.name;
             document.getElementById("productPrice").innerText = product.price;
 
@@ -407,30 +394,27 @@ function handleScan(data) {
         });
 }
 
-// 🔁 SCAN AGAIN (NO RE-INIT)
 function restartScanner() {
 
     scannedProduct = null;
 
-    document.getElementById("productBox").style.display = "none";
+    document.getElementById("productName").innerText = "Scan a product";
+    document.getElementById("productPrice").innerText = "0";
 
     resumeScanner();
 }
 
-// 🔄 RESUME CAMERA (NO RESET)
 function resumeScanner() {
 
     isProcessing = false;
 
     try {
-        Quagga.start(); // 🔥 JUST RESUME (NO REINIT)
-    } catch (e) {
-        console.log("Restart fallback");
+        Quagga.start();
+    } catch {
         scannerRunning = false;
         startScanner();
     }
 }
-
 // 🛒 ADD TO CART
 function addScannedToCart() {
 
@@ -460,8 +444,8 @@ function goToCart() {
 }
 
 // 🚀 AUTO START
-window.onload = function () {
-    if (document.getElementById("scanner")) {
-        startScanner();
-    }
-};
+// window.onload = function () {
+//     if (document.getElementById("scanner")) {
+//         startScanner();
+//     }
+// };
