@@ -197,9 +197,32 @@ function generateQR() {
         let qrUrl = `${window.location.origin}/bills.html?id=${bill.id}`;
 
         QRCode.toCanvas(qrUrl, function (err, canvas) {
-            document.getElementById("qrContainer").innerHTML = "";
-            document.getElementById("qrContainer").appendChild(canvas);
+            const qrContainer = document.getElementById("qrContainer");
+            qrContainer.innerHTML = "";
+            qrContainer.appendChild(canvas);
         });
+
+        // 🔥 DISABLE BUTTONS
+        disableCartActions();
+
+        alert("QR Generated ✅ Show to cashier");
+    });
+}
+
+function disableCartActions() {
+
+    const buttons = document.querySelectorAll("button");
+
+    buttons.forEach(btn => {
+
+        if (
+            btn.innerText.includes("Add More") ||
+            btn.innerText.includes("Clear Cart")
+        ) {
+            btn.disabled = true;
+            btn.style.opacity = "0.5";
+            btn.style.cursor = "not-allowed";
+        }
     });
 }
 
@@ -314,6 +337,7 @@ function goToScanner() {
 
 function clearCart() {
     localStorage.removeItem("cart");
+    localStorage.removeItem("qrGenerated");
     alert("Cart cleared");
     window.location.reload();
 }
