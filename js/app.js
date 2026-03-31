@@ -198,19 +198,24 @@ if (localStorage.getItem("qrGenerated") === "true") {
     .then(res => res.json())
     .then(bill => {
 
-        let qrUrl = `${window.location.origin}/bills.html?id=${bill.id}`;
+    let qrUrl = `${window.location.origin}/payment.html?id=${bill.id}`;
 
-        QRCode.toCanvas(qrUrl, function (err, canvas) {
-            const qrContainer = document.getElementById("qrContainer");
-            qrContainer.innerHTML = "";
-            qrContainer.appendChild(canvas);
-        });
-
-        // 🔥 DISABLE BUTTONS
-        disableCartActions();
-
-        alert("QR Generated ✅ Show to cashier");
+    // 🔥 SHOW QR
+    QRCode.toCanvas(qrUrl, function (err, canvas) {
+        document.getElementById("qrContainer").innerHTML = "";
+        document.getElementById("qrContainer").appendChild(canvas);
     });
+
+    // 🔒 LOCK CART
+    disableCartActions();
+    localStorage.setItem("qrGenerated", "true");
+
+    // 🔥 REDIRECT AFTER 2 SECONDS
+    setTimeout(() => {
+        window.location.href = `payment.html?id=${bill.id}`;
+    }, 2000);
+
+});
 }
 
 function disableCartActions() {
