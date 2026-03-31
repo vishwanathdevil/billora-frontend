@@ -1,14 +1,32 @@
-let scannedProduct = null;
+console.log("APP JS LOADED");
 
-// 🔒 Protect pages
-const protectedPages = ["home.html", "store.html", "scanner.html", "cart.html", "payment.html", "bills.html"];
+// 🔐 SESSION CHECK
+const appUser = JSON.parse(localStorage.getItem("user"));
+
+const protectedPages = [
+    "home.html",
+    "store.html",
+    "scanner.html",
+    "cart.html",
+    "payment.html",
+    "bills.html"
+];
 
 let currentPage = window.location.pathname.split("/").pop();
 
+// 🚫 Block access if not logged in
 if (protectedPages.includes(currentPage)) {
-    let isLoggedIn = localStorage.getItem("loggedIn");
-    if (!isLoggedIn) {
+    if (!appUser) {
         window.location.href = "index.html";
+    }
+}
+
+// 🔁 Redirect if already logged in (ONLY for index page)
+if (currentPage === "index.html" && appUser) {
+    if (appUser.role === "CASHIER") {
+        window.location.href = "cashier.html";
+    } else {
+        window.location.href = "home.html";
     }
 }
 
@@ -18,31 +36,31 @@ function register() {
     let password = document.getElementById("password").value.trim();
 
     if (!username || !password) {
-        alert("Enter details");
+        alert("Enter username & password");
         return;
     }
 
     fetch("https://billora-backend-9kyk.onrender.com/api/users/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ username, password })
     })
-    .then(res => res.text())
-    .then(data => {
-        alert(data); // ✅ shows backend message
-    })
-    .catch(() => alert("Error"));
+    .then(res => res.json())
+    .then(user => {
+        localStorage.setItem("user", JSON.stringify(user));
+        alert("Registered & Logged in ✅");
+        window.location.href = "home.html";
+    });
 }
 
-// 🔐 LOGIN
+// 🔑 LOGIN
 function login() {
 
     let username = document.getElementById("username").value.trim();
     let password = document.getElementById("password").value.trim();
 
-    // ✅ Validation
     if (!username || !password) {
-        alert("Please enter username and password");
+        alert("Enter username & password");
         return;
     }
 
@@ -57,39 +75,35 @@ function login() {
         })
     })
     .then(async (res) => {
+
         let text = await res.text();
 
-        // 🔥 HANDLE SERVER ERROR PROPERLY
         if (!res.ok) {
-            console.error("Server Error:", text);
-            alert("Login failed: " + text);
-            throw new Error("Server error");
+            alert(text); // 🔥 show exact error
+            throw new Error(text);
         }
 
-        return text;
-    })
-    .then((data) => {
+        let user = JSON.parse(text);
 
-        console.log("Response:", data);
+        // ✅ ONLY SESSION STORAGE (clean)
+        localStorage.setItem("user", JSON.stringify(user));
 
-        alert(data); // show backend message
-
-        if (data === "Login successful") {
-            localStorage.setItem("loggedIn", "true");
-            localStorage.setItem("currentUser", username);
-
+        // ✅ Redirect
+        if (user.role === "CASHIER") {
+            window.location.href = "cashier.html";
+        } else {
             window.location.href = "home.html";
         }
     })
-    .catch((err) => {
+    .catch(err => {
         console.error(err);
-        alert("Server not responding or error occurred");
+        alert("Login failed: " + err.message);
     });
 }
 
 // 🚪 LOGOUT
 function logout() {
-    localStorage.clear();
+    localStorage.removeItem("user");
     window.location.href = "index.html";
 }
 
@@ -109,11 +123,6 @@ function selectStore(storeName) {
 function startShopping() {
     let trolley = document.getElementById("trolleyNumber").value.trim();
 
-    if (!selectedStore) {
-        alert("Select store");
-        return;
-    }
-
     localStorage.setItem("storeName", selectedStore);
     localStorage.setItem("trolleyNumber", trolley);
     localStorage.setItem("cart", JSON.stringify([]));
@@ -131,58 +140,17 @@ function addToCart(code) {
 
             let existing = cart.find(item => item.code === code);
 
-            if (existing) {
-                existing.quantity++;
-            } else {
-                cart.push({ ...product, quantity: 1 });
-            }
+            if (existing) existing.quantity++;
+            else cart.push({ ...product, quantity: 1 });
 
             localStorage.setItem("cart", JSON.stringify(cart));
             loadCart();
         });
 }
 
-// ➖ REMOVE QTY
-function decreaseQty(code) {
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-    let item = cart.find(p => p.code === code);
-
-    if (item) {
-        item.quantity--;
-
-        if (item.quantity <= 0) {
-            cart = cart.filter(p => p.code !== code);
-        }
-    }
-
-    localStorage.setItem("cart", JSON.stringify(cart));
-    loadCart();
-}
-
-// ❌ REMOVE ITEM
-function removeItem(code) {
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    cart = cart.filter(p => p.code !== code);
-    localStorage.setItem("cart", JSON.stringify(cart));
-    loadCart();
-}
-
-// 💰 TOTAL
-function updateTotal() {
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-    let total = 0;
-    cart.forEach(item => total += item.price * item.quantity);
-
-    let el = document.getElementById("cartTotal");
-    if (el) el.innerText = total;
-}
-
 // 🛒 LOAD CART
 function loadCart() {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
     let html = "";
     let total = 0;
 
@@ -193,12 +161,7 @@ function loadCart() {
             <div>
                 <h4>${item.name}</h4>
                 <p>₹ ${item.price}</p>
-
-                <button onclick="decreaseQty('${item.code}')">➖</button>
-                ${item.quantity}
-                <button onclick="addToCart('${item.code}')">➕</button>
-
-                <button onclick="removeItem('${item.code}')">Remove</button>
+                <p>Qty: ${item.quantity}</p>
             </div><hr>
         `;
     });
@@ -207,7 +170,7 @@ function loadCart() {
     document.getElementById("cartTotal").innerText = total;
 }
 
-// 💳 GENERATE QR (NEW SYSTEM 🔥)
+// 💳 GENERATE QR
 function generateQR() {
 
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -217,50 +180,35 @@ function generateQR() {
         return;
     }
 
-    let username = localStorage.getItem("currentUser");
+    let user = JSON.parse(localStorage.getItem("user"));
 
-    fetch("https://billora-backend-9kyk.onrender.com/api/cart", {
+    fetch("https://billora-backend-9kyk.onrender.com/api/bills", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
-            username: username,
-            items: cart.map(item => item.name),
-            total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+            username: user.username,
+            items: cart.map(i => i.name),
+            total: cart.reduce((sum, i) => sum + i.price * i.quantity, 0)
         })
     })
     .then(res => res.json())
-    .then(data => {
+    .then(bill => {
 
-        let cartId = data.id;
-
-        let qrUrl = `${window.location.origin}/bills.html?id=${cartId}`;
-
-        let container = document.getElementById("qrContainer");
-
-        if (!container) {
-            alert("QR container not found");
-            return;
-        }
-
-        container.innerHTML = "";
+        let qrUrl = `${window.location.origin}/bills.html?id=${bill.id}`;
 
         QRCode.toCanvas(qrUrl, function (err, canvas) {
-            if (err) {
-                alert("QR error");
-                return;
-            }
-            container.appendChild(canvas);
+            document.getElementById("qrContainer").innerHTML = "";
+            document.getElementById("qrContainer").appendChild(canvas);
         });
-
     });
 }
 
 // 🧾 LOAD BILLS
 function loadBills() {
 
-    let user = localStorage.getItem("currentUser");
+    let user = JSON.parse(localStorage.getItem("user"));
 
-    fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${user}`)
+    fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${user.username}`)
         .then(res => res.json())
         .then(data => {
 
@@ -281,37 +229,73 @@ function loadBills() {
         });
 }
 
-// 🔄 PAGE LOAD
-window.onload = function () {
+// 🔍 SCANNER VARIABLES
+let scannedCode = null;
 
-    if (currentPage === "cart.html") {
-        loadCart();
-    }
+// 🎥 START SCANNER
+function startScanner() {
 
-    if (currentPage === "bills.html") {
-        loadBills();
-    }
+    Quagga.init({
+        inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: document.querySelector('#scanner'),
+            constraints: {
+                facingMode: "environment"
+            }
+        },
+        decoder: {
+            readers: ["code_128_reader", "ean_reader", "ean_8_reader"]
+        }
+    }, function (err) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        Quagga.start();
+    });
 
-    if (currentPage === "scanner.html") {
-        startScanner();
-    }
+    Quagga.onDetected(function (result) {
 
+        scannedCode = result.codeResult.code;
+
+        console.log("Scanned:", scannedCode);
+
+        // 🔥 Fetch product
+        fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}`)
+            .then(res => res.json())
+            .then(product => {
+
+                document.getElementById("productName").innerText = product.name;
+                document.getElementById("productPrice").innerText = product.price;
+
+                Quagga.stop(); // stop after scan
+            })
+            .catch(() => {
+                alert("Product not found");
+            });
+    });
 }
 
-// 💳 CHECKOUT (CASHIER)
-function checkout() {
+// ➕ ADD SCANNED PRODUCT
+function addScannedToCart() {
 
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
+    if (!scannedCode) {
+        alert("Scan a product first");
+        return;
+    }
 
-    fetch(`https://billora-backend-9kyk.onrender.com/api/cart/checkout/${id}`, {
-        method: "POST"
-    })
-    .then(res => res.json())
-    .then(() => {
-        alert("Payment successful!");
-        window.location.href = `bills.html?id=${id}`;
-    });
+    addToCart(scannedCode);
+    alert("Added to cart ✅");
+}
+
+// 🔁 RESTART SCANNER
+function restartScanner() {
+    scannedCode = null;
+    document.getElementById("productName").innerText = "Scan a product";
+    document.getElementById("productPrice").innerText = "0";
+
+    startScanner();
 }
 
 // 🛒 GO TO CART
@@ -319,133 +303,7 @@ function goToCart() {
     window.location.href = "cart.html";
 }
 
-// 🔙 Go to scanner page
-function goToScanner() {
-    window.location.href = "scanner.html";
+// 🚀 AUTO START SCANNER (ONLY ON SCANNER PAGE)
+if (currentPage === "scanner.html") {
+    startScanner();
 }
-
-// 🧹 Clear cart
-function clearCart() {
-    localStorage.removeItem("cart");
-    loadCart();
-}
-
-// 📷 START CAMERA SCANNER
-let isProcessing = false;
-let scannerRunning = false;
-
-function startScanner() {
-
-    if (scannerRunning) return;
-
-    scannerRunning = true;
-    isProcessing = false;
-
-    Quagga.init({
-        inputStream: {
-            name: "Live",
-            type: "LiveStream",
-            target: document.querySelector('#scanner'),
-            constraints: { facingMode: "environment" }
-        },
-        decoder: {
-            readers: ["ean_reader", "code_128_reader", "upc_reader"]
-        }
-    }, function (err) {
-        if (err) {
-            alert("Camera error");
-            return;
-        }
-        Quagga.start();
-    });
-
-    Quagga.offDetected();
-    Quagga.onDetected(handleScan);
-}
-
-function handleScan(data) {
-
-    if (isProcessing) return;
-    isProcessing = true;
-
-    let code = data.codeResult.code.replace(/^0+/, '');
-
-    Quagga.stop();
-
-    fetch(`https://billora-backend-9kyk.onrender.com/api/products/${code}`)
-        .then(res => res.json())
-        .then(product => {
-
-            if (!product || !product.name) {
-                alert("Product not found");
-                resumeScanner();
-                return;
-            }
-
-            scannedProduct = product;
-
-            document.getElementById("productName").innerText = product.name;
-            document.getElementById("productPrice").innerText = product.price;
-
-        })
-        .catch(() => {
-            alert("Error fetching product");
-            resumeScanner();
-        });
-}
-
-function restartScanner() {
-
-    scannedProduct = null;
-
-    document.getElementById("productName").innerText = "Scan a product";
-    document.getElementById("productPrice").innerText = "0";
-
-    resumeScanner();
-}
-
-function resumeScanner() {
-
-    isProcessing = false;
-
-    try {
-        Quagga.start();
-    } catch {
-        scannerRunning = false;
-        startScanner();
-    }
-}
-// 🛒 ADD TO CART
-function addScannedToCart() {
-
-    if (!scannedProduct) {
-        alert("Scan product first");
-        return;
-    }
-
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-    let existing = cart.find(item => item.code === scannedProduct.code);
-
-    if (existing) {
-        existing.quantity++;
-    } else {
-        cart.push({ ...scannedProduct, quantity: 1 });
-    }
-
-    localStorage.setItem("cart", JSON.stringify(cart));
-
-    alert("Added to cart");
-}
-
-// 🔗 GO TO CART
-function goToCart() {
-    window.location.href = "cart.html";
-}
-
-// 🚀 AUTO START
-// window.onload = function () {
-//     if (document.getElementById("scanner")) {
-//         startScanner();
-//     }
-// };

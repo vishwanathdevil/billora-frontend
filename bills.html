@@ -19,26 +19,51 @@
     <div class="total">
         Total: ₹<span id="total"></span>
     </div>
+    <p><b>Status:</b> <span id="status"></span></p>
+
+<button id="payBtn" onclick="payBill()">Pay Now</button>
 </div>
 
 <script>
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
 
-    fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${id}`)
-        .then(res => res.json())
-        .then(data => {
+    function loadBill() {
+        fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${id}`)
+            .then(res => res.json())
+            .then(data => {
 
-            document.getElementById("username").innerText = data.username;
-            document.getElementById("total").innerText = data.total;
+                document.getElementById("username").innerText = data.username;
+                document.getElementById("total").innerText = data.total;
+                document.getElementById("status").innerText = data.status;
 
-            const itemsList = document.getElementById("items");
-            data.items.forEach(item => {
-                const li = document.createElement("li");
-                li.innerText = item;
-                itemsList.appendChild(li);
+                const itemsList = document.getElementById("items");
+                itemsList.innerHTML = "";
+
+                data.items.forEach(item => {
+                    const li = document.createElement("li");
+                    li.innerText = item;
+                    itemsList.appendChild(li);
+                });
+
+                // Hide button if already paid
+                if (data.status === "PAID") {
+                    document.getElementById("payBtn").style.display = "none";
+                }
             });
+    }
+
+    function payBill() {
+        fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${id}/pay`, {
+            method: "PUT"
+        })
+        .then(() => {
+            alert("Payment Successful ✅");
+            loadBill(); // refresh
         });
+    }
+
+    loadBill();
 </script>
 
 </body>
