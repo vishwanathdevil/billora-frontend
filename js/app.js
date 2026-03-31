@@ -173,13 +173,17 @@ function loadCart() {
 // 💳 GENERATE QR
 function generateQR() {
 
+    localStorage.setItem("qrGenerated", "true");
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
     if (cart.length === 0) {
         alert("Cart empty");
         return;
     }
-
+    // 🔒 CHECK IF QR ALREADY GENERATED
+if (localStorage.getItem("qrGenerated") === "true") {
+    disableCartActions();
+}
     let user = JSON.parse(localStorage.getItem("user"));
 
     fetch("https://billora-backend-9kyk.onrender.com/api/bills", {
