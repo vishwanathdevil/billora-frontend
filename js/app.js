@@ -307,3 +307,13 @@ function goToCart() {
 if (currentPage === "scanner.html") {
     startScanner();
 }
+
+function goToScanner() {
+    window.location.href = "scanner.html";
+}
+
+function clearCart() {
+    localStorage.removeItem("cart");
+    alert("Cart cleared");
+    window.location.reload();
+}
