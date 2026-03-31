@@ -83,13 +83,24 @@ function showBill(bill) {
 
         ${
             bill.status === "PENDING"
-                ? `<button onclick="markPaid(${bill.id})">💰 Mark as Paid</button>`
+                ? `
+                <button onclick="payOnline(${bill.id})">📱 UPI Payment</button>
+                <button onclick="payCash(${bill.id})">💵 Cash Payment</button>
+                `
                 : `<p style="color:green;">✔ Already Paid</p>`
         }
 
         <br><br>
         <button onclick="restartScanner()">🔁 Scan Another</button>
     `;
+}
+
+async function payOnline(id) {
+    await markPaid(id);
+}
+
+async function payCash(id) {
+    await markPaid(id);
 }
 
 // 💰 MARK PAID

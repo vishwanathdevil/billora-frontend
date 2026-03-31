@@ -230,6 +230,34 @@ function disableCartActions() {
     });
 }
 
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
+const totalEl = document.getElementById("payTotal");
+
+function checkStatus() {
+
+    fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${id}`)
+        .then(res => res.json())
+        .then(bill => {
+
+            totalEl.innerText = bill.total;
+
+            if (bill.status === "PAID") {
+                alert("Payment Successful ✅");
+
+                localStorage.removeItem("cart");
+                localStorage.removeItem("qrGenerated");
+
+                window.location.href = "home.html";
+            }
+        });
+}
+
+// 🔁 CHECK EVERY 3 SECONDS
+setInterval(checkStatus, 3000);
+checkStatus();
+
 // 🧾 LOAD BILLS
 function loadBills() {
 
