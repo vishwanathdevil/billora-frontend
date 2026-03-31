@@ -317,3 +317,8 @@ function clearCart() {
     alert("Cart cleared");
     window.location.reload();
 }
+
+// 🛒 AUTO LOAD CART PAGE
+if (currentPage === "cart.html") {
+    loadCart();
+}
