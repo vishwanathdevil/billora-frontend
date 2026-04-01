@@ -278,15 +278,25 @@ if (currentPage === "payment.html") {
 
 
     // ✅ CUSTOMER CLICK PAY
-    function payNow() {
-        fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${currentBillId}/pay/UPI`, {
-            method: "PUT"
-        }).then(() => {
-            alert("Payment Successful ✅");
-            finishPayment();
-        });
-    }
+    // function payNow() {
+    //     fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${currentBillId}/pay/UPI`, {
+    //         method: "PUT"
+    //     }).then(() => {
+    //         alert("Payment Successful ✅");
+    //         finishPayment();
+    //     });
+    // }
+function payNow() {
 
+    const upiId = "test@upi"; // 🔥 replace with store UPI ID
+    const name = "Billora Store";
+    const amount = total;
+
+    const upiUrl = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR`;
+
+    // 🚀 open UPI apps
+    window.location.href = upiUrl;
+}
 
     function finishPayment() {
         localStorage.removeItem("cart");
@@ -390,4 +400,16 @@ function loadBills() {
                 `;
             });
         });
+}
+
+
+//
+function confirmPayment() {
+
+    fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${currentBillId}/pay/UPI`, {
+        method: "PUT"
+    }).then(() => {
+        alert("Payment Successful ✅");
+        finishPayment();
+    });
 }
