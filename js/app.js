@@ -1,4 +1,5 @@
 console.log("APP JS LOADED");
+
 let selectedStoreId = localStorage.getItem("storeId") || 1;
 
 /* ================================
@@ -63,6 +64,10 @@ function login() {
     .then(res => res.json())
     .then(user => {
         localStorage.setItem("user", JSON.stringify(user));
+
+        // 🔥 IMPORTANT: store mapping
+        localStorage.setItem("storeId", user.storeId);
+
         window.location.href = user.role === "CASHIER" ? "cashier.html" : "home.html";
     })
     .catch(() => alert("Login failed"));
@@ -82,20 +87,31 @@ function goToStore() { window.location.href = "store.html"; }
 function goToScanner() { window.location.href = "scanner.html"; }
 function goToCart() { window.location.href = "cart.html"; }
 function goToPayment() { window.location.href = "payment.html"; }
-function goToBills() {
-    window.location.href = "bills.html";
-}
+function goToBills() { window.location.href = "bills.html"; }
 
 /* ================================
-   🏬 STORE
+   🏬 STORE (FROM BACKEND)
 ================================ */
 
-let selectedStore = "";
+function loadStores() {
 
-function startShopping() {
-    localStorage.setItem("storeName", selectedStore);
-    localStorage.setItem("cart", JSON.stringify([]));
-    window.location.href = "scanner.html";
+    fetch("https://billora-backend-9kyk.onrender.com/api/stores")
+        .then(res => res.json())
+        .then(stores => {
+
+            const container = document.getElementById("storeList");
+            if (!container) return;
+
+            container.innerHTML = "";
+
+            stores.forEach(store => {
+                container.innerHTML += `
+                    <button onclick="selectStore(${store.id})">
+                        ${store.name}
+                    </button>
+                `;
+            });
+        });
 }
 
 function selectStore(id) {
@@ -103,11 +119,15 @@ function selectStore(id) {
     window.location.href = "scanner.html";
 }
 
+// Auto load stores
+if (currentPage === "store.html") loadStores();
+
 /* ================================
    🛒 CART
 ================================ */
 
 function addToCart(code) {
+
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
     fetch(`https://billora-backend-9kyk.onrender.com/api/products/${code}?storeId=${selectedStoreId}`)
@@ -124,10 +144,12 @@ function addToCart(code) {
 
             localStorage.setItem("cart", JSON.stringify(cart));
             alert("Added to cart ✅");
-        });
+        })
+        .catch(() => alert("Product not found ❌"));
 }
 
 function loadCart() {
+
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
     const cartItems = document.getElementById("cartItems");
@@ -156,95 +178,84 @@ function loadCart() {
 
 function clearCart() {
     localStorage.removeItem("cart");
-    localStorage.removeItem("qrGenerated");
     alert("Cart cleared");
     window.location.reload();
 }
 
-// Auto load cart
 if (currentPage === "cart.html") loadCart();
 
 /* ================================
-   💳 PAYMENT PAGE (QR + STATUS)
+   💳 PAYMENT
 ================================ */
 
 if (currentPage === "payment.html") {
 
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
-const user = JSON.parse(localStorage.getItem("user"));
 
-const qrContainer = document.getElementById("qrContainer");
-const totalEl = document.getElementById("payTotal");
+    if (!cart.length) {
+        alert("Cart empty ❌");
+        window.location.href = "scanner.html";
+    }
 
-let currentBillId = null;
+    const qrContainer = document.getElementById("qrContainer");
+    const totalEl = document.getElementById("payTotal");
 
-// 🧾 TOTAL
-let total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
-totalEl.innerText = total;
+    let total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    totalEl.innerText = total;
 
-// 🔥 CREATE BILL
-fetch("https://billora-backend-9kyk.onrender.com/api/bills", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-        username: user.username,
-        items: cart.map(i => i.name),
-        total: total,
-        storeId: selectedStoreId
+    let currentBillId = null;
+
+    fetch("https://billora-backend-9kyk.onrender.com/api/bills", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            username: user.username,
+            items: cart.map(i => i.name),
+            total: total,
+            storeId: selectedStoreId
+        })
     })
-})
-.then(res => res.json())
-.then(bill => {
+    .then(res => res.json())
+    .then(bill => {
 
-    currentBillId = bill.id;
+        currentBillId = bill.id;
 
-    const qrUrl = `${window.location.origin}/payment.html?id=${bill.id}`;
+        const qrUrl = `${window.location.origin}/payment.html?id=${bill.id}`;
 
-    // ✅ FIX QR
-    QRCode.toCanvas(qrUrl, function (err, canvas) {
-        qrContainer.innerHTML = "";
-        qrContainer.appendChild(canvas);
+        QRCode.toCanvas(qrUrl, function (err, canvas) {
+            qrContainer.innerHTML = "";
+            qrContainer.appendChild(canvas);
+        });
+
+        setInterval(() => {
+
+            fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${currentBillId}`)
+                .then(res => res.json())
+                .then(bill => {
+
+                    if (bill.paymentMode === "CASH") {
+                        alert("Cash Payment Successful ✅");
+                        finishPayment();
+                    }
+
+                    if (bill.paymentMode === "UPI") {
+                        document.getElementById("payBtn").disabled = false;
+                    }
+
+                });
+
+        }, 3000);
     });
 
-    startStatusCheck();
-});
+    function payNow() {
+        alert("Payment Successful ✅");
+        finishPayment();
+    }
 
-// 🔁 STATUS CHECK
-function startStatusCheck() {
-
-    setInterval(() => {
-
-        fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${currentBillId}`)
-            .then(res => res.json())
-            .then(bill => {
-
-                // 💰 CASH → AUTO SUCCESS
-                if (bill.paymentMode === "CASH") {
-                    alert("Cash Payment Successful ✅");
-                    finishPayment();
-                }
-
-                // 📱 UPI → ENABLE BUTTON
-                if (bill.paymentMode === "UPI") {
-                    document.getElementById("payBtn").disabled = false;
-                }
-
-            });
-
-    }, 3000);
-}
-
-// 💳 CUSTOMER PAY BUTTON
-function payNow() {
-    alert("Payment Successful ✅");
-    finishPayment();
-}
-
-// 🧹 CLEANUP
-function finishPayment() {
-    localStorage.removeItem("cart");
-    window.location.href = "home.html";
-}
+    function finishPayment() {
+        localStorage.removeItem("cart");
+        window.location.href = "home.html";
+    }
 }
 
 /* ================================
@@ -280,7 +291,7 @@ function startScanner() {
 
                 Quagga.stop();
             })
-            .catch(() => alert("Product not found"));
+            .catch(() => alert("Product not found ❌"));
     });
 }
 
@@ -294,7 +305,6 @@ function restartScanner() {
     startScanner();
 }
 
-// Auto start scanner
 if (currentPage === "scanner.html") startScanner();
 
 /* ================================
@@ -308,6 +318,8 @@ function loadBills() {
         .then(data => {
 
             const container = document.getElementById("billsList");
+            if (!container) return;
+
             container.innerHTML = "";
 
             data.forEach(bill => {
