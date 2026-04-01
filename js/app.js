@@ -81,8 +81,7 @@ function goToStore() { window.location.href = "store.html"; }
 function goToScanner() { window.location.href = "scanner.html"; }
 function goToCart() { window.location.href = "cart.html"; }
 function goToPayment() { window.location.href = "payment.html"; }
-function goToBills() {
-    window.location.href = "bills.html";
+function goToBills() { window.location.href = "bills.html";
 }
 
 /* ================================
