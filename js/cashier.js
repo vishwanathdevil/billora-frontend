@@ -10,12 +10,19 @@ if (!cashierUser || cashierUser.role !== "CASHIER") {
 
 const container = document.getElementById("ordersContainer");
 
-let html5QrCode;
+let html5QrCode = null;
+let currentBillId = null;
 
 // 📷 START QR SCANNER
 function startCashierScanner() {
 
     container.innerHTML = "<h3>📷 Scan Customer QR</h3>";
+
+    // clean previous instance
+    if (html5QrCode) {
+        html5QrCode.stop().catch(() => {});
+        html5QrCode = null;
+    }
 
     html5QrCode = new Html5Qrcode("ordersContainer");
 
@@ -32,14 +39,16 @@ function startCashierScanner() {
 
             let billId;
 
-            // 🔥 HANDLE BOTH CASES
-            if (decodedText.includes("id=")) {
-                // QR contains URL
-                const url = new URL(decodedText);
-                billId = url.searchParams.get("id");
-            } else {
-                // QR contains only ID
-                billId = decodedText;
+            try {
+                if (decodedText.includes("id=")) {
+                    const url = new URL(decodedText);
+                    billId = url.searchParams.get("id");
+                } else {
+                    billId = decodedText;
+                }
+            } catch {
+                alert("Invalid QR ❌");
+                return;
             }
 
             if (!billId) {
@@ -47,13 +56,14 @@ function startCashierScanner() {
                 return;
             }
 
+            currentBillId = billId;
+
             try {
                 const res = await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${billId}`);
                 const bill = await res.json();
 
+                await html5QrCode.stop(); // stop before showing bill
                 showBill(bill);
-
-                html5QrCode.stop();
 
             } catch (err) {
                 console.error(err);
@@ -61,9 +71,7 @@ function startCashierScanner() {
             }
         },
 
-        (errorMessage) => {
-            // ignore scan errors
-        }
+        () => {} // ignore scan errors
     );
 }
 
@@ -72,13 +80,13 @@ function showBill(bill) {
 
     container.innerHTML = `
         <h2>🧾 Bill #${bill.id}</h2>
-        <p><b>User:</b> ${bill.username}</p>
+        <p><b>User:</b> ${bill.username || "Guest"}</p>
         <p><b>Total:</b> ₹${bill.total}</p>
         <p><b>Status:</b> ${bill.status}</p>
 
         <h3>Items:</h3>
         <ul>
-            ${bill.items.map(item => `<li>${item}</li>`).join("")}
+            ${bill.items?.map(item => `<li>${item}</li>`).join("") || "<li>No items</li>"}
         </ul>
 
         ${
@@ -95,50 +103,57 @@ function showBill(bill) {
     `;
 }
 
+// 📱 UPI PAYMENT (Approve only)
 async function payOnline(id) {
-    await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${id}/pay/UPI`, {
-        method: "PUT"
-    });
-    alert("UPI Approved ✅");
-}
-
-async function payCash(id) {
-    await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${id}/pay/CASH`, {
-        method: "PUT"
-    });
-    alert("Cash Payment Done ✅");
-    window.location.reload();
-}
-
-// 💰 MARK PAID
-async function markPaid(id) {
 
     try {
-        await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${id}/pay`, {
+        await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${id}/pay/UPI`, {
             method: "PUT"
         });
 
-        alert("Payment Done ✅");
+        alert("UPI Approved ✅");
 
-        restartScanner();
+        resetFlow();
 
     } catch (err) {
         console.error(err);
-        alert("Error updating payment ❌");
+        alert("UPI Payment Failed ❌");
     }
 }
 
-// 🔁 RESTART SCANNER
-function restartScanner() {
+// 💵 CASH PAYMENT
+async function payCash(id) {
 
-    if (html5QrCode) {
-        html5QrCode.stop().then(() => {
-            container.innerHTML = "";
-            startCashierScanner();
+    try {
+        await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${id}/pay/CASH`, {
+            method: "PUT"
         });
-    } else {
-        startCashierScanner();
+
+        alert("Cash Payment Done ✅");
+
+        resetFlow();
+
+    } catch (err) {
+        console.error(err);
+        alert("Cash Payment Failed ❌");
     }
+}
+
+// 🔁 RESET FLOW (BEST PRACTICE)
+function resetFlow() {
+
+    currentBillId = null;
+
+    container.innerHTML = "<h3>🔄 Ready for next customer...</h3>";
+
+    setTimeout(() => {
+        startCashierScanner();
+    }, 1000);
+}
+
+// 🔁 RESTART MANUAL
+function restartScanner() {
+    resetFlow();
 }
 
 // 🚪 LOGOUT
