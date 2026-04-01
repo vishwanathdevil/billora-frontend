@@ -1,4 +1,5 @@
 console.log("APP JS LOADED");
+let selectedStoreId = localStorage.getItem("storeId") || 1;
 
 /* ================================
    🔐 AUTH + SESSION
@@ -91,14 +92,14 @@ function goToBills() {
 
 let selectedStore = "";
 
-function selectStore(store) {
-    selectedStore = store;
-    document.getElementById("trolleySection").style.display = "block";
-}
-
 function startShopping() {
     localStorage.setItem("storeName", selectedStore);
     localStorage.setItem("cart", JSON.stringify([]));
+    window.location.href = "scanner.html";
+}
+
+function selectStore(id) {
+    localStorage.setItem("storeId", id);
     window.location.href = "scanner.html";
 }
 
@@ -109,7 +110,7 @@ function startShopping() {
 function addToCart(code) {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-    fetch(`https://billora-backend-9kyk.onrender.com/api/products/${code}`)
+    fetch(`https://billora-backend-9kyk.onrender.com/api/products/${code}?storeId=${selectedStoreId}`)
         .then(res => res.json())
         .then(product => {
 
@@ -188,7 +189,8 @@ fetch("https://billora-backend-9kyk.onrender.com/api/bills", {
     body: JSON.stringify({
         username: user.username,
         items: cart.map(i => i.name),
-        total: total
+        total: total,
+        storeId: selectedStoreId
     })
 })
 .then(res => res.json())
@@ -269,7 +271,7 @@ function startScanner() {
 
         scannedCode = res.codeResult.code;
 
-        fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}`)
+        fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${selectedStoreId}`)
             .then(res => res.json())
             .then(product => {
 

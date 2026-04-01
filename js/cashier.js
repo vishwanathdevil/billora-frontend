@@ -111,14 +111,42 @@ async function payOnline(id) {
             method: "PUT"
         });
 
-        alert("UPI Approved ✅");
+        alert("Waiting for customer payment ⏳");
 
-        resetFlow();
+        // ❌ DO NOT RESET HERE
+        // resetFlow();  ← REMOVE THIS
+
+        startPaymentListener(id); // ✅ start waiting
 
     } catch (err) {
         console.error(err);
-        alert("UPI Payment Failed ❌");
+        alert("UPI Error ❌");
     }
+}
+
+// payment listener (polling)
+function startPaymentListener(id) {
+
+    const interval = setInterval(async () => {
+
+        try {
+            const res = await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${id}`);
+            const bill = await res.json();
+
+            if (bill.status === "PAID") {
+
+                clearInterval(interval);
+
+                alert("Payment Successful ✅");
+
+                resetFlow(); // ✅ NOW reset scanner
+            }
+
+        } catch (err) {
+            console.error("Polling error:", err);
+        }
+
+    }, 2000); // every 2 sec
 }
 
 // 💵 CASH PAYMENT
