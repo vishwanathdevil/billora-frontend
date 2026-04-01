@@ -293,6 +293,8 @@ Quagga.onDetected(res => {
     fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${selectedStoreId}`)
         .then(res => {
 
+            console.log("SCANNED CODE:", scannedCode);
+            console.log("STORE ID:", selectedStoreId);
             if (!res.ok) {
                 throw new Error("Product not found");
             }
