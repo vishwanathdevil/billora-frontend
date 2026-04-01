@@ -281,21 +281,40 @@ function startScanner() {
         Quagga.start();
     });
 
-    Quagga.onDetected(res => {
+    let isProcessing = false; // 🔥 ADD THIS GLOBAL
 
-        scannedCode = res.codeResult.code;
+Quagga.onDetected(res => {
 
-        fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${selectedStoreId}`)
-            .then(res => res.json())
-            .then(product => {
+    if (isProcessing) return; // 🚫 prevent multiple calls
+    isProcessing = true;
 
-                document.getElementById("productName").innerText = product.name;
-                document.getElementById("productPrice").innerText = product.price;
+    scannedCode = res.codeResult.code;
 
-                Quagga.stop();
-            })
-            .catch(() => alert("Product not found ❌"));
-    });
+    fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${selectedStoreId}`)
+        .then(res => {
+
+            if (!res.ok) {
+                throw new Error("Product not found");
+            }
+
+            return res.json();
+        })
+        .then(product => {
+
+            document.getElementById("productName").innerText = product.name;
+            document.getElementById("productPrice").innerText = product.price;
+
+            Quagga.stop(); // ✅ stop scanner
+        })
+        .catch(() => {
+            alert("Product not found ❌");
+
+            // 🔥 allow scanning again AFTER alert
+            setTimeout(() => {
+                isProcessing = false;
+            }, 1500);
+        });
+});
 }
 
 function addScannedToCart() {
@@ -305,6 +324,7 @@ function addScannedToCart() {
 
 function restartScanner() {
     scannedCode = null;
+    isProcessing = false; // reset processing flag
     startScanner();
 }
 
