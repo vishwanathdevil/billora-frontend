@@ -96,11 +96,18 @@ function showBill(bill) {
 }
 
 async function payOnline(id) {
-    await markPaid(id);
+    await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${id}/pay/UPI`, {
+        method: "PUT"
+    });
+    alert("UPI Approved ✅");
 }
 
 async function payCash(id) {
-    await markPaid(id);
+    await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${id}/pay/CASH`, {
+        method: "PUT"
+    });
+    alert("Cash Payment Done ✅");
+    window.location.reload();
 }
 
 // 💰 MARK PAID

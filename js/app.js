@@ -167,51 +167,79 @@ if (currentPage === "cart.html") loadCart();
 if (currentPage === "payment.html") {
 
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const qrContainer = document.getElementById("qrContainer");
-    const totalEl = document.getElementById("payTotal");
+const user = JSON.parse(localStorage.getItem("user"));
 
-    if (cart.length === 0) {
-        alert("Cart empty");
-        window.location.href = "home.html";
-    }
+const qrContainer = document.getElementById("qrContainer");
+const totalEl = document.getElementById("payTotal");
 
-    const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
-    totalEl.innerText = total;
+let currentBillId = null;
 
-    fetch("https://billora-backend-9kyk.onrender.com/api/bills", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            username: user.username,
-            items: cart.map(i => i.name),
-            total: total
-        })
+// 🧾 TOTAL
+let total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
+totalEl.innerText = total;
+
+// 🔥 CREATE BILL
+fetch("https://billora-backend-9kyk.onrender.com/api/bills", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+        username: user.username,
+        items: cart.map(i => i.name),
+        total: total
     })
-    .then(res => res.json())
-    .then(bill => {
+})
+.then(res => res.json())
+.then(bill => {
 
-        const qrUrl = `${window.location.origin}/payment.html?id=${bill.id}`;
+    currentBillId = bill.id;
 
-        QRCode.toCanvas(qrUrl, canvas => {
-            qrContainer.innerHTML = "";
-            qrContainer.appendChild(canvas);
-        });
+    const qrUrl = `${window.location.origin}/payment.html?id=${bill.id}`;
 
-        // 🔁 Check payment status
-        setInterval(() => {
-            fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${bill.id}`)
-                .then(res => res.json())
-                .then(updated => {
-
-                    if (updated.status === "PAID") {
-                        alert("Payment Successful ✅");
-
-                        localStorage.removeItem("cart");
-                        window.location.href = "home.html";
-                    }
-                });
-        }, 3000);
+    // ✅ FIX QR
+    QRCode.toCanvas(qrUrl, function (err, canvas) {
+        qrContainer.innerHTML = "";
+        qrContainer.appendChild(canvas);
     });
+
+    startStatusCheck();
+});
+
+// 🔁 STATUS CHECK
+function startStatusCheck() {
+
+    setInterval(() => {
+
+        fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${currentBillId}`)
+            .then(res => res.json())
+            .then(bill => {
+
+                // 💰 CASH → AUTO SUCCESS
+                if (bill.paymentMode === "CASH") {
+                    alert("Cash Payment Successful ✅");
+                    finishPayment();
+                }
+
+                // 📱 UPI → ENABLE BUTTON
+                if (bill.paymentMode === "UPI") {
+                    document.getElementById("payBtn").disabled = false;
+                }
+
+            });
+
+    }, 3000);
+}
+
+// 💳 CUSTOMER PAY BUTTON
+function payNow() {
+    alert("Payment Successful ✅");
+    finishPayment();
+}
+
+// 🧹 CLEANUP
+function finishPayment() {
+    localStorage.removeItem("cart");
+    window.location.href = "home.html";
+}
 }
 
 /* ================================
