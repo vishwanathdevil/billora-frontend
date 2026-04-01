@@ -1,5 +1,3 @@
-const storeId = cashierUser.storeId;
-
 // 🔐 CASHIER PROTECTION
 const cashierUser = JSON.parse(localStorage.getItem("user"));
 
@@ -8,6 +6,7 @@ if (!cashierUser || cashierUser.role !== "CASHIER") {
     window.location.href = "index.html";
 }
 
+const storeId = cashierUser.storeId;
 // ------------------------------
 
 const container = document.getElementById("ordersContainer");
