@@ -21,49 +21,73 @@
     </div>
     <p><b>Status:</b> <span id="status"></span></p>
 
-<button id="payBtn" onclick="payBill()">Pay Now</button>
+<button onclick="window.location.href='home.html'">⬅ Back</button>
 </div>
 
 <script>
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
+const user = JSON.parse(localStorage.getItem("user"));
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
 
-    function loadBill() {
-        fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${id}`)
-            .then(res => res.json())
-            .then(data => {
+const itemsList = document.getElementById("items");
+const usernameEl = document.getElementById("username");
+const totalEl = document.getElementById("total");
 
-                document.getElementById("username").innerText = data.username;
-                document.getElementById("total").innerText = data.total;
-                document.getElementById("status").innerText = data.status;
+// 🔥 CASE 1: VIEW SINGLE BILL
+if (id) {
 
-                const itemsList = document.getElementById("items");
-                itemsList.innerHTML = "";
+    fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${id}`)
+        .then(res => res.json())
+        .then(data => {
 
-                data.items.forEach(item => {
-                    const li = document.createElement("li");
-                    li.innerText = item;
-                    itemsList.appendChild(li);
-                });
+            usernameEl.innerText = data.username;
+            totalEl.innerText = data.total;
 
-                // Hide button if already paid
-                if (data.status === "PAID") {
-                    document.getElementById("payBtn").style.display = "none";
-                }
+            itemsList.innerHTML = "";
+
+            data.items.forEach(item => {
+                const li = document.createElement("li");
+                li.innerText = item;
+                itemsList.appendChild(li);
             });
-    }
 
-    function payBill() {
-        fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${id}/pay`, {
-            method: "PUT"
         })
-        .then(() => {
-            alert("Payment Successful ✅");
-            loadBill(); // refresh
-        });
-    }
+        .catch(() => alert("Bill not found"));
 
-    loadBill();
+}
+
+// 🔥 CASE 2: SHOW ALL USER BILLS
+else {
+
+    fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${user.username}`)
+        .then(res => res.json())
+        .then(data => {
+
+            usernameEl.innerText = user.username;
+            itemsList.innerHTML = "";
+
+            let total = 0;
+
+            data.forEach(bill => {
+
+                total += bill.total;
+
+                const li = document.createElement("li");
+                li.innerText = `Bill #${bill.id} - ₹${bill.total}`;
+                li.style.cursor = "pointer";
+
+                // 👉 click to open bill
+                li.onclick = () => {
+                    window.location.href = `bills.html?id=${bill.id}`;
+                };
+
+                itemsList.appendChild(li);
+            });
+
+            totalEl.innerText = total;
+
+        });
+}
 </script>
 
 </body>
