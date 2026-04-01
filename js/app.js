@@ -63,14 +63,17 @@ function login() {
     })
     .then(res => res.json())
     .then(user => {
-        localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("storeId", user.storeId);
 
-        // 🔥 IMPORTANT: store mapping
-        localStorage.setItem("storeId", user.storeId);
-
-        window.location.href = user.role === "CASHIER" ? "cashier.html" : "home.html";
-    })
-    .catch(() => alert("Login failed"));
+    if (user.role === "ADMIN") {
+        window.location.href = "admin.html";
+    } else if (user.role === "CASHIER") {
+        window.location.href = "cashier.html";
+    } else {
+        window.location.href = "home.html";
+    }
+});
 }
 
 function logout() {

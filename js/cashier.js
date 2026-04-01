@@ -1,3 +1,5 @@
+const storeId = cashierUser.storeId;
+
 // 🔐 CASHIER PROTECTION
 const cashierUser = JSON.parse(localStorage.getItem("user"));
 
@@ -62,6 +64,11 @@ function startCashierScanner() {
                 const res = await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${billId}`);
                 const bill = await res.json();
 
+                //STORE VALIDATION
+                if (bill.storeId !== storeId) {
+                    alert("This bill does not belong to your store ❌");
+                    return;
+                }
                 await html5QrCode.stop(); // stop before showing bill
                 showBill(bill);
 

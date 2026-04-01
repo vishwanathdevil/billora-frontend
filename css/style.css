@@ -29,8 +29,9 @@ button {
 CAMERA
 #scanner {
     position: relative;
-    width: 100%;
-    max-width: 350px;
+    width: 100px;
+    height: 100px;
+    /* max-width: 350px; */
     margin: auto;
     z-index: 1;
 }

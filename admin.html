@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel</title>
+    <style>
+body { font-family: Arial; padding: 20px; }
+input { padding: 10px; margin: 5px; width: 200px; }
+button { padding: 10px; margin: 5px; cursor: pointer; }
+div { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
+</style>
+</head>
+<body>
+
+<h2>🏪 Admin Panel</h2>
+
+<button onclick="logout()">Logout</button>
+
+<hr>
+
+<h3>Add Product</h3>
+
+<input type="text" id="name" placeholder="Product Name"><br><br>
+<input type="text" id="code" placeholder="Barcode"><br><br>
+<input type="number" id="price" placeholder="Price"><br><br>
+
+<button onclick="addProduct()">Add Product</button>
+
+<hr>
+
+<h3>Products</h3>
+<div id="productList"></div>
+
+<script src="js/admin.js"></script>
+
+</body>
+</html>
