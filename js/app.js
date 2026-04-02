@@ -1,4 +1,5 @@
 console.log("APP JS LOADED");
+console.log("JS FILE LOADED");
 
 let selectedStoreId = localStorage.getItem("storeId") || 1;
 
@@ -405,6 +406,7 @@ function payNow() {
 /* ================================
    🔍 SCANNER (FIXED ONLY THIS)
 ================================ */
+console.log("startScanner called");
 
 let scannedCode = null;
 let isScannerRunning = false;
