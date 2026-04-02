@@ -329,27 +329,105 @@ function payNow() {
     });
 }
 
+
+// let scannedCode = null;
+// let isScannerRunning = false;
+
+// function startScanner() {
+
+//     // 🔥 RESET BEFORE START (IMPORTANT)
+//     if (isScannerRunning) {
+//         Quagga.stop();
+//         Quagga.offDetected();
+//     }
+
+//     Quagga.init({
+//         inputStream: {
+//             type: "LiveStream",
+//             target: document.getElementById("scanner"),
+//             constraints: {
+//                 facingMode: "environment"
+//             }
+//         },
+//         decoder: {
+//             readers: ["code_128_reader", "ean_reader"]
+//         }
+//     }, err => {
+//         if (err) {
+//             console.error(err);
+//             return;
+//         }
+
+//         Quagga.start();
+//         isScannerRunning = true;
+//     });
+
+//     let isProcessing = false;
+
+//     Quagga.offDetected(); // 🔥 prevent duplicate listeners
+
+//     Quagga.onDetected(res => {
+
+//         if (isProcessing) return;
+//         isProcessing = true;
+
+//         scannedCode = res.codeResult.code;
+
+//         fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${selectedStoreId}`)
+//             .then(res => {
+
+//                 console.log("SCANNED CODE:", scannedCode);
+//                 console.log("STORE ID:", selectedStoreId);
+
+//                 if (!res.ok) throw new Error();
+
+//                 return res.json();
+//             })
+//             .then(product => {
+
+//                 document.getElementById("productName").innerText = product.name;
+//                 document.getElementById("productPrice").innerText = product.price;
+
+//                 Quagga.stop();
+//                 isScannerRunning = false;
+//             })
+//             .catch(() => {
+//                 alert("Product not found ❌");
+
+//                 setTimeout(() => {
+//                     isProcessing = false;
+//                 }, 1500);
+//             });
+//     });
+// }
+
+
 /* ================================
-   🔍 SCANNER
+   🔍 SCANNER (FIXED ONLY THIS)
 ================================ */
 
 let scannedCode = null;
 let isScannerRunning = false;
+let isProcessing = false; // ✅ moved global
 
 function startScanner() {
 
-    // 🔥 RESET BEFORE START (IMPORTANT)
+    const scannerDiv = document.getElementById("scanner");
+    if (!scannerDiv) return;
+
+    // 🔥 reset previous instance
     if (isScannerRunning) {
         Quagga.stop();
         Quagga.offDetected();
+        isScannerRunning = false;
     }
 
     Quagga.init({
         inputStream: {
             type: "LiveStream",
-            target: document.getElementById("scanner"),
+            target: scannerDiv,
             constraints: {
-                facingMode: "environment"
+                facingMode: { ideal: "environment" } // ✅ fix camera
             }
         },
         decoder: {
@@ -357,17 +435,16 @@ function startScanner() {
         }
     }, err => {
         if (err) {
-            console.error(err);
+            console.error("Quagga error:", err);
             return;
         }
 
+        console.log("Camera started ✅");
         Quagga.start();
         isScannerRunning = true;
     });
 
-    let isProcessing = false;
-
-    Quagga.offDetected(); // 🔥 prevent duplicate listeners
+    Quagga.offDetected(); // prevent duplicate
 
     Quagga.onDetected(res => {
 
@@ -403,6 +480,24 @@ function startScanner() {
             });
     });
 }
+
+function addScannedToCart() {
+    if (!scannedCode) return alert("Scan first");
+    addToCart(scannedCode);
+}
+
+function restartScanner() {
+    scannedCode = null;
+    isProcessing = false;
+    startScanner();
+}
+
+// ✅ FIXED AUTO START (IMPORTANT)
+if (window.location.href.includes("scanner.html")) {
+    startScanner();
+}
+
+
 
 function addScannedToCart() {
     if (!scannedCode) return alert("Scan first");
