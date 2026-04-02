@@ -42,6 +42,9 @@ function startScanner() {
 
                     document.getElementById("productName").innerText = product.name;
                     document.getElementById("productPrice").innerText = product.price;
+                    quantity = 1;
+                    document.getElementById("quantity").innerText = quantity;
+                    updateSubtotal();
                 })
                 .catch(() => {
                     alert("Product not found ❌");
@@ -57,12 +60,14 @@ function startScanner() {
 window.increaseQty = function () {
     quantity++;
     document.getElementById("quantity").innerText = quantity;
+    updateSubtotal();
 };
 
 window.decreaseQty = function () {
     if (quantity > 1) {
         quantity--;
         document.getElementById("quantity").innerText = quantity;
+        updateSubtotal();
     }
 };
 
@@ -111,6 +116,7 @@ window.restartScanner = function () {
     quantity = 1;
 
     document.getElementById("quantity").innerText = quantity;
+    document.getElementById("subtotal").innerText = "0";
     document.getElementById("productName").innerText = "Scan a product";
     document.getElementById("productPrice").innerText = "0";
 
@@ -151,6 +157,13 @@ function loadCart() {
     });
 
     cartTotal.innerText = total;
+}
+
+function updateSubtotal() {
+    const price = parseFloat(document.getElementById("productPrice").innerText) || 0;
+    const subtotal = price * quantity;
+
+    document.getElementById("subtotal").innerText = subtotal;
 }
 
 
