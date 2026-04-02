@@ -1,4 +1,4 @@
-let selectedStoreId = 1;
+window.selectedStoreId = 1;
 
 console.log("ZXING Scanner code loaded");
 
@@ -13,6 +13,8 @@ function startScanner() {
     if (!scannerDiv) return;
 
     isScanning = true;
+
+    codeReader.reset(); // reset any previous state
 
     codeReader.decodeFromVideoDevice(null, "scanner", (result, err) => {
 
