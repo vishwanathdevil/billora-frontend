@@ -3,8 +3,8 @@
 <head>
   <title>Billora Scanner</title>
 
-  <!-- Scanner Library -->
-  <script src="https://unpkg.com/html5-qrcode"></script>
+  <!-- Quagga -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
 
   <style>
     body {
@@ -12,15 +12,29 @@
       text-align: center;
     }
 
-    #reader {
+    #scanner {
       width: 320px;
+      height: 240px;
       margin: auto;
+      border: 2px solid black;
     }
 
-    #result {
+    .controls {
       margin-top: 15px;
-      font-size: 18px;
-      font-weight: bold;
+    }
+
+    button {
+      padding: 10px;
+      margin: 5px;
+      cursor: pointer;
+    }
+
+    .product-box {
+      margin-top: 20px;
+    }
+
+    .qty-box {
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -29,58 +43,26 @@
 
 <h2>Scan Product</h2>
 
-<div id="reader"></div>
-<p id="result"></p>
+<div id="scanner"></div>
 
-<script>
-  function onScanSuccess(decodedText) {
+<div class="product-box">
+  <p><b>Name:</b> <span id="productName">-</span></p>
+  <p><b>Price:</b> ₹<span id="productPrice">-</span></p>
+</div>
 
-    // Stop scanner after one scan (important fix)
-    html5QrcodeScanner.clear();
+<div class="qty-box">
+  <button onclick="decreaseQty()">-</button>
+  <span id="quantity">1</span>
+  <button onclick="increaseQty()">+</button>
+</div>
 
-    // Show scanned barcode
-    document.getElementById("result").innerText = "Scanned: " + decodedText;
+<div class="controls">
+  <button onclick="addScannedToCart()">Add to Cart</button>
+  <button onclick="restartScanner()">Scan Again</button>
+  <button onclick="goToCart()">Go to Cart</button>
+</div>
 
-    // CALL YOUR BACKEND (THIS MATCHES YOUR PROJECT)
-    fetch("http://localhost:8080/products/" + decodedText)
-      .then(res => res.json())
-      .then(data => {
-
-        // DIRECTLY ADD TO CART (your flow)
-        let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-        cart.push({
-          id: data.id,
-          name: data.name,
-          price: data.price,
-          quantity: 1
-        });
-
-        localStorage.setItem("cart", JSON.stringify(cart));
-
-        alert(data.name + " added to cart");
-
-        // Redirect to cart page (your flow)
-        window.location.href = "cart.html";
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Product not found");
-      });
-  }
-
-  function onScanFailure(error) {
-    // ignore continuous scan errors
-  }
-
-  let html5QrcodeScanner = new Html5QrcodeScanner(
-    "reader",
-    { fps: 10, qrbox: 250 },
-    false
-  );
-
-  html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-</script>
+<script src="scanner.js"></script>
 
 </body>
 </html>
