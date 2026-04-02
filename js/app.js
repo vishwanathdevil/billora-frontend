@@ -171,20 +171,59 @@ function loadCart() {
 
     let total = 0;
 
-    cart.forEach(item => {
-        total += item.price * item.quantity;
+    cart.forEach((item, index) => {
+
+        const price = Number(item.price);
+        const qty = Number(item.quantity);
+
+        const itemTotal = price * qty;
+        total += itemTotal;
 
         cartItems.innerHTML += `
             <div>
                 <h4>${item.name}</h4>
-                <p>₹ ${item.price}</p>
-                <p>Qty: ${item.quantity}</p>
+                <p>₹ ${price}</p>
+
+                <div>
+                    <button onclick="decreaseCartQty(${index})">-</button>
+                    <span>${qty}</span>
+                    <button onclick="increaseCartQty(${index})">+</button>
+                </div>
+
+                <p>Subtotal: ₹ ${itemTotal}</p>
             </div><hr>
         `;
     });
 
     cartTotal.innerText = total;
 }
+window.increaseCartQty = function (index) {
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    cart[index].quantity++;
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    loadCart(); // 🔥 refresh UI
+};
+
+window.decreaseCartQty = function (index) {
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    if (cart[index].quantity > 1) {
+        cart[index].quantity--;
+    } else {
+        // remove item if qty = 1
+        cart.splice(index, 1);
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    loadCart(); // 🔥 refresh UI
+};
+
 
 function clearCart() {
     localStorage.removeItem("cart");
