@@ -1,3 +1,4 @@
+// ✅ GLOBAL STORE ID
 window.selectedStoreId = 1;
 
 console.log("ZXING Scanner code loaded");
@@ -5,11 +6,16 @@ console.log("ZXING Scanner code loaded");
 let scannedCode = null;
 let isScanning = false;
 
+// ✅ ZXING READER
 const codeReader = new ZXing.BrowserMultiFormatReader();
 
+
+// =======================
+// 🚀 START SCANNER
+// =======================
 function startScanner() {
 
-    codeReader.reset(); // reset any previous state
+    codeReader.reset(); // stop previous camera
 
     const scannerDiv = document.getElementById("scanner");
     if (!scannerDiv) return;
@@ -23,11 +29,11 @@ function startScanner() {
             scannedCode = result.text;
             console.log("Scanned:", scannedCode);
 
-            // stop after successful scan
+            // stop scanning after success
             isScanning = false;
             codeReader.reset();
 
-            fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${selectedStoreId}`)
+            fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${window.selectedStoreId}`)
                 .then(res => {
                     if (!res.ok) throw new Error();
                     return res.json();
@@ -48,7 +54,52 @@ function startScanner() {
     });
 }
 
-// ✅ GLOBAL FUNCTIONS (buttons)
+window.increaseQty = function () {
+    quantity++;
+    document.getElementById("quantity").innerText = quantity;
+};
+
+window.decreaseQty = function () {
+    if (quantity > 1) {
+        quantity--;
+        document.getElementById("quantity").innerText = quantity;
+    }
+};
+
+// =======================
+// 🛒 ADD TO CART
+// =======================
+function addToCart(code) {
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    fetch(`https://billora-backend-9kyk.onrender.com/api/products/${code}?storeId=${window.selectedStoreId}`)
+        .then(res => {
+            if (!res.ok) throw new Error();
+            return res.json();
+        })
+        .then(product => {
+
+            const existing = cart.find(i => i.code === product.code);
+
+            if (existing) {
+                existing.quantity+= quantity;
+            } else {
+                cart.push({ ...product, quantity: quantity });
+            }
+
+            localStorage.setItem("cart", JSON.stringify(cart));
+            alert("Added to cart ✅");
+        })
+        .catch(() => {
+            alert("Product not found ❌");
+        });
+}
+
+
+// =======================
+// 🌐 GLOBAL BUTTON FUNCTIONS
+// =======================
 window.addScannedToCart = function () {
     if (!scannedCode) return alert("Scan first");
     addToCart(scannedCode);
@@ -57,7 +108,9 @@ window.addScannedToCart = function () {
 window.restartScanner = function () {
     scannedCode = null;
     isScanning = true;
+    quantity = 1;
 
+    document.getElementById("quantity").innerText = quantity;
     document.getElementById("productName").innerText = "Scan a product";
     document.getElementById("productPrice").innerText = "0";
 
@@ -69,40 +122,9 @@ window.goToCart = function () {
 };
 
 
-// ✅ AUTO START
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("DOM loaded, starting scanner");
-    startScanner();
-});
-
-function addToCart(code) {
-
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-    fetch(`https://billora-backend-9kyk.onrender.com/api/products/${code}?storeId=${selectedStoreId}`)
-        .then(res => {
-            if (!res.ok) throw new Error();
-            return res.json();
-        })
-        .then(product => {
-
-            const existing = cart.find(i => i.code === product.code);
-
-            if (existing) {
-                existing.quantity++;
-            } else {
-                cart.push({ ...product, quantity: 1 });
-            }
-
-            localStorage.setItem("cart", JSON.stringify(cart));
-            alert("Added to cart ✅");
-        })
-        .catch(() => {
-            console.log("Product not found once");
-            alert("Product not found ❌");
-        });
-}
-
+// =======================
+// 📦 LOAD CART
+// =======================
 function loadCart() {
 
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -131,10 +153,30 @@ function loadCart() {
     cartTotal.innerText = total;
 }
 
+
+// =======================
+// 🧹 CLEAR CART
+// =======================
 function clearCart() {
     localStorage.removeItem("cart");
     alert("Cart cleared");
     window.location.reload();
 }
 
-if (currentPage === "cart.html") loadCart();
+
+// =======================
+// 🚀 AUTO START
+// =======================
+document.addEventListener("DOMContentLoaded", function () {
+
+    console.log("DOM loaded, starting scanner");
+
+    startScanner();
+
+    // detect current page safely
+    const currentPage = window.location.pathname.split("/").pop();
+
+    if (currentPage === "cart.html") {
+        loadCart();
+    }
+});
