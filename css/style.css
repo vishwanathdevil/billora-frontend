@@ -29,6 +29,13 @@ button {
     object-fit: cover;
 }
 
+#scanner {
+    width: 320px;
+    height: 240px;
+    border: 2px solid black;
+    margin: 20px auto;
+}
+
 #scanner canvas {
     width: 100% !important;
     height: 100% !important;
