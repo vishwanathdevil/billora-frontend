@@ -1,74 +1,51 @@
-console.log("Scanner code loaded");
+console.log("ZXING Scanner code loaded");
 
 let scannedCode = null;
-let isScannerRunning = false;
-let isProcessing = false;
+let isScanning = false;
+
+const codeReader = new ZXing.BrowserMultiFormatReader();
 
 function startScanner() {
 
     const scannerDiv = document.getElementById("scanner");
     if (!scannerDiv) return;
 
-    if (isScannerRunning) {
-        Quagga.stop();
-        Quagga.offDetected();
-        isScannerRunning = false;
-    }
+    isScanning = true;
 
-    Quagga.init({
-        inputStream: {
-            type: "LiveStream",
-            target: scannerDiv,
-            constraints: {
-                facingMode: "environment"
-            }
-        },
-        decoder: {
-            readers: ["code_128_reader", "ean_reader"]
+    codeReader.decodeFromVideoDevice(null, "scanner", (result, err) => {
+
+        if (result && isScanning) {
+
+            scannedCode = result.text;
+            console.log("Scanned:", scannedCode);
+
+            // stop after successful scan
+            isScanning = false;
+            codeReader.reset();
+
+            fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${selectedStoreId}`)
+                .then(res => {
+                    if (!res.ok) throw new Error();
+                    return res.json();
+                })
+                .then(product => {
+
+                    document.getElementById("productName").innerText = product.name;
+                    document.getElementById("productPrice").innerText = product.price;
+                })
+                .catch(() => {
+                    alert("Product not found ❌");
+                });
         }
-    }, function (err) {
 
-        if (err) {
-            console.error("Quagga error:", err);
-            return;
+        if (err && !(err instanceof ZXing.NotFoundException)) {
+            console.error(err);
         }
-
-        console.log("Camera started ✅");
-        Quagga.start();
-        isScannerRunning = true;
-    });
-
-    Quagga.offDetected();
-
-    Quagga.onDetected(function (res) {
-
-        if (isProcessing) return;
-        isProcessing = true;
-
-        scannedCode = res.codeResult.code;
-
-        fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${selectedStoreId}`)
-            .then(res => {
-                if (!res.ok) throw new Error();
-                return res.json();
-            })
-            .then(product => {
-
-                document.getElementById("productName").innerText = product.name;
-                document.getElementById("productPrice").innerText = product.price;
-
-                Quagga.stop();
-                isScannerRunning = false;
-            })
-            .catch(() => {
-                alert("Product not found ❌");
-                isProcessing = false;
-            });
     });
 }
 
 
-// ✅ MAKE FUNCTIONS GLOBAL (VERY IMPORTANT)
+// ✅ GLOBAL FUNCTIONS (buttons)
 window.addScannedToCart = function () {
     if (!scannedCode) return alert("Scan first");
     addToCart(scannedCode);
@@ -76,7 +53,11 @@ window.addScannedToCart = function () {
 
 window.restartScanner = function () {
     scannedCode = null;
-    isProcessing = false;
+    isScanning = true;
+
+    document.getElementById("productName").innerText = "Scan a product";
+    document.getElementById("productPrice").innerText = "0";
+
     startScanner();
 };
 
@@ -85,7 +66,7 @@ window.goToCart = function () {
 };
 
 
-// ✅ AUTO START CAMERA
+// ✅ AUTO START
 window.onload = function () {
     startScanner();
 };
