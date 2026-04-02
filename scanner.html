@@ -1,34 +1,86 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Scanner</title>
-    <link rel="stylesheet" href="css/style.css">
+  <title>Billora Scanner</title>
+
+  <!-- Scanner Library -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+    }
+
+    #reader {
+      width: 320px;
+      margin: auto;
+    }
+
+    #result {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
 </head>
+
 <body>
 
 <h2>Scan Product</h2>
 
-<div class="container">
+<div id="reader"></div>
+<p id="result"></p>
 
-    <!-- CAMERA -->
-    <div id="scanner" style="width: 300px; height: 300px;"></div>
+<script>
+  function onScanSuccess(decodedText) {
 
-    <!-- PRODUCT INFO -->
-    <h3 id="productName">Scan a product</h3>
-    <p>Price: ₹ <span id="productPrice">0</span></p>
+    // Stop scanner after one scan (important fix)
+    html5QrcodeScanner.clear();
 
-    <!-- BUTTONS (ALWAYS VISIBLE) -->
-    <div id="actionButtons">
-        <button onclick="addScannedToCart()">Add to Cart</button>
-        <button onclick="restartScanner()">Scan Again</button>
-        <button onclick="goToCart()">Go to Cart</button>
-    </div>
+    // Show scanned barcode
+    document.getElementById("result").innerText = "Scanned: " + decodedText;
 
-</div>
+    // CALL YOUR BACKEND (THIS MATCHES YOUR PROJECT)
+    fetch("http://localhost:8080/products/" + decodedText)
+      .then(res => res.json())
+      .then(data => {
 
-<!-- <script src="https://unpkg.com/quagga/dist/quagga.min.js"></script> -->
-<script src="https://unpkg.com/html5-qrcode"></script>
-<script src="js/app.js"></script>
+        // DIRECTLY ADD TO CART (your flow)
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+        cart.push({
+          id: data.id,
+          name: data.name,
+          price: data.price,
+          quantity: 1
+        });
+
+        localStorage.setItem("cart", JSON.stringify(cart));
+
+        alert(data.name + " added to cart");
+
+        // Redirect to cart page (your flow)
+        window.location.href = "cart.html";
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Product not found");
+      });
+  }
+
+  function onScanFailure(error) {
+    // ignore continuous scan errors
+  }
+
+  let html5QrcodeScanner = new Html5QrcodeScanner(
+    "reader",
+    { fps: 10, qrbox: 250 },
+    false
+  );
+
+  html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+</script>
 
 </body>
 </html>
