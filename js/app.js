@@ -276,6 +276,16 @@ if (currentPage === "payment.html") {
         }, 3000);
     });
 
+
+    // ✅ CUSTOMER CLICK PAY
+    // function payNow() {
+    //     fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${currentBillId}/pay/UPI`, {
+    //         method: "PUT"
+    //     }).then(() => {
+    //         alert("Payment Successful ✅");
+    //         finishPayment();
+    //     });
+    // }
 function payNow() {
 
     fetch("https://billora-backend-9kyk.onrender.com/api/payment/create-order", {
@@ -319,21 +329,93 @@ function payNow() {
     });
 }
 
+
+// let scannedCode = null;
+// let isScannerRunning = false;
+
+// function startScanner() {
+
+//     // 🔥 RESET BEFORE START (IMPORTANT)
+//     if (isScannerRunning) {
+//         Quagga.stop();
+//         Quagga.offDetected();
+//     }
+
+//     Quagga.init({
+//         inputStream: {
+//             type: "LiveStream",
+//             target: document.getElementById("scanner"),
+//             constraints: {
+//                 facingMode: "environment"
+//             }
+//         },
+//         decoder: {
+//             readers: ["code_128_reader", "ean_reader"]
+//         }
+//     }, err => {
+//         if (err) {
+//             console.error(err);
+//             return;
+//         }
+
+//         Quagga.start();
+//         isScannerRunning = true;
+//     });
+
+//     let isProcessing = false;
+
+//     Quagga.offDetected(); // 🔥 prevent duplicate listeners
+
+//     Quagga.onDetected(res => {
+
+//         if (isProcessing) return;
+//         isProcessing = true;
+
+//         scannedCode = res.codeResult.code;
+
+//         fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${selectedStoreId}`)
+//             .then(res => {
+
+//                 console.log("SCANNED CODE:", scannedCode);
+//                 console.log("STORE ID:", selectedStoreId);
+
+//                 if (!res.ok) throw new Error();
+
+//                 return res.json();
+//             })
+//             .then(product => {
+
+//                 document.getElementById("productName").innerText = product.name;
+//                 document.getElementById("productPrice").innerText = product.price;
+
+//                 Quagga.stop();
+//                 isScannerRunning = false;
+//             })
+//             .catch(() => {
+//                 alert("Product not found ❌");
+
+//                 setTimeout(() => {
+//                     isProcessing = false;
+//                 }, 1500);
+//             });
+//     });
+// }
+
+
 /* ================================
    🔍 SCANNER (FIXED ONLY THIS)
 ================================ */
 
 let scannedCode = null;
 let isScannerRunning = false;
-let isProcessing = false;
-let quantity = 1;
+let isProcessing = false; // ✅ moved global
 
 function startScanner() {
 
     const scannerDiv = document.getElementById("scanner");
     if (!scannerDiv) return;
 
-    // reset previous scanner
+    // 🔥 reset previous instance
     if (isScannerRunning) {
         Quagga.stop();
         Quagga.offDetected();
@@ -345,27 +427,26 @@ function startScanner() {
             type: "LiveStream",
             target: scannerDiv,
             constraints: {
-                facingMode: { ideal: "environment" }
+                facingMode: { ideal: "environment" } // ✅ fix camera
             }
         },
         decoder: {
             readers: ["code_128_reader", "ean_reader"]
         }
-    }, function (err) {
-
+    }, err => {
         if (err) {
             console.error("Quagga error:", err);
             return;
         }
 
+        console.log("Camera started ✅");
         Quagga.start();
         isScannerRunning = true;
     });
 
-    // prevent duplicate triggers
-    Quagga.offDetected();
+    Quagga.offDetected(); // prevent duplicate
 
-    Quagga.onDetected(function (res) {
+    Quagga.onDetected(res => {
 
         if (isProcessing) return;
         isProcessing = true;
@@ -373,92 +454,63 @@ function startScanner() {
         scannedCode = res.codeResult.code;
 
         fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${selectedStoreId}`)
-            .then(function (response) {
+            .then(res => {
 
                 console.log("SCANNED CODE:", scannedCode);
                 console.log("STORE ID:", selectedStoreId);
 
-                if (!response.ok) throw new Error();
+                if (!res.ok) throw new Error();
 
-                return response.json();
+                return res.json();
             })
-            .then(function (product) {
+            .then(product => {
 
-                // ✅ show product on UI
                 document.getElementById("productName").innerText = product.name;
                 document.getElementById("productPrice").innerText = product.price;
 
-                // ✅ reset quantity every new scan
-                quantity = 1;
-                document.getElementById("quantity").innerText = quantity;
-
-                // ✅ stop scanner after success
                 Quagga.stop();
                 isScannerRunning = false;
             })
-            .catch(function () {
-
+            .catch(() => {
                 alert("Product not found ❌");
 
-                setTimeout(function () {
+                setTimeout(() => {
                     isProcessing = false;
                 }, 1500);
             });
     });
 }
 
-
-// ✅ add to cart with quantity
 function addScannedToCart() {
-    if (!scannedCode) {
-        alert("Scan first");
-        return;
-    }
-
-    addToCart(scannedCode, quantity);
+    if (!scannedCode) return alert("Scan first");
+    addToCart(scannedCode);
 }
 
-
-// ✅ restart scanner
 function restartScanner() {
     scannedCode = null;
     isProcessing = false;
-
-    document.getElementById("productName").innerText = "-";
-    document.getElementById("productPrice").innerText = "-";
-
-    quantity = 1;
-    document.getElementById("quantity").innerText = quantity;
-
     startScanner();
 }
 
-
-// ✅ quantity increase
-function increaseQty() {
-    quantity++;
-    document.getElementById("quantity").innerText = quantity;
-}
-
-
-// ✅ quantity decrease
-function decreaseQty() {
-    if (quantity > 1) {
-        quantity--;
-        document.getElementById("quantity").innerText = quantity;
-    }
-}
-
-// ✅ go to cart
-function goToCart() {
-    window.location.href = "cart.html";
-}
-
-
-// ✅ auto start
+// ✅ FIXED AUTO START (IMPORTANT)
 if (window.location.href.includes("scanner.html")) {
     startScanner();
 }
+
+
+
+function addScannedToCart() {
+    if (!scannedCode) return alert("Scan first");
+    addToCart(scannedCode);
+}
+
+function restartScanner() {
+    scannedCode = null;
+    isProcessing = false; // reset processing flag
+    startScanner();
+}
+
+if (currentPage === "scanner.html") startScanner();
 
 /* ================================
    🧾 BILL HISTORY
