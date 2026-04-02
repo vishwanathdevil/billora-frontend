@@ -334,57 +334,74 @@ function payNow() {
 ================================ */
 
 let scannedCode = null;
+let isScannerRunning = false;
 
 function startScanner() {
+
+    // 🔥 RESET BEFORE START (IMPORTANT)
+    if (isScannerRunning) {
+        Quagga.stop();
+        Quagga.offDetected();
+    }
 
     Quagga.init({
         inputStream: {
             type: "LiveStream",
             target: document.getElementById("scanner"),
-            constraints: { facingMode: "environment" }
+            constraints: {
+                facingMode: "environment"
+            }
         },
-        decoder: { readers: ["code_128_reader", "ean_reader"] }
+        decoder: {
+            readers: ["code_128_reader", "ean_reader"]
+        }
     }, err => {
-        if (err) return console.error(err);
+        if (err) {
+            console.error(err);
+            return;
+        }
+
         Quagga.start();
+        isScannerRunning = true;
     });
 
-    let isProcessing = false; // 🔥 ADD THIS GLOBAL
+    let isProcessing = false;
 
-Quagga.onDetected(res => {
+    Quagga.offDetected(); // 🔥 prevent duplicate listeners
 
-    if (isProcessing) return; // 🚫 prevent multiple calls
-    isProcessing = true;
+    Quagga.onDetected(res => {
 
-    scannedCode = res.codeResult.code;
+        if (isProcessing) return;
+        isProcessing = true;
 
-    fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${selectedStoreId}`)
-        .then(res => {
+        scannedCode = res.codeResult.code;
 
-            console.log("SCANNED CODE:", scannedCode);
-            console.log("STORE ID:", selectedStoreId);
-            if (!res.ok) {
-                throw new Error("Product not found");
-            }
+        fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${selectedStoreId}`)
+            .then(res => {
 
-            return res.json();
-        })
-        .then(product => {
+                console.log("SCANNED CODE:", scannedCode);
+                console.log("STORE ID:", selectedStoreId);
 
-            document.getElementById("productName").innerText = product.name;
-            document.getElementById("productPrice").innerText = product.price;
+                if (!res.ok) throw new Error();
 
-            Quagga.stop(); // ✅ stop scanner
-        })
-        .catch(() => {
-            alert("Product not found ❌");
+                return res.json();
+            })
+            .then(product => {
 
-            // 🔥 allow scanning again AFTER alert
-            setTimeout(() => {
-                isProcessing = false;
-            }, 1500);
-        });
-});
+                document.getElementById("productName").innerText = product.name;
+                document.getElementById("productPrice").innerText = product.price;
+
+                Quagga.stop();
+                isScannerRunning = false;
+            })
+            .catch(() => {
+                alert("Product not found ❌");
+
+                setTimeout(() => {
+                    isProcessing = false;
+                }, 1500);
+            });
+    });
 }
 
 function addScannedToCart() {
