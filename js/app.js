@@ -481,36 +481,22 @@ function startScanner() {
     });
 }
 
-function addScannedToCart() {
+window.addScannedToCart = function() {
     if (!scannedCode) return alert("Scan first");
     addToCart(scannedCode);
-}
+};
 
-function restartScanner() {
+window.restartScanner = function() {
     scannedCode = null;
     isProcessing = false;
     startScanner();
 }
 
 // ✅ FIXED AUTO START (IMPORTANT)
-if (window.location.href.includes("scanner.html")) {
+window.addEventListener("load", function () {
     startScanner();
-}
-
-
-
-function addScannedToCart() {
-    if (!scannedCode) return alert("Scan first");
-    addToCart(scannedCode);
-}
-
-function restartScanner() {
-    scannedCode = null;
-    isProcessing = false; // reset processing flag
-    startScanner();
-}
-
-if (currentPage === "scanner.html") startScanner();
+});
+// if (currentPage === "scanner.html") startScanner();
 
 /* ================================
    🧾 BILL HISTORY
