@@ -67,6 +67,7 @@ window.goToCart = function () {
 
 
 // ✅ AUTO START
-window.onload = function () {
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("DOM loaded, starting scanner");
     startScanner();
-};
+});
