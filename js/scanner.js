@@ -1,3 +1,5 @@
+let selectedStoreId = 1;
+
 console.log("ZXING Scanner code loaded");
 
 let scannedCode = null;
