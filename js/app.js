@@ -406,18 +406,17 @@ function payNow() {
 /* ================================
    🔍 SCANNER (FIXED ONLY THIS)
 ================================ */
-console.log("startScanner called");
+// ===== SCANNER CODE START =====
 
 let scannedCode = null;
 let isScannerRunning = false;
-let isProcessing = false; // ✅ moved global
+let isProcessing = false;
 
 function startScanner() {
 
     const scannerDiv = document.getElementById("scanner");
     if (!scannerDiv) return;
 
-    // 🔥 reset previous instance
     if (isScannerRunning) {
         Quagga.stop();
         Quagga.offDetected();
@@ -429,13 +428,14 @@ function startScanner() {
             type: "LiveStream",
             target: scannerDiv,
             constraints: {
-                facingMode: { ideal: "environment" } // ✅ fix camera
+                facingMode: "environment"
             }
         },
         decoder: {
             readers: ["code_128_reader", "ean_reader"]
         }
-    }, err => {
+    }, function (err) {
+
         if (err) {
             console.error("Quagga error:", err);
             return;
@@ -446,9 +446,9 @@ function startScanner() {
         isScannerRunning = true;
     });
 
-    Quagga.offDetected(); // prevent duplicate
+    Quagga.offDetected();
 
-    Quagga.onDetected(res => {
+    Quagga.onDetected(function (res) {
 
         if (isProcessing) return;
         isProcessing = true;
@@ -457,12 +457,7 @@ function startScanner() {
 
         fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${selectedStoreId}`)
             .then(res => {
-
-                console.log("SCANNED CODE:", scannedCode);
-                console.log("STORE ID:", selectedStoreId);
-
                 if (!res.ok) throw new Error();
-
                 return res.json();
             })
             .then(product => {
@@ -475,29 +470,35 @@ function startScanner() {
             })
             .catch(() => {
                 alert("Product not found ❌");
-
-                setTimeout(() => {
-                    isProcessing = false;
-                }, 1500);
+                isProcessing = false;
             });
     });
 }
 
-window.addScannedToCart = function() {
+
+// ✅ MAKE FUNCTIONS GLOBAL (VERY IMPORTANT)
+window.addScannedToCart = function () {
     if (!scannedCode) return alert("Scan first");
     addToCart(scannedCode);
 };
 
-window.restartScanner = function() {
+window.restartScanner = function () {
     scannedCode = null;
     isProcessing = false;
     startScanner();
-}
+};
 
-// ✅ FIXED AUTO START (IMPORTANT)
-window.addEventListener("load", function () {
+window.goToCart = function () {
+    window.location.href = "cart.html";
+};
+
+
+// ✅ AUTO START CAMERA
+window.onload = function () {
     startScanner();
-});
+};
+
+// ===== SCANNER CODE END =====
 // if (currentPage === "scanner.html") startScanner();
 
 /* ================================
