@@ -316,16 +316,6 @@ if (currentPage === "payment.html") {
         }, 3000);
     });
 
-
-    // ✅ CUSTOMER CLICK PAY
-    // function payNow() {
-    //     fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${currentBillId}/pay/UPI`, {
-    //         method: "PUT"
-    //     }).then(() => {
-    //         alert("Payment Successful ✅");
-    //         finishPayment();
-    //     });
-    // }
 function payNow() {
 
     fetch("https://billora-backend-9kyk.onrender.com/api/payment/create-order", {
@@ -350,13 +340,45 @@ function payNow() {
 
             handler: function (response) {
 
-                // ✅ PAYMENT SUCCESS
-                fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${currentBillId}/pay/UPI`, {
-                    method: "PUT"
-                }).then(() => {
-                    alert("Payment Successful ✅");
-                    finishPayment();
+                // 🔥 STEP 1: VERIFY PAYMENT WITH BACKEND
+                fetch("https://billora-backend-9kyk.onrender.com/api/payment/verify", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_signature: response.razorpay_signature
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+
+                    if (data.status === "success") {
+
+                        // 🔥 STEP 2: UPDATE BILL ONLY AFTER VERIFIED PAYMENT
+                        fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${currentBillId}/pay/UPI`, {
+                            method: "PUT"
+                        })
+                        .then(() => {
+                            alert("Payment Successful ✅");
+                            finishPayment();
+                        });
+
+                    } else {
+                        alert("Payment verification failed ❌");
+                    }
+                })
+                .catch(() => {
+                    alert("Verification error ❌");
                 });
+            },
+
+            modal: {
+                ondismiss: function () {
+                    console.log("Payment popup closed");
+                }
             },
 
             theme: {
@@ -366,6 +388,9 @@ function payNow() {
 
         const rzp = new Razorpay(options);
         rzp.open();
+    })
+    .catch(() => {
+        alert("Order creation failed ❌");
     });
 }
 
