@@ -152,18 +152,30 @@ function showBill(bill) {
     `;
 }
 
+function showWaitingUI(id) {
+    container.innerHTML = `
+        <h2>🧾 Bill #${id}</h2>
+        <h3 style="color:orange;">Waiting for customer payment ⏳</h3>
+
+        <button onclick="cancelUPI()">❌ Cancel & Switch to Cash</button>
+    `;
+}
+function cancelUPI() {
+    alert("UPI Cancelled → Use Cash");
+
+    restartScanner();
+}
+
 // 📱 UPI PAYMENT (Approve only)
 async function payOnline(id) {
 
     try {
-        await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${id}/pay/UPI`, {
-            method: "PUT"
-        });
 
         alert("Waiting for customer payment ⏳");
 
         // ❌ DO NOT RESET HERE
         // resetFlow();  ← REMOVE THIS
+        showWaitingUI(id);
 
         startPaymentListener(id); // ✅ start waiting
 
@@ -188,14 +200,14 @@ function startPaymentListener(id) {
 
                 alert("Payment Successful ✅");
 
-                resetFlow(); // ✅ NOW reset scanner
+                resetFlow();
             }
 
         } catch (err) {
             console.error("Polling error:", err);
         }
 
-    }, 2000); // every 2 sec
+    }, 2000);
 }
 
 // 💵 CASH PAYMENT
