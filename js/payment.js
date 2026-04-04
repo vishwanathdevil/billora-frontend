@@ -5,6 +5,7 @@ let stompClient = null;
 // ===============================
 const urlParams = new URLSearchParams(window.location.search);
 let currentBillId = urlParams.get("id");
+const selectedStoreId = localStorage.getItem("selectedStoreId") || 1;
 
 // ===============================
 // 💳 PAYMENT PAGE LOGIC
