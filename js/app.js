@@ -240,12 +240,7 @@ if (currentPage === "cart.html") loadCart();
 if (currentPage === "payment.html") {
 
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const user = JSON.parse(localStorage.getItem("user")); // ✅ FIX
-
-    if (!cart.length) {
-        alert("Cart empty ❌");
-        window.location.href = "scanner.html";
-    }
+    const user = JSON.parse(localStorage.getItem("user"));
 
     const qrContainer = document.getElementById("qrContainer");
     const totalEl = document.getElementById("payTotal");
@@ -254,14 +249,13 @@ if (currentPage === "payment.html") {
     totalEl.innerText = total;
 
     let currentBillId = null;
-    let isFinished = false; // ✅ prevent multiple alerts
 
     // ✅ CREATE BILL
     fetch("https://billora-backend-9kyk.onrender.com/api/bills", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            username: user?.username || "Guest",   // ✅ FIX
+            username: user?.username || "Guest",
             items: cart.map(i => i.name),
             total: total,
             storeId: selectedStoreId
@@ -278,126 +272,78 @@ if (currentPage === "payment.html") {
             qrContainer.innerHTML = "";
             qrContainer.appendChild(canvas);
         });
+    });
 
-        // ✅ POLLING (SAFE)
-        const interval = setInterval(() => {
+    // ✅ WEBSOCKET (NO POLLING)
+    let stompClient = null;
 
-            if (isFinished) {
-                clearInterval(interval);
-                return;
-            }
+    function connectWebSocket() {
 
-            fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${currentBillId}`)
-                .then(res => res.json())
-                .then(bill => {
+        const socket = new SockJS("https://billora-backend-9kyk.onrender.com/ws");
+        stompClient = Stomp.over(socket);
 
-                    // 💵 CASH
-                    if (bill.paymentMode === "CASH") {
-                        isFinished = true;
-                        alert("Cash Payment Successful ✅");
-                        finishPayment();
-                    }
+        stompClient.connect({}, function () {
 
-                    // 📱 UPI APPROVED
-                    if (bill.paymentMode === "UPI") {
+            stompClient.subscribe("/topic/bills", function (message) {
+
+                const bill = JSON.parse(message.body);
+
+                if (bill.id === currentBillId) {
+
+                    // 🔥 CASHIER APPROVED
+                    if (bill.status === "WAITING") {
                         document.getElementById("payBtn").disabled = false;
                     }
 
-                    // ✅ FINAL SUCCESS (after customer clicks pay)
+                    // 🔥 PAYMENT SUCCESS
                     if (bill.status === "PAID") {
-                        isFinished = true;
                         alert("Payment Successful ✅");
                         finishPayment();
                     }
-
-                })
-                .catch(() => console.log("Polling error"));
-
-        }, 3000);
-    });
-
-function payNow() {
-
-    fetch("https://billora-backend-9kyk.onrender.com/api/payment/create-order", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            amount: total
-        })
-    })
-    .then(res => res.json())
-    .then(order => {
-
-        const options = {
-            key: "rzp_test_SYKrnMrPo4MNDv",
-            amount: order.amount,
-            currency: "INR",
-            name: "Billora",
-            description: "Store Payment",
-            order_id: order.id,
-
-            handler: function (response) {
-
-                // 🔥 STEP 1: VERIFY PAYMENT WITH BACKEND
-                fetch("https://billora-backend-9kyk.onrender.com/api/payment/verify", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        razorpay_order_id: response.razorpay_order_id,
-                        razorpay_payment_id: response.razorpay_payment_id,
-                        razorpay_signature: response.razorpay_signature
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-
-                    if (data.status === "success") {
-
-                        // 🔥 STEP 2: UPDATE BILL ONLY AFTER VERIFIED PAYMENT
-                        fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${currentBillId}/pay/UPI`, {
-                            method: "PUT"
-                        })
-                        .then(() => {
-                            alert("Payment Successful ✅");
-                            finishPayment();
-                        });
-
-                    } else {
-                        alert("Payment verification failed ❌");
-                    }
-                })
-                .catch(() => {
-                    alert("Verification error ❌");
-                });
-            },
-
-            modal: {
-                ondismiss: function () {
-                    console.log("Payment popup closed");
                 }
-            },
+            });
+        });
+    }
 
-            theme: {
-                color: "#3399cc"
-            }
-        };
+    connectWebSocket();
 
-        const rzp = new Razorpay(options);
-        rzp.open();
-    })
-    .catch(() => {
-        alert("Order creation failed ❌");
-    });
+    function payNow() {
+
+        fetch("https://billora-backend-9kyk.onrender.com/api/payment/create-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount: total })
+        })
+        .then(res => res.json())
+        .then(order => {
+
+            const options = {
+                key: "rzp_test_SYKrnMrPo4MNDv",
+                amount: order.amount,
+                currency: "INR",
+                order_id: order.id,
+
+                handler: function (response) {
+
+                    // ✅ VERIFY ONLY (NO DIRECT SUCCESS)
+                    fetch("https://billora-backend-9kyk.onrender.com/api/payment/verify", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                            billId: currentBillId
+                        })
+                    });
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+        });
+    }
 }
-
-// ===== SCANNER CODE START =====
-
-// ===== SCANNER CODE END =====
-// if (currentPage === "scanner.html") startScanner();
 
 /* ================================
    🧾 BILL HISTORY
@@ -424,5 +370,4 @@ function loadBills() {
                 `;
             });
         });
-}
 }
