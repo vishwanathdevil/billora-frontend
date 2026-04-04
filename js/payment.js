@@ -1,14 +1,16 @@
 let stompClient = null;
 
 // ===============================
-// 🔥 GET BILL ID FROM URL
+// GET BILL ID FROM URL
 // ===============================
 const urlParams = new URLSearchParams(window.location.search);
 let currentBillId = urlParams.get("id");
+
+// STORE ID
 const selectedStoreId = localStorage.getItem("selectedStoreId") || 1;
 
 // ===============================
-// 💳 PAYMENT PAGE LOGIC
+// PAYMENT PAGE LOGIC
 // ===============================
 if (document.getElementById("payBtn")) {
 
@@ -18,11 +20,11 @@ if (document.getElementById("payBtn")) {
     const qrContainer = document.getElementById("qrContainer");
     const totalEl = document.getElementById("payTotal");
 
-    let total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
     totalEl.innerText = total;
 
     // ===============================
-    // ✅ CREATE BILL ONLY IF NOT EXISTS
+    // CREATE BILL (ONLY IF NO ID)
     // ===============================
     if (!currentBillId) {
         fetch("https://billora-backend-9kyk.onrender.com/api/bills", {
@@ -47,15 +49,22 @@ if (document.getElementById("payBtn")) {
                 qrContainer.appendChild(canvas);
             });
         });
+    } else {
+        // If already has billId (QR opened), still show QR
+        const qrUrl = `${window.location.origin}/payment.html?id=${currentBillId}`;
+        QRCode.toCanvas(qrUrl, function (err, canvas) {
+            qrContainer.innerHTML = "";
+            qrContainer.appendChild(canvas);
+        });
     }
 
     // ===============================
-    // 🔥 CONNECT WEBSOCKET
+    // CONNECT WEBSOCKET
     // ===============================
     connectCustomerSocket();
 
     // ===============================
-    // 💳 PAY NOW FUNCTION
+    // PAY NOW
     // ===============================
     window.payNow = function () {
 
@@ -75,7 +84,6 @@ if (document.getElementById("payBtn")) {
 
                 handler: function (response) {
 
-                    // 🔥 VERIFY PAYMENT
                     fetch("https://billora-backend-9kyk.onrender.com/api/payment/verify", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -96,7 +104,7 @@ if (document.getElementById("payBtn")) {
 }
 
 // ===============================
-// 🔥 CUSTOMER WEBSOCKET (ONLY ONE)
+// WEBSOCKET
 // ===============================
 function connectCustomerSocket() {
 
@@ -111,15 +119,15 @@ function connectCustomerSocket() {
 
             const bill = JSON.parse(message.body);
 
-            console.log("Bill update received:", bill);
+            console.log("Bill update:", bill);
 
-            // 🔥 ENABLE PAY BUTTON
-            if (bill.status === "PAYMENT_PENDING" && bill.id == currentBillId) {
+            // ENABLE BUTTON
+            if (bill.id == currentBillId && bill.status === "PAYMENT_PENDING") {
                 document.getElementById("payBtn").disabled = false;
             }
 
-            // 🔥 PAYMENT SUCCESS
-            if (bill.status === "PAID" && bill.id == currentBillId) {
+            // SUCCESS
+            if (bill.id == currentBillId && bill.status === "PAID") {
                 alert("Payment Successful ✅");
                 window.location.href = "success.html";
             }
