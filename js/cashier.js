@@ -249,3 +249,32 @@ function logout() {
 
 // 🚀 AUTO START
 startCashierScanner();
+
+// ===== WEBSOCKET =====
+let stompClient = null;
+
+function connectWebSocket() {
+
+    const socket = new SockJS("https://billora-backend-9kyk.onrender.com/ws");
+    stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function () {
+
+        console.log("Connected to WebSocket ✅");
+
+        stompClient.subscribe("/topic/bills", function (message) {
+
+            const bill = JSON.parse(message.body);
+
+            console.log("Bill update received:", bill);
+
+            if (bill.status === "PAID") {
+                alert("Customer Paid ✅");
+                loadBill(); // refresh UI
+            }
+        });
+    });
+}
+
+// AUTO CONNECT
+connectWebSocket();
