@@ -171,6 +171,10 @@ async function payOnline(id) {
 
     try {
 
+        await fetch(`https://billora-backend-9kyk.onrender.com/api/payment/start/${id}`, {
+            method: "POST"
+        });
+
         alert("Waiting for customer payment ⏳");
 
         // ❌ DO NOT RESET HERE
