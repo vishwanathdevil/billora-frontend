@@ -9,7 +9,7 @@ let currentBillId = urlParams.get("id");
 // ===============================
 // 💳 PAYMENT PAGE LOGIC
 // ===============================
-if (currentPage === "payment.html") {
+if (document.getElementById("payBtn")) {
 
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
     const user = JSON.parse(localStorage.getItem("user"));
