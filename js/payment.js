@@ -24,7 +24,7 @@ if (window.location.pathname.includes("payment.html")) {
             username: user?.username || "Guest",
             items: cart.map(i => i.name),
             total: total,
-            storeId: selectedStoreId
+            storeId: user?.storeId || 1
         })
     })
     .then(res => res.json())
