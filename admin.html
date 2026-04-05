@@ -8,6 +8,7 @@ input { padding: 10px; margin: 5px; width: 200px; }
 button { padding: 10px; margin: 5px; cursor: pointer; }
 div { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
 </style>
+<script src="https://unpkg.com/@zxing/library@latest"></script>
 </head>
 <body>
 
@@ -21,7 +22,12 @@ div { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
 
 <input type="text" id="name" placeholder="Product Name"><br><br>
 <input type="text" id="code" placeholder="Barcode"><br><br>
+
+<button onclick="startAdminScanner()">Scan Barcode</button><br><br>
+<div id="adminScanner" style="width: 300px;" margin="auto"></div>
+
 <input type="number" id="price" placeholder="Price"><br><br>
+<input type="number" id="stock" placeholder="Stock"><br><br>
 
 <button onclick="addProduct()">Add Product</button>
 
