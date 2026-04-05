@@ -49,10 +49,16 @@ function loadProducts() {
         .then(res => res.json())
         .then(data => {
 
-            const container = document.getElementById("productList");
-            container.innerHTML = "";
+    const container = document.getElementById("productList");
+    container.innerHTML = "";
 
-            data.forEach(p => {
+    if (!Array.isArray(data)) {
+        console.error("API Error:", data);
+        container.innerHTML = "Failed to load products ❌";
+        return;
+    }
+
+    data.forEach(p => {
 
                 container.innerHTML += `
                 <div>
