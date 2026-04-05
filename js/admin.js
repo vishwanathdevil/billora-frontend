@@ -144,11 +144,38 @@ function startAdminScanner() {
 
             document.getElementById("code").value = scannedCode;
 
-            alert("Barcode scanned ✅");
+            // 🔥 FAST API CALL
+            fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${storeId}`)
+                .then(res => {
+                    if (!res.ok) throw new Error("Not found");
+                    return res.json();
+                })
+                .then(product => {
 
-            codeReader.reset(); // stop camera
+                    // ✅ AUTO FILL EVERYTHING
+                    document.getElementById("name").value = product.name;
+                    document.getElementById("price").value = product.price;
+
+                    alert("Product auto loaded ✅");
+                })
+                .catch(() => {
+
+                    // 🔥 IF NOT FOUND → CREATE FROM API
+                    fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${storeId}`)
+                        .then(res => res.json())
+                        .then(product => {
+
+                            document.getElementById("name").value = product.name || "";
+                            document.getElementById("price").value = product.price || "";
+
+                            alert("Fetched from global DB 🌍");
+                        })
+                        .catch(() => {
+                            alert("Enter product manually ❌");
+                        });
+                });
+
+            codeReader.reset();
         }
     });
-
-    adminScanner = codeReader;
 }
