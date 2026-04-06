@@ -1,66 +1,105 @@
-/* RESET */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
 }
 
-/* BODY */
 body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #1d2671, #c33764);
+    background: #020617;
+    color: #fff;
+}
+
+/* Layout */
+.login-wrapper {
+    display: flex;
     height: 100vh;
+}
+
+/* Left side */
+.login-left {
+    flex: 1;
+    background: linear-gradient(135deg, #6366f1, #0ea5e9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px;
+}
+
+.login-left h1 {
+    font-size: 42px;
+    margin-bottom: 10px;
+}
+
+.login-left p {
+    color: #e0e7ff;
+}
+
+/* Right side */
+.login-right {
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* CONTAINER */
-.container {
-    width: 90%;
-    max-width: 350px;
-    background: white;
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-    text-align: center;
+/* Card */
+.login-card {
+    width: 350px;
+    padding: 30px;
+    border-radius: 16px;
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-/* TITLE */
-h2 {
+.login-card h2 {
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    color: #94a3b8;
     margin-bottom: 20px;
-    color: #333;
 }
 
-/* INPUT */
-input {
+/* Inputs */
+.input {
     width: 100%;
-    padding: 14px;
-    margin: 8px 0;
+    padding: 12px;
+    margin-bottom: 15px;
     border-radius: 10px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-}
-
-/* BUTTON */
-button {
-    width: 100%;
-    padding: 14px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: bold;
+    border: 1px solid #334155;
+    background: #020617;
     color: white;
+}
+
+/* Buttons */
+.btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    margin-top: 10px;
     cursor: pointer;
+    transition: 0.3s;
+    font-weight: 500;
 }
 
-/* LOGIN BUTTON */
-button:nth-of-type(1) {
-    background: #007bff;
+.primary {
+    background: #6366f1;
+    color: white;
 }
 
-/* REGISTER BUTTON */
-button:nth-of-type(2) {
-    background: #28a745;
+.primary:hover {
+    background: #4f46e5;
+}
+
+.secondary {
+    background: transparent;
+    border: 1px solid #334155;
+    color: #cbd5f5;
+}
+
+.secondary:hover {
+    background: #1e293b;
 }
