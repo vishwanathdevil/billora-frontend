@@ -1,0 +1,76 @@
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* BODY */
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #11998e, #38ef7d);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: white;
+}
+
+/* TITLE */
+h2 {
+    text-align: center;
+    padding: 15px;
+    font-size: 20px;
+}
+
+/* CONTAINER */
+.container {
+    flex: 1;
+    background: white;
+    color: black;
+    border-radius: 20px 20px 0 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* QR */
+#qrContainer {
+    width: 250px;
+    height: 250px;
+    background: #f5f5f5;
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* TOTAL */
+h3 {
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+#payTotal {
+    color: #28a745;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+/* BUTTON */
+button {
+    margin-top: auto;
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    background: #007bff;
+    color: white;
+}
+
+/* DISABLED */
+button:disabled {
+    background: gray;
+}

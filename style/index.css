@@ -1,13 +1,21 @@
-/* BODY CENTER */
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* BODY */
 body {
-    background: linear-gradient(135deg, #2196f3, #00c6ff);
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #1d2671, #c33764);
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* LOGIN CONTAINER */
+/* CONTAINER */
 .container {
     width: 90%;
     max-width: 350px;
@@ -24,52 +32,35 @@ h2 {
     color: #333;
 }
 
-/* INPUT FIELDS */
+/* INPUT */
 input {
     width: 100%;
-    padding: 12px;
-    margin: 10px 0;
+    padding: 14px;
+    margin: 8px 0;
     border-radius: 10px;
     border: 1px solid #ccc;
     font-size: 14px;
-    transition: 0.3s;
 }
 
-/* INPUT FOCUS */
-input:focus {
-    border-color: #2196f3;
-    outline: none;
-    box-shadow: 0 0 5px rgba(33,150,243,0.5);
-}
-
-/* BUTTON BASE */
+/* BUTTON */
 button {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     margin-top: 10px;
-    border-radius: 10px;
     border: none;
+    border-radius: 10px;
+    font-size: 15px;
     font-weight: bold;
+    color: white;
     cursor: pointer;
-    transition: 0.3s;
 }
 
 /* LOGIN BUTTON */
-button:first-of-type {
-    background: #2196f3;
-    color: white;
-}
-
-button:first-of-type:hover {
-    background: #1769aa;
+button:nth-of-type(1) {
+    background: #007bff;
 }
 
 /* REGISTER BUTTON */
-button:last-of-type {
+button:nth-of-type(2) {
     background: #28a745;
-    color: white;
-}
-
-button:last-of-type:hover {
-    background: #1e7e34;
 }

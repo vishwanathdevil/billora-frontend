@@ -1,21 +1,113 @@
-/* CAMERA */
-#scanner {
-    width: 100%;
-    max-width: 350px;
-    margin: auto;
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/* PRODUCT BOX */
-#productBox {
-    margin-top: 20px;
+/* BODY */
+body {
+    font-family: Arial, sans-serif;
+    background: black;
+    height: 100vh;
+    overflow: hidden;
+    color: white;
+}
+
+/* TITLE */
+h2 {
+    position: absolute;
+    top: 10px;
+    width: 100%;
+    text-align: center;
+    z-index: 2;
+    font-size: 18px;
+}
+
+/* CAMERA FULL SCREEN */
+#scanner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* OVERLAY CONTAINER */
+.container {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
     padding: 15px;
-    background: #f8f9fa;
-    border-radius: 10px;
-    border: 1px solid #ddd;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    z-index: 2;
+}
+
+/* PRODUCT INFO */
+#productName {
+    text-align: center;
+    font-size: 16px;
+}
+
+p {
+    text-align: center;
+    margin-top: 5px;
+}
+
+/* BUTTON AREA */
+#actionButtons {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 /* BUTTONS */
-#actionButtons button {
-    width: 90%;
-    margin: 5px;
+button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: bold;
+    color: white;
+}
+
+/* BUTTON COLORS */
+button:nth-child(1) {
+    background: #28a745; /* Add to cart */
+}
+
+button:nth-child(2) {
+    background: #007bff; /* Scan again */
+}
+
+button:nth-child(3) {
+    background: #ff9800; /* Cart */
+}
+
+/* QUANTITY ROW */
+#actionButtons span,
+#actionButtons p {
+    text-align: center;
+}
+
+/* + - BUTTONS */
+button:nth-child(4),
+button:nth-child(7) {
+    background: #444;
+}
+
+.back-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    font-size: 14px;
+    z-index: 10;
 }

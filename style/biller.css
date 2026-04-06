@@ -1,0 +1,84 @@
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: white;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* MAIN */
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* HEADER */
+.header {
+    padding: 10px;
+    text-align: center;
+    background: #000;
+    border-bottom: 1px solid #333;
+}
+
+/* SCANNER (TOP PRIORITY) */
+#scanner {
+    width: 100%;
+    height: 40vh;
+    background: black;
+}
+
+/* CART */
+#cartView {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    background: #1a1a1a;
+}
+
+/* CART ITEM */
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background: #2a2a2a;
+    margin-bottom: 8px;
+    border-radius: 8px;
+}
+
+/* TOTAL */
+.total {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* BUTTON */
+.pay-btn {
+    padding: 16px;
+    font-size: 18px;
+    background: #28a745;
+    border: none;
+    color: white;
+    font-weight: bold;
+}
+
+.back-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    font-size: 14px;
+    z-index: 10;
+}

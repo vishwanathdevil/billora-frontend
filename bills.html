@@ -7,6 +7,7 @@
 </head>
 
 <body>
+    <button class="back-btn" onclick="goBack()">⬅ Back</button>
 
 <div class="container">
     <h2>🧾 Bill</h2>
@@ -32,8 +33,9 @@ const id = params.get("id");
 const itemsList = document.getElementById("items");
 const usernameEl = document.getElementById("username");
 const totalEl = document.getElementById("total");
+const statusEl = document.getElementById("status");
 
-// 🔥 CASE 1: VIEW SINGLE BILL
+// 🔥 CASE 1: SINGLE BILL
 if (id) {
 
     fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${id}`)
@@ -42,10 +44,11 @@ if (id) {
 
             usernameEl.innerText = data.username;
             totalEl.innerText = data.total;
+            statusEl.innerText = data.status;
 
             itemsList.innerHTML = "";
 
-            data.items.forEach(item => {
+            (data.items || []).forEach(item => {
                 const li = document.createElement("li");
                 li.innerText = item;
                 itemsList.appendChild(li);
@@ -53,13 +56,12 @@ if (id) {
 
         })
         .catch(() => alert("Bill not found"));
-
 }
 
-// 🔥 CASE 2: SHOW ALL USER BILLS
+// 🔥 CASE 2: ALL USER BILLS
 else {
 
-    fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${user.username}`)
+    fetch(`https://billora-backend-9kyk.onrender.com/api/bills/user/${user.username}`)
         .then(res => res.json())
         .then(data => {
 
@@ -67,6 +69,11 @@ else {
             itemsList.innerHTML = "";
 
             let total = 0;
+
+            if (!Array.isArray(data)) {
+                console.error("Invalid response:", data);
+                return;
+            }
 
             data.forEach(bill => {
 
@@ -76,7 +83,6 @@ else {
                 li.innerText = `Bill #${bill.id} - ₹${bill.total}`;
                 li.style.cursor = "pointer";
 
-                // 👉 click to open bill
                 li.onclick = () => {
                     window.location.href = `bills.html?id=${bill.id}`;
                 };
@@ -86,7 +92,8 @@ else {
 
             totalEl.innerText = total;
 
-        });
+        })
+        .catch(err => console.error(err));
 }
 </script>
 

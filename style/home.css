@@ -1,50 +1,60 @@
-/* PAGE TITLE */
-h2 {
-    margin-bottom: 20px;
-    color: #333;
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/* LOGOUT BUTTON (TOP RIGHT) */
-button[onclick="logout()"] {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: #dc3545;
+/* BODY */
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     color: white;
-    padding: 8px 12px;
-    border-radius: 8px;
 }
 
-button[onclick="logout()"]:hover {
-    background: #b02a37;
+/* TITLE */
+h2 {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 24px;
 }
 
-/* MAIN CONTAINER */
+/* CONTAINER CENTER */
 .container {
-    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    margin-bottom: 40px;
 }
 
-/* HOME BUTTONS */
-.container button {
+/* BUTTONS */
+button {
     width: 100%;
-    padding: 15px;
-    margin: 15px 0;
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
     font-size: 16px;
     font-weight: bold;
-    border-radius: 12px;
-    border: none;
-    background: linear-gradient(135deg, #2196f3, #00c6ff);
     color: white;
-    transition: 0.3s;
+    cursor: pointer;
 }
 
-/* HOVER EFFECT */
-.container button:hover {
-    transform: scale(1.03);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+/* BUTTON COLORS */
+.container button:nth-child(1) {
+    background: #007bff; /* Select Store */
 }
 
-/* SECOND BUTTON DIFFERENT COLOR */
-.container button:last-child {
-    background: linear-gradient(135deg, #28a745, #5ddf85);
+.container button:nth-child(2) {
+    background: #28a745; /* Previous Bills */
+}
+
+/* LOGOUT */
+body > button {
+    margin: 15px;
+    background: #dc3545;
 }

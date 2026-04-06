@@ -193,3 +193,28 @@ document.addEventListener("DOMContentLoaded", function () {
         loadCart();
     }
 });
+
+function goBack() {
+
+    const page = window.location.pathname;
+
+    if (page.includes("scanner.html")) {
+        window.location.href = "store.html";
+    }
+
+    else if (page.includes("cart.html")) {
+        window.location.href = "scanner.html";
+    }
+
+    else if (page.includes("payment.html")) {
+        window.location.href = "cart.html";
+    }
+
+    else if (page.includes("bills.html")) {
+        window.location.href = "home.html";
+    }
+
+    else {
+        window.location.href = "home.html";
+    }
+}

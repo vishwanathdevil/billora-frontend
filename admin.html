@@ -2,44 +2,40 @@
 <html>
 <head>
     <title>Admin Panel</title>
-    <style>
-body { font-family: Arial; padding: 20px; }
-input { padding: 10px; margin: 5px; width: 200px; }
-button { padding: 10px; margin: 5px; cursor: pointer; }
-div { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
-</style>
-<script src="https://unpkg.com/@zxing/library@latest"></script>
+    <link rel="stylesheet" href="style/admin.css">
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
 </head>
 <body>
 
-<h2>🏪 Admin Panel</h2>
+<div class="container">
 
-<button onclick="logout()">Logout</button>
+    <div class="header">
+        <h2>🏪 Admin Panel</h2>
+        <button onclick="logout()" class="logout-btn">Logout</button>
+    </div>
 
-<hr>
+    <div class="form-section">
+        <h3>Add Product</h3>
 
-<h3>Add Product</h3>
+        <input type="text" id="name" placeholder="Product Name">
+        <input type="text" id="code" placeholder="Barcode">
 
-<input type="text" id="name" placeholder="Product Name"><br><br>
-<input type="text" id="code" placeholder="Barcode"><br><br>
+        <button onclick="startAdminScanner()">Scan Barcode</button>
 
-<button onclick="startAdminScanner()">Scan Barcode</button><br><br>
-<video id="adminScanner" style="
-    width: 1000px;
-    height: 1000px;
-    border: 2px solid black;
-    margin-top: 10px;
-"></video>
+        <video id="adminScanner"></video>
 
-<input type="number" id="price" placeholder="Price"><br><br>
-<input type="number" id="stock" placeholder="Stock"><br><br>
+        <input type="number" id="price" placeholder="Price">
+        <input type="number" id="stock" placeholder="Stock">
 
-<button onclick="addProduct()">Add Product</button>
+        <button onclick="addProduct()">Add Product</button>
+    </div>
 
-<hr>
+    <div class="product-section">
+        <h3>Products</h3>
+        <div id="productList"></div>
+    </div>
 
-<h3>Products</h3>
-<div id="productList"></div>
+</div>
 
 <script src="js/admin.js"></script>
 
