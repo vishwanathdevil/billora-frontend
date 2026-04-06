@@ -7,26 +7,15 @@
 
 /* BODY */
 body {
-    font-family: Arial, sans-serif;
-    background: #f2f4f8;
-    height: 100vh;
-    overflow-x: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* MAIN CARD */
-.container {
-    width: 95%;
-    max-width: 420px;
-    height: 95vh;
-    background: white;
-    border-radius: 15px;
-    padding: 15px;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    height: 100vh;
+}
+
+.container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
 }
 
 /* TITLE */
