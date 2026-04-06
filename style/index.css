@@ -103,3 +103,40 @@ body {
 .secondary:hover {
     background: #1e293b;
 }
+
+/* ================================
+   📱 MOBILE RESPONSIVE FIX
+================================ */
+
+@media (max-width: 768px) {
+
+    .login-wrapper {
+        flex-direction: column;
+    }
+
+    .login-left {
+        height: 35%;
+        padding: 20px;
+        text-align: center;
+        align-items: center;
+    }
+
+    .login-left h1 {
+        font-size: 28px;
+    }
+
+    .login-left p {
+        font-size: 14px;
+    }
+
+    .login-right {
+        height: 65%;
+        padding: 20px;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 350px;
+        margin: auto;
+    }
+}
