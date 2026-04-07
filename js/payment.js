@@ -129,7 +129,7 @@ function connectCustomerSocket() {
             // SUCCESS
             if (bill.id == currentBillId && bill.status === "PAID") {
                 alert("Payment Successful ✅");
-                window.location.href = "bills.html";
+                window.location.href = `bills.html?id=${currentBillId}`;
             }
         });
     });

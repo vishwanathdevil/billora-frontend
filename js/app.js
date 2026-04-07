@@ -190,7 +190,7 @@ if (currentPage === "cart.html") loadCart();
 
 function loadBills() {
 
-    fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${user.username}`)
+    fetch(`https://billora-backend-9kyk.onrender.com/api/bills/user/${user.username}`)
         .then(res => res.json())
         .then(data => {
 
