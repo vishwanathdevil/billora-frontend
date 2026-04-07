@@ -1,34 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Scanner</title>
+    <meta charset="UTF-8">
+    <title>Scanner - Billora</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
-<button class="back-btn" onclick="goBack()">⬅ Back</button>
 
-<h2>Scan Product</h2>
+<!-- HEADER -->
+<div class="header">
+    <button class="back-btn" onclick="goBack()">⬅</button>
+    <h2>Scan Product</h2>
+</div>
 
-<div class="container">
+<!-- MAIN -->
+<div class="scanner-container">
 
-    <!-- CAMERA -->
-    <video id="scanner" width="320" height="240" style="border:2px solid black;"></video>
-
-    <!-- PRODUCT INFO -->
-    <h3 id="productName">Scan a product</h3>
-    <p>Price: ₹ <span id="productPrice">0</span></p>
-
-    <!-- BUTTONS (ALWAYS VISIBLE) -->
-    <div id="actionButtons">
-        <button onclick="addScannedToCart()">Add to Cart</button>
-        <button onclick="restartScanner()">Scan Again</button>
-        <button onclick="goToCart()">Go to Cart</button>
-        <button onclick="decreaseQty()">-</button>
-    <span id="quantity">1</span>
-    <p>Subtotal: ₹ <span id="subtotal">0</span></p>
-    <button onclick="increaseQty()">+</button>
+    <!-- CAMERA SECTION -->
+    <div class="camera-box">
+        <video id="scanner"></video>
+        <div class="scan-overlay"></div>
     </div>
 
+    <!-- PRODUCT CARD -->
+    <div class="product-card">
+        <h3 id="productName">Scan a product</h3>
+        <p class="price">₹ <span id="productPrice">0</span></p>
+
+        <div class="qty-row">
+            <button onclick="decreaseQty()">−</button>
+            <span id="quantity">1</span>
+            <button onclick="increaseQty()">+</button>
+        </div>
+
+        <p class="subtotal">Subtotal: ₹ <span id="subtotal">0</span></p>
+    </div>
+
+</div>
+
+<!-- BOTTOM ACTION BAR -->
+<div class="action-bar">
+    <button onclick="addScannedToCart()">Add</button>
+    <button onclick="restartScanner()">Scan</button>
+    <button onclick="goToCart()">Cart</button>
 </div>
 
 <script src="https://unpkg.com/@zxing/library@latest"></script>

@@ -1,142 +1,75 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
-}
-
+/* BODY CENTER */
 body {
-    background: #020617;
-    color: #fff;
-}
-
-/* Layout */
-.login-wrapper {
-    display: flex;
+    background: linear-gradient(135deg, #2196f3, #00c6ff);
     height: 100vh;
-}
-
-/* Left side */
-.login-left {
-    flex: 1;
-    background: linear-gradient(135deg, #6366f1, #0ea5e9);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 60px;
-}
-
-.login-left h1 {
-    font-size: 42px;
-    margin-bottom: 10px;
-}
-
-.login-left p {
-    color: #e0e7ff;
-}
-
-/* Right side */
-.login-right {
-    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* Card */
-.login-card {
-    width: 350px;
-    padding: 30px;
-    border-radius: 16px;
-    background: #0f172a;
-    border: 1px solid #1e293b;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+/* LOGIN CONTAINER */
+.container {
+    width: 90%;
+    max-width: 350px;
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    text-align: center;
 }
 
-.login-card h2 {
-    margin-bottom: 5px;
-}
-
-.subtitle {
-    color: #94a3b8;
+/* TITLE */
+h2 {
     margin-bottom: 20px;
+    color: #333;
 }
 
-/* Inputs */
-.input {
+/* INPUT FIELDS */
+input {
     width: 100%;
     padding: 12px;
-    margin-bottom: 15px;
+    margin: 10px 0;
     border-radius: 10px;
-    border: 1px solid #334155;
-    background: #020617;
-    color: white;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    transition: 0.3s;
 }
 
-/* Buttons */
-.btn {
+/* INPUT FOCUS */
+input:focus {
+    border-color: #2196f3;
+    outline: none;
+    box-shadow: 0 0 5px rgba(33,150,243,0.5);
+}
+
+/* BUTTON BASE */
+button {
     width: 100%;
     padding: 12px;
+    margin-top: 10px;
     border-radius: 10px;
     border: none;
-    margin-top: 10px;
+    font-weight: bold;
     cursor: pointer;
     transition: 0.3s;
-    font-weight: 500;
 }
 
-.primary {
-    background: #6366f1;
+/* LOGIN BUTTON */
+button:first-of-type {
+    background: #2196f3;
     color: white;
 }
 
-.primary:hover {
-    background: #4f46e5;
+button:first-of-type:hover {
+    background: #1769aa;
 }
 
-.secondary {
-    background: transparent;
-    border: 1px solid #334155;
-    color: #cbd5f5;
+/* REGISTER BUTTON */
+button:last-of-type {
+    background: #28a745;
+    color: white;
 }
 
-.secondary:hover {
-    background: #1e293b;
-}
-
-/* ================================
-   📱 MOBILE RESPONSIVE FIX
-================================ */
-
-@media (max-width: 768px) {
-
-    .login-wrapper {
-        flex-direction: column;
-    }
-
-    .login-left {
-        height: 35%;
-        padding: 20px;
-        text-align: center;
-        align-items: center;
-    }
-
-    .login-left h1 {
-        font-size: 28px;
-    }
-
-    .login-left p {
-        font-size: 14px;
-    }
-
-    .login-right {
-        height: 65%;
-        padding: 20px;
-    }
-
-    .login-card {
-        width: 100%;
-        max-width: 350px;
-        margin: auto;
-    }
+button:last-of-type:hover {
+    background: #1e7e34;
 }

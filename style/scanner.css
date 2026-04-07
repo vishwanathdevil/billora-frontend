@@ -3,111 +3,134 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
 }
 
-/* BODY */
 body {
-    font-family: Arial, sans-serif;
-    background: black;
-    height: 100vh;
-    overflow: hidden;
+    background: #020617;
     color: white;
 }
 
-/* TITLE */
-h2 {
-    position: absolute;
-    top: 10px;
-    width: 100%;
-    text-align: center;
-    z-index: 2;
-    font-size: 18px;
-}
-
-/* CAMERA FULL SCREEN */
-#scanner {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* OVERLAY CONTAINER */
-.container {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    padding: 15px;
-    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-    z-index: 2;
-}
-
-/* PRODUCT INFO */
-#productName {
-    text-align: center;
-    font-size: 16px;
-}
-
-p {
-    text-align: center;
-    margin-top: 5px;
-}
-
-/* BUTTON AREA */
-#actionButtons {
-    margin-top: 10px;
+/* HEADER */
+.header {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #1e293b;
 }
 
-/* BUTTONS */
-button {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: bold;
-    color: white;
-}
-
-/* BUTTON COLORS */
-button:nth-child(1) {
-    background: #28a745; /* Add to cart */
-}
-
-button:nth-child(2) {
-    background: #007bff; /* Scan again */
-}
-
-button:nth-child(3) {
-    background: #ff9800; /* Cart */
-}
-
-/* QUANTITY ROW */
-#actionButtons span,
-#actionButtons p {
-    text-align: center;
-}
-
-/* + - BUTTONS */
-button:nth-child(4),
-button:nth-child(7) {
-    background: #444;
+.header h2 {
+    margin-left: 10px;
 }
 
 .back-btn {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    padding: 10px 12px;
+    background: none;
     border: none;
-    border-radius: 8px;
-    background: rgba(0,0,0,0.6);
     color: white;
-    font-size: 14px;
-    z-index: 10;
+    font-size: 20px;
+}
+
+/* MAIN CONTAINER */
+.scanner-container {
+    padding: 15px;
+}
+
+/* CAMERA */
+.camera-box {
+    position: relative;
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #1e293b;
+}
+
+#scanner {
+    width: 100%;
+    height: auto;
+}
+
+/* SCAN OVERLAY */
+.scan-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 70%;
+    height: 2px;
+    background: #22c55e;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px #22c55e;
+}
+
+/* PRODUCT CARD */
+.product-card {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 16px;
+    background: #0f172a;
+    border: 1px solid #1e293b;
+}
+
+.product-card h3 {
+    margin-bottom: 10px;
+}
+
+.price {
+    color: #22c55e;
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+/* QUANTITY */
+.qty-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.qty-row button {
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    border: none;
+    background: #1e293b;
+    color: white;
+    font-size: 18px;
+}
+
+/* SUBTOTAL */
+.subtotal {
+    text-align: center;
+    color: #94a3b8;
+}
+
+/* ACTION BAR (BOTTOM FIXED) */
+.action-bar {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    background: #020617;
+    border-top: 1px solid #1e293b;
+}
+
+.action-bar button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: #6366f1;
+    color: white;
+    font-weight: 500;
+}
+
+/* RESPONSIVE */
+@media (min-width: 768px) {
+    .scanner-container {
+        max-width: 500px;
+        margin: auto;
+    }
 }

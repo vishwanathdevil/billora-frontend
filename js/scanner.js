@@ -15,48 +15,56 @@ const codeReader = new ZXing.BrowserMultiFormatReader();
 // =======================
 function startScanner() {
 
-    codeReader.reset(); // stop previous camera
+    const videoElement = document.getElementById("scanner");
 
-    const scannerDiv = document.getElementById("scanner");
-    if (!scannerDiv) return;
+    if (!videoElement) {
+        console.error("Video element not found");
+        return;
+    }
+
+    codeReader.reset();
 
     isScanning = true;
 
-    codeReader.decodeFromVideoDevice(null, "scanner", (result, err) => {
+    codeReader.decodeFromVideoDevice(
+        null,
+        videoElement, // ✅ PASS ELEMENT NOT STRING
+        (result, err) => {
 
-        if (result && isScanning) {
+            if (result && isScanning) {
 
-            scannedCode = result.text;
-            console.log("Scanned:", scannedCode);
+                scannedCode = result.text;
+                console.log("Scanned:", scannedCode);
 
-            // stop scanning after success
-            isScanning = false;
-            codeReader.reset();
+                isScanning = false;
+                codeReader.reset();
 
-            fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${window.selectedStoreId}`)
-                .then(res => {
-                    if (!res.ok) throw new Error();
-                    return res.json();
-                })
-                .then(product => {
+                fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${window.selectedStoreId}`)
+                    .then(res => {
+                        if (!res.ok) throw new Error();
+                        return res.json();
+                    })
+                    .then(product => {
 
-                    document.getElementById("productName").innerText = product.name;
-                    document.getElementById("productPrice").innerText = product.price;
-                    quantity = 1;
-                    document.getElementById("quantity").innerText = quantity;
-                    updateSubtotal();
-                })
-                .catch(() => {
-                    alert("Product not found ❌");
-                });
+                        document.getElementById("productName").innerText = product.name;
+                        document.getElementById("productPrice").innerText = product.price;
+
+                        quantity = 1;
+                        document.getElementById("quantity").innerText = quantity;
+
+                        updateSubtotal();
+                    })
+                    .catch(() => {
+                        alert("Product not found ❌");
+                    });
+            }
+
+            if (err && !(err instanceof ZXing.NotFoundException)) {
+                console.error(err);
+            }
         }
-
-        if (err && !(err instanceof ZXing.NotFoundException)) {
-            console.error(err);
-        }
-    });
+    );
 }
-
 window.increaseQty = function () {
     quantity++;
     document.getElementById("quantity").innerText = quantity;
