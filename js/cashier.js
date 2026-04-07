@@ -35,15 +35,17 @@ function startCashierScanner() {
     html5QrCode.start(
         { facingMode: "environment" },
         {
-            fps: 10,
-            qrbox: 250
+            fps: 30,
+            qrbox: 350
         },
 
         async (decodedText) => {
 
             // 🚫 prevent multiple scans
-            if (!isScanning) return;
-            isScanning = false;
+            let lastScanTime = 0;
+
+            if (Date.now() - lastScanTime < 2000) return;
+            lastScanTime = Date.now();
 
             console.log("QR:", decodedText);
 

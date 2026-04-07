@@ -44,7 +44,7 @@ if (document.getElementById("payBtn")) {
 
             const qrUrl = `${window.location.origin}/payment.html?id=${bill.id}`;
 
-            QRCode.toCanvas(qrUrl, function (err, canvas) {
+            QRCode.toCanvas(qrUrl,{width:250}, function (err, canvas) {
                 qrContainer.innerHTML = "";
                 qrContainer.appendChild(canvas);
             });
@@ -52,7 +52,7 @@ if (document.getElementById("payBtn")) {
     } else {
         // If already has billId (QR opened), still show QR
         const qrUrl = `${window.location.origin}/payment.html?id=${currentBillId}`;
-        QRCode.toCanvas(qrUrl, function (err, canvas) {
+        QRCode.toCanvas(qrUrl,{width:250}, function (err, canvas) {
             qrContainer.innerHTML = "";
             qrContainer.appendChild(canvas);
         });
