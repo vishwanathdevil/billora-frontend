@@ -19,7 +19,8 @@ let isScanning = true;
 
 function startCashierScanner() {
 
-    container.innerHTML = "<h3>📷 Scan Customer QR</h3>";
+    container.innerHTML = `<h3>📷 Scan Customer QR</h3>
+    <div id=\"reader\"></div>`;
 
     // 🔥 reset flags
     isScanning = true;
@@ -30,7 +31,7 @@ function startCashierScanner() {
         html5QrCode = null;
     }
 
-    html5QrCode = new Html5Qrcode("ordersContainer");
+    html5QrCode = new Html5Qrcode("reader");
 
     html5QrCode.start(
         { facingMode: "environment" },
@@ -290,7 +291,7 @@ function connectWebSocket() {
 
             if (bill.status === "PAID") {
                 alert("Customer Paid ✅");
-                loadBill(); // refresh UI
+                resetFlow(); // refresh UI
             }
         });
     });
