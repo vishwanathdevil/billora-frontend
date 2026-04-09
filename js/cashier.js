@@ -137,7 +137,9 @@ function showBill(bill) {
 
         <h3>Items:</h3>
         <ul>
-            ${bill.items?.map(item => `<li>${item}</li>`).join("") || "<li>No items</li>"}
+            ${bill.items?.map(item => 
+    `<li>${item.name} x${item.quantity} - ₹${item.price * item.quantity}</li>`
+).join("")}
         </ul>
 
         ${

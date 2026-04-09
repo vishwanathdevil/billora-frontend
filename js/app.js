@@ -204,7 +204,9 @@ function loadBills() {
                     <div>
                         <h3>Bill #${bill.id}</h3>
                         <p>Total: ₹${bill.total}</p>
-                        <p>${bill.items.join(", ")}</p>
+                        <p>
+${bill.items.map(i => `${i.name} x${i.quantity}`).join(", ")}
+</p>
                     </div><hr>
                 `;
             });

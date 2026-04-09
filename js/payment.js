@@ -31,11 +31,15 @@ if (document.getElementById("payBtn")) {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                username: user?.username || "Guest",
-                items: cart.map(i => i.name),
-                total: total,
-                storeId: selectedStoreId
-            })
+    username: user?.username || "Guest",
+    items: cart.map(i => ({
+        name: i.name,
+        quantity: i.quantity,
+        price: i.price
+    })),
+    total: total,
+    storeId: selectedStoreId
+})
         })
         .then(res => res.json())
         .then(bill => {
@@ -67,6 +71,9 @@ if (document.getElementById("payBtn")) {
     // PAY NOW
     // ===============================
     window.payNow = function () {
+        const btn = document.getElementById("payBtn");
+btn.disabled = true;
+btn.innerText = "Processing...";
 
         fetch("https://billora-backend-9kyk.onrender.com/api/payment/create-order", {
             method: "POST",
@@ -128,8 +135,11 @@ function connectCustomerSocket() {
 
             // SUCCESS
             if (bill.id == currentBillId && bill.status === "PAID") {
-                alert("Payment Successful ✅");
-                window.location.href = `bills.html?id=${currentBillId}`;
+                localStorage.removeItem("cart");
+
+showToast("Payment Successful ✅");
+
+window.location.href = `bills.html?id=${currentBillId}`;
             }
         });
     });

@@ -1,5 +1,26 @@
 console.log("LOGIN JS LOADED");
 
+
+function showToast(msg) {
+    let toast = document.getElementById("toast");
+
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "toast";
+        document.body.appendChild(toast);
+    }
+
+    toast.innerText = msg;
+    toast.style.display = "block";
+
+    setTimeout(() => {
+        toast.style.display = "none";
+    }, 2000);
+}
+
+
+
+
 /* ================================
    🔐 LOGIN + REGISTER ONLY
 ================================ */

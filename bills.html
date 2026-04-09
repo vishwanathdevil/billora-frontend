@@ -47,10 +47,10 @@ if (id) {
             itemsList.innerHTML = "";
 
             (data.items || []).forEach(item => {
-                const li = document.createElement("li");
-                li.innerText = item;
-                itemsList.appendChild(li);
-            });
+    const li = document.createElement("li");
+    li.innerText = `${item.name} x${item.quantity} - ₹${item.price * item.quantity}`;
+    itemsList.appendChild(li);
+});
 
         })
         .catch(() => alert("Bill not found"));

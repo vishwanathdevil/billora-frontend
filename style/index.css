@@ -73,3 +73,18 @@ button:last-of-type {
 button:last-of-type:hover {
     background: #1e7e34;
 }
+
+
+
+#toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #222;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    display: none;
+    z-index: 999;
+}
