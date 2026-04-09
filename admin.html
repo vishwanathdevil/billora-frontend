@@ -14,20 +14,25 @@
         <button onclick="logout()" class="logout-btn">Logout</button>
     </div>
 
+    <!-- 🔥 PRODUCT CARD -->
     <div class="form-section">
-        <h3>Add Product</h3>
 
-        <input type="text" id="name" placeholder="Product Name">
-        <input type="text" id="code" placeholder="Barcode">
+        <h3>Scan or Add Product</h3>
 
-        <button onclick="startAdminScanner()">Scan Barcode</button>
+        <div class="scanner-box">
+            <video id="adminScanner"></video>
+            <button onclick="startAdminScanner()">📷 Scan Barcode</button>
+        </div>
 
-        <video id="adminScanner"></video>
+        <div class="product-card">
+            <input type="text" id="name" placeholder="Product Name">
+            <input type="text" id="code" placeholder="Barcode">
+            <input type="number" id="price" placeholder="Price">
+            <input type="number" id="stock" placeholder="Stock">
 
-        <input type="number" id="price" placeholder="Price">
-        <input type="number" id="stock" placeholder="Stock">
+            <button onclick="addProduct()">Save Product</button>
+        </div>
 
-        <button onclick="addProduct()">Add Product</button>
     </div>
 
     <div class="product-section">

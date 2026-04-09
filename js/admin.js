@@ -35,9 +35,19 @@ function addProduct() {
         })
     })
     .then(() => {
-        alert("Product Added ✅");
+        clearForm();
         loadProducts();
     });
+}
+
+// ===============================
+// CLEAR FORM
+// ===============================
+function clearForm() {
+    document.getElementById("name").value = "";
+    document.getElementById("code").value = "";
+    document.getElementById("price").value = "";
+    document.getElementById("stock").value = "";
 }
 
 // ===============================
@@ -49,42 +59,35 @@ function loadProducts() {
         .then(res => res.json())
         .then(data => {
 
-    const container = document.getElementById("productList");
-    container.innerHTML = "";
+            const container = document.getElementById("productList");
+            container.innerHTML = "";
 
-    if (!Array.isArray(data)) {
-        console.error("API Error:", data);
-        container.innerHTML = "Failed to load products ❌";
-        return;
-    }
-
-    data.forEach(p => {
+            data.forEach(p => {
 
                 container.innerHTML += `
-                <div>
+                <div class="product-item">
                     <h4>${p.name}</h4>
                     <p>Code: ${p.code}</p>
 
                     <p>
-                        Price: 
+                        Price:
                         <input value="${p.price}" onchange="updateField(${p.id}, this.value, 'price')">
                     </p>
 
                     <p>
-                        Stock: 
+                        Stock:
                         <input value="${p.stock}" onchange="updateField(${p.id}, this.value, 'stock')">
                     </p>
 
                     <button onclick="deleteProduct(${p.id})">Delete</button>
                 </div>
-                <hr>
                 `;
             });
         });
 }
 
 // ===============================
-// UPDATE PRODUCT FIELD
+// UPDATE FIELD
 // ===============================
 function updateField(id, value, field) {
 
@@ -111,27 +114,12 @@ function deleteProduct(id) {
     fetch(`${API}/${id}`, {
         method: "DELETE"
     })
-    .then(() => {
-        alert("Deleted ✅");
-        loadProducts();
-    });
+    .then(() => loadProducts());
 }
 
 // ===============================
-// LOGOUT
+// SCANNER
 // ===============================
-function logout() {
-    localStorage.clear();
-    window.location.href = "index.html";
-}
-
-// ===============================
-// INIT
-// ===============================
-loadProducts();
-
-let adminScanner = null;
-
 function startAdminScanner() {
 
     const codeReader = new ZXing.BrowserMultiFormatReader();
@@ -144,38 +132,32 @@ function startAdminScanner() {
 
             document.getElementById("code").value = scannedCode;
 
-            // 🔥 FAST API CALL
-            fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${storeId}`)
+            fetch(`${API}/${scannedCode}?storeId=${storeId}`)
                 .then(res => {
-                    if (!res.ok) throw new Error("Not found");
+                    if (!res.ok) throw new Error();
                     return res.json();
                 })
                 .then(product => {
 
-                    // ✅ AUTO FILL EVERYTHING
                     document.getElementById("name").value = product.name;
                     document.getElementById("price").value = product.price;
+                    document.getElementById("stock").value = product.stock;
 
-                    alert("Product auto loaded ✅");
                 })
                 .catch(() => {
-
-                    // 🔥 IF NOT FOUND → CREATE FROM API
-                    fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${storeId}`)
-                        .then(res => res.json())
-                        .then(product => {
-
-                            document.getElementById("name").value = product.name || "";
-                            document.getElementById("price").value = product.price || "";
-
-                            alert("Fetched from global DB 🌍");
-                        })
-                        .catch(() => {
-                            alert("Enter product manually ❌");
-                        });
+                    // no alert → smooth UX
                 });
 
             codeReader.reset();
         }
     });
 }
+
+// ===============================
+function logout() {
+    localStorage.clear();
+    window.location.href = "index.html";
+}
+
+// INIT
+loadProducts();
