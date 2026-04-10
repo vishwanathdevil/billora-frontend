@@ -1,131 +1,91 @@
-:root {
-    --primary: #0f172a;
-    --accent: #3b82f6;
-    --surface: rgba(255, 255, 255, 0.7);
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
+/* BODY */
 body {
-    background: #f1f5f9;
-    background-image: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.05) 0, transparent 50%), 
-                      radial-gradient(at 50% 0%, rgba(139, 92, 246, 0.05) 0, transparent 50%);
-    margin: 0;
-    overflow-x: hidden;
-}
-
-.grand-header {
-    padding: 60px 24px 30px;
-    background: linear-gradient(to bottom, #ffffff 0%, rgba(255,255,255,0) 100%);
-}
-
-.top-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-}
-
-.brand-logo {
-    font-weight: 800;
-    letter-spacing: -1px;
-    font-size: 20px;
-}
-
-.blur-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
-    border: 1px solid rgba(0,0,0,0.05);
-    background: var(--surface);
-    backdrop-filter: blur(8px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-}
-
-.welcome-section h1 {
-    font-size: 34px;
-    font-weight: 800;
-    margin: 0;
-    letter-spacing: -1.5px;
-    line-height: 1.1;
-}
-
-.text-gradient {
-    background: linear-gradient(90deg, #2563eb, #7c3aed);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-/* Store Cards: The "Grand" Part */
-.grand-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Two columns for a modern app feel */
-    gap: 16px;
-    padding: 0 24px 100px;
-}
-
-#storeList button {
-    background: white;
-    border: 1px solid rgba(255,255,255,0.8);
-    border-radius: 28px;
-    padding: 24px 16px;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #2980b9, #6dd5fa);
+    height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
-    box-shadow: 0 10px 20px -5px rgba(0,0,0,0.05);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    animation: popIn 0.5s ease-out backwards;
-}
-
-#storeList button:active {
-    transform: scale(0.92);
-    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-}
-
-/* Custom visual icon for stores */
-#storeList button::before {
-    content: '🏪';
-    font-size: 32px;
-    margin-bottom: 12px;
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
-}
-
-@keyframes popIn {
-    0% { opacity: 0; transform: scale(0.8); }
-    100% { opacity: 1; transform: scale(1); }
-}
-
-/* Bottom Sheet */
-.bottom-sheet {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: white;
-    border-radius: 32px 32px 0 0;
-    padding: 20px 24px 50px;
-    box-shadow: 0 -20px 40px rgba(0,0,0,0.1);
-    z-index: 1000;
-}
-
-.sheet-handle {
-    width: 40px;
-    height: 5px;
-    background: #e2e8f0;
-    border-radius: 10px;
-    margin: 0 auto 20px;
-}
-
-.btn-action {
-    background: #0f172a;
     color: white;
-    width: 100%;
-    padding: 18px;
-    border-radius: 20px;
-    font-weight: 700;
-    font-size: 16px;
+}
+
+/* TITLE */
+h2 {
+    text-align: center;
+    padding: 15px;
+}
+
+/* MAIN CONTAINER */
+.container {
+    flex: 1;
+    background: white;
+    color: black;
+    border-radius: 20px 20px 0 0;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* STORE LIST */
+#storeList {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* STORE BUTTON */
+.store-btn {
+    padding: 15px;
+    border-radius: 12px;
+    background: #f5f5f5;
     border: none;
-    margin-top: 20px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: left;
+}
+
+/* SELECTED STORE */
+.store-btn.active {
+    background: #007bff;
+    color: white;
+}
+
+/* TROLLEY SECTION */
+#trolleySection {
+    margin-top: 10px;
+}
+
+/* INPUT */
+input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+
+/* BUTTON */
+button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: bold;
+    color: white;
+    background: #28a745;
+}
+
+/* BACK BUTTON */
+.container > button:last-child {
+    background: #dc3545;
+    margin-top: 10px;
 }
