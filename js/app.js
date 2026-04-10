@@ -1,6 +1,6 @@
 console.log("APP JS LOADED");
 console.log("JS FILE LOADED");
-
+console.log("APP JS LOADED");
 
 let selectedStoreId = localStorage.getItem("storeId") || 1;
 
