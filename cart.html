@@ -5,28 +5,32 @@
     <link rel="stylesheet" href="./style/cart.css">
 </head>
 <body>
-<button class="back-btn" onclick="goBack()">⬅ Back</button>
 
-    <h2>Your Cart</h2>
+<button class="back-btn" onclick="goBack()">⬅</button>
 
-    <div class="container">
+<div class="container">
 
-        <!-- Cart Items -->
-        <div id="cartItems"></div>
+    <h2>🛒 Your Cart</h2>
 
-        <br>
+    <!-- CART LIST -->
+    <div id="cartItems"></div>
 
-        <!-- Total -->
+    <!-- TOTAL CARD -->
+    <div class="card">
         <h3>Total: ₹ <span id="cartTotal">0</span></h3>
-        <br>
-
-        <button onclick="goToScanner()">Add More Products</button>
-        <button onclick="goToPayment()">Proceed to Payment</button>
-        <button onclick="clearCart()">Clear Cart</button>
-
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-    <script src="js/app.js"></script>
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="action-bar">
+    <button onclick="goToScanner()">➕ Add</button>
+    <button onclick="goToPayment()">💳 Pay</button>
+    <button onclick="clearCart()">🗑 Clear</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script src="js/app.js"></script>
+
 </body>
 </html>
