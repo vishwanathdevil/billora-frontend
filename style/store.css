@@ -1,91 +1,148 @@
-/* RESET */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+/* ===============================
+   🔥 BILLORA STORE PAGE UI
+================================ */
 
-/* BODY */
 body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #2980b9, #6dd5fa);
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    color: white;
-}
-
-/* TITLE */
-h2 {
+    font-family: 'Inter', sans-serif;
+    background: radial-gradient(circle at top, #1e293b, #020617);
+    color: #f1f5f9;
     text-align: center;
-    padding: 15px;
+    padding: 20px;
 }
 
-/* MAIN CONTAINER */
+/* ===============================
+   🧠 TITLE
+================================ */
+h2 {
+    margin-top: 20px;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* ===============================
+   📦 MAIN CONTAINER
+================================ */
 .container {
-    flex: 1;
-    background: white;
-    color: black;
-    border-radius: 20px 20px 0 0;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
+    max-width: 420px;
+    margin: auto;
+    margin-top: 20px;
 }
 
-/* STORE LIST */
+/* ===============================
+   🏬 STORE LIST
+================================ */
 #storeList {
-    flex: 1;
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 14px;
 }
 
 /* STORE BUTTON */
-.store-btn {
-    padding: 15px;
-    border-radius: 12px;
-    background: #f5f5f5;
+#storeList button {
+    padding: 16px;
+    border-radius: 18px;
     border: none;
     font-size: 16px;
-    font-weight: bold;
-    text-align: left;
-}
+    font-weight: 600;
+    cursor: pointer;
 
-/* SELECTED STORE */
-.store-btn.active {
-    background: #007bff;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
     color: white;
+
+    box-shadow: 0 6px 25px rgba(59,130,246,0.4);
+    transition: all 0.25s ease;
 }
 
-/* TROLLEY SECTION */
+#storeList button:hover {
+    transform: translateY(-3px);
+    opacity: 0.95;
+}
+
+#storeList button:active {
+    transform: scale(0.96);
+}
+
+/* ===============================
+   🛒 TROLLEY POPUP
+================================ */
 #trolleySection {
-    margin-top: 10px;
+    margin-top: 25px;
+    padding: 20px;
+    border-radius: 20px;
+
+    background: linear-gradient(145deg, #0f172a, #020617);
+    box-shadow: 
+        0 10px 40px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+
+    animation: popupFade 0.4s ease;
 }
 
 /* INPUT */
-input {
+#trolleySection input {
     width: 100%;
     padding: 14px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    margin-bottom: 10px;
-}
-
-/* BUTTON */
-button {
-    width: 100%;
-    padding: 14px;
+    margin-bottom: 12px;
+    border-radius: 12px;
     border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: bold;
-    color: white;
-    background: #28a745;
+    font-size: 14px;
+    background: #020617;
+    color: #fff;
+    outline: none;
 }
 
-/* BACK BUTTON */
-.container > button:last-child {
-    background: #dc3545;
-    margin-top: 10px;
+/* START BUTTON */
+#trolleySection button {
+    width: 100%;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(34,197,94,0.4);
+}
+
+/* ===============================
+   🔙 BACK BUTTON
+================================ */
+.container > button {
+    margin-top: 20px;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    background: #ef4444;
+    color: white;
+    font-weight: 600;
+}
+
+/* ===============================
+   ✨ POPUP ANIMATION
+================================ */
+@keyframes popupFade {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ===============================
+   📱 MOBILE OPTIMIZATION
+================================ */
+@media (max-width: 480px) {
+    h2 {
+        font-size: 22px;
+    }
+
+    #storeList button {
+        font-size: 15px;
+        padding: 14px;
+    }
 }

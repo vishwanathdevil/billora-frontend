@@ -1,3 +1,7 @@
+/* ===============================
+   🔥 BILLORA CART UI - PREMIUM
+================================ */
+
 /* RESET */
 * {
     margin: 0;
@@ -7,80 +11,174 @@
 
 /* BODY */
 body {
-    font-family: Arial, sans-serif;
-    background: #f4f6f9;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
+    font-family: 'Inter', sans-serif;
+    background: radial-gradient(circle at top, #0f172a, #020617);
+    color: #f1f5f9;
 }
 
-/* HEADER */
+/* ===============================
+   🔝 HEADER
+================================ */
+.back-btn {
+    margin: 16px;
+    background: #1e293b;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+}
+
+/* ===============================
+   📦 CONTAINER
+================================ */
+.container {
+    max-width: 420px;
+    margin: auto;
+    padding: 16px;
+}
+
+/* TITLE */
 h2 {
     text-align: center;
-    padding: 15px;
-    background: #0d6efd;
-    color: white;
+    margin-bottom: 16px;
+    font-size: 22px;
+    font-weight: 600;
 }
 
-/* BACK BUTTON */
-.back-btn {
-    margin: 10px;
-    padding: 10px;
-    border: none;
-    background: #333;
-    color: white;
-    border-radius: 8px;
-}
-
-/* CONTAINER */
-.container {
-    flex: 1;
-    overflow-y: auto;
-    padding: 15px;
-}
-
-/* TOTAL */
-h3 {
-    text-align: center;
-    margin: 10px 0;
-    font-size: 18px;
-}
-
-/* QR */
-#qrContainer {
+/* ===============================
+   🛒 CART ITEMS
+================================ */
+#cartItems {
     display: flex;
-    justify-content: center;
-    margin: 15px 0;
+    flex-direction: column;
+    gap: 12px;
 }
 
-/* BUTTON GROUP */
-.container button {
-    width: 100%;
-    padding: 14px;
-    margin: 8px 0;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: bold;
+/* EACH ITEM CARD */
+#cartItems div {
+    background: linear-gradient(145deg, #020617, #0f172a);
+    padding: 16px;
+    border-radius: 18px;
+
+    box-shadow:
+        0 8px 30px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+
+    transition: 0.2s;
+}
+
+/* ITEM HOVER */
+#cartItems div:hover {
+    transform: translateY(-2px);
+}
+
+/* PRODUCT NAME */
+#cartItems h4 {
+    font-size: 16px;
+    margin-bottom: 6px;
+}
+
+/* DETAILS */
+#cartItems p {
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+/* ===============================
+   💰 TOTAL CARD
+================================ */
+.card {
+    margin-top: 16px;
+    padding: 18px;
+    border-radius: 18px;
+
+    background: linear-gradient(135deg, #22c55e, #16a34a);
     color: white;
+
+    text-align: center;
+
+    box-shadow: 0 10px 30px rgba(34,197,94,0.4);
+}
+
+.card h3 {
+    font-size: 20px;
+}
+
+/* ===============================
+   📱 ACTION BAR
+================================ */
+.action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+
+    display: flex;
+    gap: 10px;
+    padding: 14px;
+
+    background: rgba(2,6,23,0.95);
+    backdrop-filter: blur(10px);
+
+    border-top: 1px solid #1e293b;
+}
+
+/* BUTTONS */
+.action-bar button {
+    flex: 1;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
     cursor: pointer;
     transition: 0.2s;
 }
 
-/* BUTTON COLORS */
-.container button:nth-of-type(1) {
-    background: #0d6efd; /* Add More */
+/* ADD */
+.action-bar button:nth-child(1) {
+    background: #334155;
+    color: white;
 }
 
-.container button:nth-of-type(2) {
-    background: #198754; /* Payment */
+/* PAY */
+.action-bar button:nth-child(2) {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
 }
 
-.container button:nth-of-type(3) {
-    background: #dc3545; /* Clear */
+/* CLEAR */
+.action-bar button:nth-child(3) {
+    background: #ef4444;
+    color: white;
 }
 
-/* ACTIVE CLICK EFFECT */
-.container button:active {
-    transform: scale(0.97);
+/* EFFECTS */
+.action-bar button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.action-bar button:active {
+    transform: scale(0.95);
+}
+
+/* ===============================
+   📱 MOBILE
+================================ */
+@media (max-width: 480px) {
+
+    h2 {
+        font-size: 20px;
+    }
+
+    .card h3 {
+        font-size: 18px;
+    }
+
+    .action-bar button {
+        font-size: 13px;
+        padding: 12px;
+    }
 }

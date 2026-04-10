@@ -1,60 +1,121 @@
-/* RESET */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* ===============================
+   🔥 BILLORA HOME - PREMIUM UI
+================================ */
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: radial-gradient(circle at top, #1e293b, #020617);
+    color: #f1f5f9;
 }
 
-/* BODY */
-body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
+/* CONTAINER */
+.container {
+    max-width: 420px;
+    margin: auto;
+    padding: 20px;
     height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    color: white;
 }
 
-/* TITLE */
+/* ===============================
+   👋 HEADER
+================================ */
 h2 {
+    font-size: 24px;
+    font-weight: 700;
     text-align: center;
     margin-top: 30px;
-    font-size: 24px;
+    letter-spacing: 0.5px;
 }
 
-/* CONTAINER CENTER */
-.container {
+/* ===============================
+   📦 MAIN CARD
+================================ */
+.card {
+    background: linear-gradient(145deg, #0f172a, #020617);
+    border-radius: 24px;
+    padding: 25px;
+    box-shadow: 
+        0 10px 40px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+    
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    padding: 20px;
-    margin-bottom: 40px;
+    gap: 18px;
 }
 
-/* BUTTONS */
+/* ===============================
+   🔘 BUTTONS
+================================ */
 button {
     width: 100%;
     padding: 16px;
+    border-radius: 16px;
     border: none;
-    border-radius: 12px;
     font-size: 16px;
-    font-weight: bold;
-    color: white;
+    font-weight: 600;
     cursor: pointer;
+    transition: all 0.25s ease;
 }
 
-/* BUTTON COLORS */
-.container button:nth-child(1) {
-    background: #007bff; /* Select Store */
+/* PRIMARY BUTTON */
+.card button:nth-child(1) {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+    box-shadow: 0 6px 20px rgba(34,197,94,0.4);
 }
 
-.container button:nth-child(2) {
-    background: #28a745; /* Previous Bills */
+/* SECOND BUTTON */
+.card button:nth-child(3) {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    box-shadow: 0 6px 20px rgba(59,130,246,0.4);
 }
 
-/* LOGOUT */
-body > button {
-    margin: 15px;
-    background: #dc3545;
+/* LOGOUT BUTTON */
+.container > button {
+    background: #ef4444;
+    color: white;
+    margin-bottom: 20px;
+}
+
+/* HOVER EFFECT */
+button:hover {
+    transform: translateY(-2px);
+    opacity: 0.95;
+}
+
+/* CLICK EFFECT */
+button:active {
+    transform: scale(0.96);
+}
+
+/* ===============================
+   ✨ EXTRA TOUCH (branding feel)
+================================ */
+.container::before {
+    content: "Billora";
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    letter-spacing: 4px;
+    color: #64748b;
+}
+
+/* ===============================
+   📱 MOBILE OPTIMIZATION
+================================ */
+@media (max-width: 480px) {
+    h2 {
+        font-size: 22px;
+    }
+
+    button {
+        font-size: 15px;
+        padding: 14px;
+    }
 }
