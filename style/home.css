@@ -13,7 +13,8 @@ body {
     max-width: 420px;
     margin: auto;
     padding: 20px;
-    height: 100vh;
+
+    min-height: 100dvh; /* ✅ BEST for mobile */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
