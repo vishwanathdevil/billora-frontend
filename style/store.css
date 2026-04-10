@@ -1,57 +1,147 @@
-/* Container for the list of stores */
-.store-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
-    max-height: 300px;
-    overflow-y: auto;
-    padding-right: 5px;
-    margin-bottom: 10px;
+/* Layout & Background */
+.main-layout {
+    width: 100vw;
+    height: 100vh;
+    background: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
-/* Custom styling for buttons injected by JS */
+/* Header Styling */
+.store-header {
+    padding: 60px 25px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.header-text h1 {
+    font-size: 24px;
+    font-weight: 800;
+    margin: 0;
+    color: #0f172a;
+    letter-spacing: -0.5px;
+}
+
+.header-text p {
+    margin: 2px 0 0;
+    font-size: 14px;
+    color: #64748b;
+}
+
+.icon-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* Search Bar */
+.search-box {
+    margin: 20px;
+    position: relative;
+}
+
+.search-box i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    color: #94a3b8;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 14px 14px 14px 45px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    font-size: 15px;
+}
+
+/* Store Grid & Cards */
+.store-grid {
+    padding: 0 20px 100px;
+    display: grid;
+    gap: 15px;
+    overflow-y: auto;
+}
+
+/* Style for buttons injected via JS */
 #storeList button {
     background: white;
-    color: var(--primary);
     border: 1px solid #e2e8f0;
-    text-align: left;
-    padding: 16px;
+    padding: 20px;
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    text-align: left;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
 }
 
-#storeList button:hover, #storeList button:active {
-    border-color: var(--accent);
-    background: rgba(37, 99, 235, 0.05);
-    transform: translateY(-2px);
+#storeList button:active {
+    transform: scale(0.97);
+    border-color: #2563eb;
+    background: #f0f7ff;
 }
 
-/* Arrow indicator for each store button */
-#storeList button::after {
-    content: '→';
-    font-weight: 800;
-    color: var(--accent);
+/* Trolley Slide-up Panel */
+.trolley-slide-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 30px 30px 0 0;
+    box-shadow: 0 -10px 25px rgba(0,0,0,0.1);
+    padding: 20px 25px 40px;
+    z-index: 100;
+    animation: slideUp 0.5s ease;
 }
 
-/* Scrollbar styling for the store list */
-.store-grid::-webkit-scrollbar {
-    width: 4px;
-}
-
-.store-grid::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+.drag-handle {
+    width: 40px;
+    height: 5px;
+    background: #e2e8f0;
     border-radius: 10px;
+    margin: 0 auto 20px;
 }
 
-/* Animation for the Trolley Section appearance */
-#trolleySection {
-    animation: slideUp 0.4s ease-out;
+.panel-content h3 {
+    font-weight: 800;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-grand {
+    background: #0f172a;
+    color: white;
+    padding: 18px;
+    border-radius: 18px;
+    width: 100%;
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+    border: none;
 }
 
 @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
 }

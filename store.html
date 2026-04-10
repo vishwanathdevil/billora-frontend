@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Billora | Select Store</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -12,30 +13,41 @@
 </head>
 <body>
 
-    <div class="login-wrapper"> <div class="login-card"> <div class="logo-area">
-                <div class="logo-icon" style="background: var(--accent);">
-                    <i data-lucide="map-pin"></i>
-                </div>
+    <div class="main-layout">
+        <header class="store-header">
+            <button class="icon-btn" onclick="goHome()">
+                <i data-lucide="chevron-left"></i>
+            </button>
+            <div class="header-text">
                 <h1>Select Store</h1>
-                <p class="subtitle">Where are you shopping today?</p>
+                <p>Find a Billora partner near you</p>
+            </div>
+            <div class="user-badge">
+                <i data-lucide="map-pin"></i>
+            </div>
+        </header>
+
+        <main class="content-area">
+            <div class="search-box">
+                <i data-lucide="search"></i>
+                <input type="text" placeholder="Search for a store...">
             </div>
 
             <div id="storeList" class="store-grid">
                 </div>
 
-            <div id="trolleySection" style="display:none; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.1);">
-                <div class="input-group">
-                    <i data-lucide="shopping-cart"></i>
-                    <input type="text" id="trolleyNumber" placeholder="Enter Trolley Number">
+            <div id="trolleySection" class="trolley-slide-panel" style="display:none;">
+                <div class="drag-handle"></div>
+                <div class="panel-content">
+                    <h3><i data-lucide="shopping-cart"></i> Finalize Trolley</h3>
+                    <p>Enter the number found on your trolley handle.</p>
+                    <input type="text" id="trolleyNumber" placeholder="Ex: TRL-204">
+                    <button class="btn-grand" onclick="startShopping()">
+                        Start Shopping <span>→</span>
+                    </button>
                 </div>
-                <button class="btn-primary" onclick="startShopping()">Start Shopping</button>
             </div>
-
-            <button class="btn-secondary" onclick="goHome()" style="margin-top: 20px;">
-                <i data-lucide="arrow-left" style="width: 16px; vertical-align: middle; margin-right: 5px;"></i> 
-                Back
-            </button>
-        </div>
+        </main>
     </div>
 
     <script>
