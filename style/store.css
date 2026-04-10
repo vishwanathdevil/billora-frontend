@@ -1,91 +1,57 @@
-/* RESET */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-/* BODY */
-body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #2980b9, #6dd5fa);
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    color: white;
-}
-
-/* TITLE */
-h2 {
-    text-align: center;
-    padding: 15px;
-}
-
-/* MAIN CONTAINER */
-.container {
-    flex: 1;
-    background: white;
-    color: black;
-    border-radius: 20px 20px 0 0;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-}
-
-/* STORE LIST */
-#storeList {
-    flex: 1;
+/* Container for the list of stores */
+.store-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    max-height: 300px;
     overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-/* STORE BUTTON */
-.store-btn {
-    padding: 15px;
-    border-radius: 12px;
-    background: #f5f5f5;
-    border: none;
-    font-size: 16px;
-    font-weight: bold;
-    text-align: left;
-}
-
-/* SELECTED STORE */
-.store-btn.active {
-    background: #007bff;
-    color: white;
-}
-
-/* TROLLEY SECTION */
-#trolleySection {
-    margin-top: 10px;
-}
-
-/* INPUT */
-input {
-    width: 100%;
-    padding: 14px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
+    padding-right: 5px;
     margin-bottom: 10px;
 }
 
-/* BUTTON */
-button {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: bold;
-    color: white;
-    background: #28a745;
+/* Custom styling for buttons injected by JS */
+#storeList button {
+    background: white;
+    color: var(--primary);
+    border: 1px solid #e2e8f0;
+    text-align: left;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
-/* BACK BUTTON */
-.container > button:last-child {
-    background: #dc3545;
-    margin-top: 10px;
+#storeList button:hover, #storeList button:active {
+    border-color: var(--accent);
+    background: rgba(37, 99, 235, 0.05);
+    transform: translateY(-2px);
+}
+
+/* Arrow indicator for each store button */
+#storeList button::after {
+    content: '→';
+    font-weight: 800;
+    color: var(--accent);
+}
+
+/* Scrollbar styling for the store list */
+.store-grid::-webkit-scrollbar {
+    width: 4px;
+}
+
+.store-grid::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+/* Animation for the Trolley Section appearance */
+#trolleySection {
+    animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
