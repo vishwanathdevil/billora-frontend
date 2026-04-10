@@ -3,24 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Billora - Login</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Billora | Next-Gen Shopping</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="./style/global.css">
 </head>
 <body>
 
-    <div class="container" style="text-align: center; margin-top: 50px;">
-        <div style="font-size: 50px;">🛒</div>
-        <h1 style="font-weight: 800; letter-spacing: -1px;">Billora</h1>
-        <p style="color: #64748b; margin-bottom: 30px;">Your smart shopping companion</p>
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i data-lucide="shopping-cart"></i>
+                </div>
+                <h1>Billora</h1>
+                <p class="subtitle">Self-checkout made simple</p>
+            </div>
 
-        <div class="card">
-            <input type="text" id="username" placeholder="Username">
-            <input type="password" id="password" placeholder="Password">
-            <button onclick="login()">Sign In</button>
-            <button class="secondary" onclick="register()">Create Account</button>
+            <div class="input-group">
+                <i data-lucide="user"></i>
+                <input type="text" id="username" placeholder="Username">
+            </div>
+
+            <div class="input-group">
+                <i data-lucide="lock"></i>
+                <input type="password" id="password" placeholder="Password">
+            </div>
+
+            <button class="btn-primary" onclick="login()">Login to Store</button>
+            <button class="btn-secondary" onclick="register()">Create Account</button>
         </div>
     </div>
 
+    <div id="toast"></div>
+
+    <script>
+        // This triggers the Lucide icons to render
+        lucide.createIcons();
+    </script>
     <script src="js/app.js"></script>
     <script src="js/index.js"></script>
 </body>
