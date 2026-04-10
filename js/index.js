@@ -54,7 +54,15 @@ function login() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password })
     })
-    .then(res => res.json())
+    .then(async res => {
+        const data = await res.json().catch(() => null);
+
+        if (!res.ok) {
+            throw new Error(data || "Login failed");
+        }
+
+        return data;
+    })
     .then(user => {
 
         localStorage.setItem("user", JSON.stringify(user));
@@ -67,5 +75,8 @@ function login() {
         } else {
             window.location.href = "home.html";
         }
+    })
+    .catch(err => {
+        alert("❌ " + err.message);
     });
 }
