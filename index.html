@@ -1,23 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Billora - Login</title>
     <link rel="stylesheet" href="./style/global.css">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2196f3">
 </head>
 <body>
 
-    <div class="container">
-        <h2>Billora</h2>
+    <div class="container" style="text-align: center; margin-top: 50px;">
+        <div style="font-size: 50px;">🛒</div>
+        <h1 style="font-weight: 800; letter-spacing: -1px;">Billora</h1>
+        <p style="color: #64748b; margin-bottom: 30px;">Your smart shopping companion</p>
 
-        <input type="text" id="username" placeholder="Enter Username">
-        <input type="password" id="password" placeholder="Enter Password">
-
-        <button onclick="login()">Login</button>
-        <button onclick="register()">Register</button>
+        <div class="card">
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="login()">Sign In</button>
+            <button class="secondary" onclick="register()">Create Account</button>
+        </div>
     </div>
-    <div id="toast"></div>
 
     <script src="js/app.js"></script>
     <script src="js/index.js"></script>
