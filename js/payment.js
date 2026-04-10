@@ -1,6 +1,5 @@
 let stompClient = null;
 
-
 function showToast(msg) {
     let toast = document.getElementById("toast");
 
@@ -51,22 +50,22 @@ if (document.getElementById("payBtn")) {
     totalEl.innerText = total;
 
     // ===============================
-    // CREATE BILL (ONLY IF NO ID)
+    // CREATE BILL
     // ===============================
     if (!currentBillId) {
         fetch("https://billora-backend-9kyk.onrender.com/api/bills", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-    username: user?.username || "Guest",
-    items: cart.map(i => ({
-        name: i.name,
-        quantity: i.quantity,
-        price: i.price
-    })),
-    total: total,
-    storeId: selectedStoreId
-})
+                username: user?.username || "Guest",
+                items: cart.map(i => ({
+                    name: i.name,
+                    quantity: i.quantity,
+                    price: i.price
+                })),
+                total: total,
+                storeId: selectedStoreId
+            })
         })
         .then(res => res.json())
         .then(bill => {
@@ -75,18 +74,21 @@ if (document.getElementById("payBtn")) {
 
             const qrUrl = `${window.location.origin}/payment.html?id=${bill.id}`;
 
-            QRCode.toCanvas(qrUrl,{width:250}, function (err, canvas) {
+            QRCode.toCanvas(qrUrl, { width: 250 }, function (err, canvas) {
                 qrContainer.innerHTML = "";
                 qrContainer.appendChild(canvas);
             });
+
+            startPolling(); // ✅ fallback
         });
     } else {
-        // If already has billId (QR opened), still show QR
         const qrUrl = `${window.location.origin}/payment.html?id=${currentBillId}`;
-        QRCode.toCanvas(qrUrl,{width:250}, function (err, canvas) {
+        QRCode.toCanvas(qrUrl, { width: 250 }, function (err, canvas) {
             qrContainer.innerHTML = "";
             qrContainer.appendChild(canvas);
         });
+
+        startPolling(); // ✅ fallback
     }
 
     // ===============================
@@ -98,9 +100,10 @@ if (document.getElementById("payBtn")) {
     // PAY NOW
     // ===============================
     window.payNow = function () {
+
         const btn = document.getElementById("payBtn");
-btn.disabled = true;
-btn.innerText = "Processing...";
+        btn.disabled = true;
+        btn.innerText = "Processing...";
 
         fetch("https://billora-backend-9kyk.onrender.com/api/payment/create-order", {
             method: "POST",
@@ -118,6 +121,7 @@ btn.innerText = "Processing...";
 
                 handler: function (response) {
 
+                    // 🔥 VERIFY PAYMENT
                     fetch("https://billora-backend-9kyk.onrender.com/api/payment/verify", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -127,12 +131,24 @@ btn.innerText = "Processing...";
                             razorpay_signature: response.razorpay_signature,
                             billId: currentBillId
                         })
+                    })
+                    .then(() => {
+                        // fallback polling will handle success
+                        console.log("Verify sent");
+                    })
+                    .catch(() => {
+                        console.log("Verify failed, polling fallback active");
                     });
                 }
             };
 
             const rzp = new Razorpay(options);
             rzp.open();
+        })
+        .catch(() => {
+            btn.disabled = false;
+            btn.innerText = "Pay Now";
+            alert("Payment failed ❌");
         });
     };
 }
@@ -155,19 +171,47 @@ function connectCustomerSocket() {
 
             console.log("Bill update:", bill);
 
-            // ENABLE BUTTON
             if (bill.id == currentBillId && bill.status === "PAYMENT_PENDING") {
                 document.getElementById("payBtn").disabled = false;
             }
 
-            // SUCCESS
             if (bill.id == currentBillId && bill.status === "PAID") {
+
                 localStorage.removeItem("cart");
 
-showToast("Payment Successful ✅");
+                showToast("Payment Successful ✅");
 
-window.location.href = `bills.html?id=${currentBillId}`;
+                window.location.href = `bills.html?id=${currentBillId}`;
             }
         });
     });
+}
+
+// ===============================
+// 🔥 FALLBACK POLLING (CRITICAL FIX)
+// ===============================
+function startPolling() {
+
+    setInterval(async () => {
+
+        if (!currentBillId) return;
+
+        try {
+            const res = await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${currentBillId}`);
+            const bill = await res.json();
+
+            if (bill.status === "PAID") {
+
+                localStorage.removeItem("cart");
+
+                showToast("Payment Successful ✅");
+
+                window.location.href = `bills.html?id=${currentBillId}`;
+            }
+
+        } catch (err) {
+            console.log("Polling retry...");
+        }
+
+    }, 3000);
 }
