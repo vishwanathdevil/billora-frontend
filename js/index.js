@@ -1,6 +1,8 @@
 console.log("LOGIN JS LOADED");
 
-
+/* ================================
+   🔔 TOAST
+================================ */
 function showToast(msg) {
     let toast = document.getElementById("toast");
 
@@ -18,18 +20,16 @@ function showToast(msg) {
     }, 2000);
 }
 
-
-
-
 /* ================================
-   🔐 LOGIN + REGISTER ONLY
+   🔐 REGISTER
 ================================ */
-
 function register() {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value.trim();
 
-    if (!username || !password) return alert("Enter details");
+    if (!username || !password) return showToast("Enter details");
+
+    showLoader(true);
 
     fetch("https://billora-backend-9kyk.onrender.com/api/users/register", {
         method: "POST",
@@ -40,14 +40,25 @@ function register() {
     .then(data => {
         localStorage.setItem("user", JSON.stringify(data));
         window.location.href = "home.html";
-    });
+    })
+    .catch(() => showToast("Registration failed"))
+    .finally(() => showLoader(false));
 }
 
+/* ================================
+   🔐 LOGIN (PREMIUM UX)
+================================ */
 function login() {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value.trim();
+    const btn = document.getElementById("loginBtn");
 
-    if (!username || !password) return alert("Enter details");
+    if (!username || !password) return showToast("Enter details");
+
+    // 🔥 UI START
+    btn.disabled = true;
+    btn.innerText = "⏳ Logging in...";
+    showLoader(true);
 
     fetch("https://billora-backend-9kyk.onrender.com/api/users/login", {
         method: "POST",
@@ -77,6 +88,21 @@ function login() {
         }
     })
     .catch(err => {
-        alert("❌ " + err.message);
+        showToast("❌ " + err.message);
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerText = "Login to shop";
+        showLoader(false);
     });
+}
+
+/* ================================
+   🔄 LOADER CONTROL
+================================ */
+function showLoader(state) {
+    const loader = document.getElementById("loader");
+    if (loader) {
+        loader.style.display = state ? "flex" : "none";
+    }
 }
