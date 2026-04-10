@@ -36,75 +36,68 @@ function startCashierScanner() {
     html5QrCode.start(
         { facingMode: "environment" },
         {
-            fps: 30,
-            qrbox: 350
+            fps: 20,
+            qrbox: 500
         },
 
-        async (decodedText) => {
+async (decodedText) => {
 
-            // 🚫 prevent multiple scans
-            let lastScanTime = 0;
+    if (Date.now() - lastScanTime < 2000) return;
+    lastScanTime = Date.now();
 
-            if (Date.now() - lastScanTime < 2000) return;
-            lastScanTime = Date.now();
+    console.log("QR:", decodedText);
 
-            console.log("QR:", decodedText);
+    let billId;
 
-            let billId;
+    try {
+        if (decodedText.includes("id=")) {
+            const url = new URL(decodedText);
+            billId = url.searchParams.get("id");
+        } else {
+            billId = decodedText;
+        }
+    } catch {
+        alert("Invalid QR ❌");
+        resetScanner();
+        return;
+    }
 
-            try {
-                if (decodedText.includes("id=")) {
-                    const url = new URL(decodedText);
-                    billId = url.searchParams.get("id");
-                } else {
-                    billId = decodedText;
-                }
-            } catch {
-                alert("Invalid QR ❌");
-                resetScanner();
-                return;
-            }
+    if (!billId) {
+        alert("Invalid QR ❌");
+        resetScanner();
+        return;
+    }
 
-            if (!billId) {
-                alert("Invalid QR ❌");
-                resetScanner();
-                return;
-            }
+    currentBillId = billId;
 
-            currentBillId = billId;
+    try {
+        const res = await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${billId}`);
 
-            try {
-                const res = await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${billId}`);
+        if (!res.ok) throw new Error();
 
-                if (!res.ok) throw new Error();
+        const bill = await res.json();
 
-                const bill = await res.json();
+        if (bill.storeId !== storeId) {
+            alert("This bill does not belong to your store ❌");
+            resetScanner();
+            return;
+        }
 
-                console.log("Bill Store:", bill.storeId, "Cashier Store:", storeId);
+        // ✅ STOP CAMERA CLEANLY
+        if (html5QrCode) {
+            await html5QrCode.stop();
+            html5QrCode.clear(); // 🔥 IMPORTANT
+            html5QrCode = null;
+        }
 
-                // 🏬 STORE VALIDATION
-                if (bill.storeId !== storeId) {
-                    alert("This bill does not belong to your store ❌");
-                    resetScanner();
-                    return;
-                }
+        showBill(bill);
 
-                // ✅ stop scanner safely
-                if (html5QrCode) {
-                    try {
-                        await html5QrCode.stop();
-                    } catch {}
-                    html5QrCode = null;
-                }
-
-                showBill(bill);
-
-            } catch (err) {
-                console.error(err);
-                alert("Bill not found ❌");
-                resetScanner();
-            }
-        },
+    } catch (err) {
+        console.error(err);
+        alert("Bill not found ❌");
+        resetScanner();
+    }
+},
 
         () => {} // ignore scan errors
     );
