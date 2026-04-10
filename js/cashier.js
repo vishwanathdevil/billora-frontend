@@ -13,21 +13,20 @@ const container = document.getElementById("ordersContainer");
 
 let html5QrCode = null;
 let currentBillId = null;
+let lastScanTime = 0; // ✅ FIXED (global)
 
 // 📷 START QR SCANNER
-let isScanning = true;
-
 function startCashierScanner() {
 
-    container.innerHTML = `<h3>📷 Scan Customer QR</h3>
-    <div id=\"reader\"></div>`;
-
-    // 🔥 reset flags
-    isScanning = true;
+    container.innerHTML = `
+        <h3>📷 Scan Customer QR</h3>
+        <div id="reader"></div>
+    `;
 
     // clean previous instance
     if (html5QrCode) {
         html5QrCode.stop().catch(() => {});
+        html5QrCode.clear().catch(() => {});
         html5QrCode = null;
     }
 
@@ -36,68 +35,71 @@ function startCashierScanner() {
     html5QrCode.start(
         { facingMode: "environment" },
         {
-            fps: 20,
-            qrbox: 500
+            fps: 10, // ✅ optimized
+            qrbox: { width: 250, height: 250 }
         },
 
-async (decodedText) => {
+        async (decodedText) => {
 
-    if (Date.now() - lastScanTime < 2000) return;
-    lastScanTime = Date.now();
+            // 🚫 prevent multiple scans
+            if (Date.now() - lastScanTime < 2000) return;
+            lastScanTime = Date.now();
 
-    console.log("QR:", decodedText);
+            console.log("QR:", decodedText);
 
-    let billId;
+            let billId;
 
-    try {
-        if (decodedText.includes("id=")) {
-            const url = new URL(decodedText);
-            billId = url.searchParams.get("id");
-        } else {
-            billId = decodedText;
-        }
-    } catch {
-        alert("Invalid QR ❌");
-        resetScanner();
-        return;
-    }
+            try {
+                // ✅ FIXED parsing (robust)
+                if (decodedText.includes("id=")) {
+                    const match = decodedText.match(/id=(\d+)/);
+                    billId = match ? match[1] : null;
+                } else {
+                    billId = decodedText;
+                }
+            } catch {
+                alert("Invalid QR ❌");
+                resetScanner();
+                return;
+            }
 
-    if (!billId) {
-        alert("Invalid QR ❌");
-        resetScanner();
-        return;
-    }
+            if (!billId) {
+                alert("Invalid QR ❌");
+                resetScanner();
+                return;
+            }
 
-    currentBillId = billId;
+            currentBillId = billId;
 
-    try {
-        const res = await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${billId}`);
+            try {
+                const res = await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${billId}`);
 
-        if (!res.ok) throw new Error();
+                if (!res.ok) throw new Error();
 
-        const bill = await res.json();
+                const bill = await res.json();
 
-        if (bill.storeId !== storeId) {
-            alert("This bill does not belong to your store ❌");
-            resetScanner();
-            return;
-        }
+                // 🏬 STORE VALIDATION
+                if (bill.storeId !== storeId) {
+                    alert("This bill does not belong to your store ❌");
+                    resetScanner();
+                    return;
+                }
 
-        // ✅ STOP CAMERA CLEANLY
-        if (html5QrCode) {
-            await html5QrCode.stop();
-            html5QrCode.clear(); // 🔥 IMPORTANT
-            html5QrCode = null;
-        }
+                // ✅ STOP CAMERA PROPERLY
+                if (html5QrCode) {
+                    await html5QrCode.stop();
+                    await html5QrCode.clear(); // 🔥 IMPORTANT
+                    html5QrCode = null;
+                }
 
-        showBill(bill);
+                showBill(bill);
 
-    } catch (err) {
-        console.error(err);
-        alert("Bill not found ❌");
-        resetScanner();
-    }
-},
+            } catch (err) {
+                console.error(err);
+                alert("Bill not found ❌");
+                resetScanner();
+            }
+        },
 
         () => {} // ignore scan errors
     );
@@ -112,12 +114,15 @@ function resetScanner() {
 
     if (html5QrCode) {
         html5QrCode.stop().catch(() => {});
+        html5QrCode.clear().catch(() => {});
         html5QrCode = null;
     }
 
+    container.innerHTML = "<h3>🔄 Restarting scanner...</h3>";
+
     setTimeout(() => {
         startCashierScanner();
-    }, 1000);
+    }, 1500); // ✅ FIXED delay
 }
 
 // 🧾 SHOW BILL
@@ -132,8 +137,8 @@ function showBill(bill) {
         <h3>Items:</h3>
         <ul>
             ${bill.items?.map(item => 
-    `<li>${item.name} x${item.quantity} - ₹${item.price * item.quantity}</li>`
-).join("")}
+                `<li>${item.name} x${item.quantity} - ₹${item.price * item.quantity}</li>`
+            ).join("")}
         </ul>
 
         ${
@@ -158,13 +163,13 @@ function showWaitingUI(id) {
         <button onclick="cancelUPI()">❌ Cancel & Switch to Cash</button>
     `;
 }
+
 function cancelUPI() {
     alert("UPI Cancelled → Use Cash");
-
     restartScanner();
 }
 
-// 📱 UPI PAYMENT (Approve only)
+// 📱 UPI PAYMENT
 async function payOnline(id) {
 
     try {
@@ -175,11 +180,8 @@ async function payOnline(id) {
 
         alert("Waiting for customer payment ⏳");
 
-        // ❌ DO NOT RESET HERE
-        // resetFlow();  ← REMOVE THIS
         showWaitingUI(id);
-
-        startPaymentListener(id); // ✅ start waiting
+        startPaymentListener(id);
 
     } catch (err) {
         console.error(err);
@@ -187,7 +189,7 @@ async function payOnline(id) {
     }
 }
 
-// payment listener (polling)
+// polling
 function startPaymentListener(id) {
 
     const interval = setInterval(async () => {
@@ -230,7 +232,7 @@ async function payCash(id) {
     }
 }
 
-// 🔁 RESET FLOW (BEST PRACTICE)
+// 🔁 RESET FLOW
 function resetFlow() {
 
     currentBillId = null;
@@ -239,20 +241,21 @@ function resetFlow() {
 
     setTimeout(() => {
         startCashierScanner();
-    }, 1000);
+    }, 1500);
 }
 
-// 🔁 RESTART MANUAL
-    function restartScanner() {
+// 🔁 RESTART
+function restartScanner() {
 
     if (html5QrCode) {
         html5QrCode.stop().catch(() => {});
+        html5QrCode.clear().catch(() => {});
         html5QrCode = null;
     }
 
     setTimeout(() => {
         startCashierScanner();
-    }, 500);
+    }, 1000);
 }
 
 // 🚪 LOGOUT
@@ -280,15 +283,12 @@ function connectWebSocket() {
 
             const bill = JSON.parse(message.body);
 
-            console.log("Bill update received:", bill);
-
             if (bill.status === "PAID") {
                 alert("Customer Paid ✅");
-                resetFlow(); // refresh UI
+                resetFlow();
             }
         });
     });
 }
 
-// AUTO CONNECT
 connectWebSocket();
