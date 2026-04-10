@@ -1,21 +1,31 @@
-/* Layout & Background */
-.main-layout {
-    width: 100vw;
-    height: 100vh;
+/* Layout Settings */
+body {
     background: #f8fafc;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    margin: 0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
-/* Header Styling */
+.page-container {
+    max-width: 500px; /* Keeps it looking like a mobile app even on desktop */
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header with Blur Effect */
 .store-header {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     padding: 60px 25px 20px;
     display: flex;
     align-items: center;
     gap: 15px;
-    background: white;
-    border-bottom: 1px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
 .header-text h1 {
@@ -23,13 +33,13 @@
     font-weight: 800;
     margin: 0;
     color: #0f172a;
-    letter-spacing: -0.5px;
+    letter-spacing: -1px;
 }
 
 .header-text p {
-    margin: 2px 0 0;
     font-size: 14px;
     color: #64748b;
+    margin: 2px 0 0;
 }
 
 .icon-btn {
@@ -42,106 +52,97 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    color: #0f172a;
 }
 
-/* Search Bar */
-.search-box {
+/* Search Box Styling */
+.search-container {
     margin: 20px;
-    position: relative;
-}
-
-.search-box i {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 18px;
-    color: #94a3b8;
-}
-
-.search-box input {
-    width: 100%;
-    padding: 14px 14px 14px 45px;
-    background: #fff;
+    background: white;
+    border-radius: 18px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
     border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    font-size: 15px;
 }
 
-/* Store Grid & Cards */
+.search-container input {
+    border: none;
+    outline: none;
+    font-size: 16px;
+    width: 100%;
+    font-weight: 500;
+}
+
+/* Store Cards */
 .store-grid {
-    padding: 0 20px 100px;
-    display: grid;
+    padding: 10px 20px 100px;
+    display: flex;
+    flex-direction: column;
     gap: 15px;
-    overflow-y: auto;
 }
 
-/* Style for buttons injected via JS */
+/* These styles target the buttons injected by your JS */
 #storeList button {
     background: white;
     border: 1px solid #e2e8f0;
     padding: 20px;
-    border-radius: 20px;
+    border-radius: 22px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    text-align: left;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+    animation: slideIn 0.5s ease-out backwards;
 }
 
 #storeList button:active {
-    transform: scale(0.97);
-    border-color: #2563eb;
-    background: #f0f7ff;
+    transform: scale(0.96);
+    background: #f1f5f9;
 }
 
-/* Trolley Slide-up Panel */
-.trolley-slide-panel {
+/* Animation for the list */
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Staggered Delay for first 5 stores */
+#storeList button:nth-child(1) { animation-delay: 0.1s; }
+#storeList button:nth-child(2) { animation-delay: 0.15s; }
+#storeList button:nth-child(3) { animation-delay: 0.2s; }
+#storeList button:nth-child(4) { animation-delay: 0.25s; }
+
+/* Trolley Slide Panel */
+.trolley-panel {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     background: white;
-    border-radius: 30px 30px 0 0;
-    box-shadow: 0 -10px 25px rgba(0,0,0,0.1);
     padding: 20px 25px 40px;
-    z-index: 100;
-    animation: slideUp 0.5s ease;
-}
-
-.drag-handle {
-    width: 40px;
-    height: 5px;
-    background: #e2e8f0;
-    border-radius: 10px;
-    margin: 0 auto 20px;
-}
-
-.panel-content h3 {
-    font-weight: 800;
-    margin-bottom: 5px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    border-radius: 30px 30px 0 0;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+    z-index: 200;
+    animation: panelUp 0.4s ease-out;
 }
 
 .btn-grand {
     background: #0f172a;
     color: white;
+    width: 100%;
     padding: 18px;
     border-radius: 18px;
-    width: 100%;
     font-weight: 700;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-top: 15px;
     border: none;
+    margin-top: 15px;
+    font-size: 16px;
 }
 
-@keyframes slideUp {
+@keyframes panelUp {
     from { transform: translateY(100%); }
     to { transform: translateY(0); }
 }
