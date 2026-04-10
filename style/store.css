@@ -1,148 +1,131 @@
-/* Layout Settings */
+:root {
+    --primary: #0f172a;
+    --accent: #3b82f6;
+    --surface: rgba(255, 255, 255, 0.7);
+}
+
 body {
-    background: #f8fafc;
+    background: #f1f5f9;
+    background-image: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.05) 0, transparent 50%), 
+                      radial-gradient(at 50% 0%, rgba(139, 92, 246, 0.05) 0, transparent 50%);
     margin: 0;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    overflow-x: hidden;
 }
 
-.page-container {
-    max-width: 500px; /* Keeps it looking like a mobile app even on desktop */
-    margin: 0 auto;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+.grand-header {
+    padding: 60px 24px 30px;
+    background: linear-gradient(to bottom, #ffffff 0%, rgba(255,255,255,0) 100%);
 }
 
-/* Header with Blur Effect */
-.store-header {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 60px 25px 20px;
+.top-nav {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 15px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    margin-bottom: 30px;
 }
 
-.header-text h1 {
-    font-size: 24px;
+.brand-logo {
     font-weight: 800;
-    margin: 0;
-    color: #0f172a;
     letter-spacing: -1px;
+    font-size: 20px;
 }
 
-.header-text p {
-    font-size: 14px;
-    color: #64748b;
-    margin: 2px 0 0;
-}
-
-.icon-btn {
-    width: 45px;
-    height: 45px;
+.blur-btn {
+    width: 44px;
+    height: 44px;
     border-radius: 14px;
-    border: 1px solid #e2e8f0;
-    background: white;
+    border: 1px solid rgba(0,0,0,0.05);
+    background: var(--surface);
+    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: #0f172a;
 }
 
-/* Search Box Styling */
-.search-container {
-    margin: 20px;
-    background: white;
-    border-radius: 18px;
-    padding: 14px 18px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-    border: 1px solid #e2e8f0;
+.welcome-section h1 {
+    font-size: 34px;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
 }
 
-.search-container input {
-    border: none;
-    outline: none;
-    font-size: 16px;
-    width: 100%;
-    font-weight: 500;
+.text-gradient {
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-/* Store Cards */
-.store-grid {
-    padding: 10px 20px 100px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+/* Store Cards: The "Grand" Part */
+.grand-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two columns for a modern app feel */
+    gap: 16px;
+    padding: 0 24px 100px;
 }
 
-/* These styles target the buttons injected by your JS */
 #storeList button {
     background: white;
-    border: 1px solid #e2e8f0;
-    padding: 20px;
-    border-radius: 22px;
+    border: 1px solid rgba(255,255,255,0.8);
+    border-radius: 28px;
+    padding: 24px 16px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    cursor: pointer;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
-    animation: slideIn 0.5s ease-out backwards;
+    text-align: center;
+    box-shadow: 0 10px 20px -5px rgba(0,0,0,0.05);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: popIn 0.5s ease-out backwards;
 }
 
 #storeList button:active {
-    transform: scale(0.96);
-    background: #f1f5f9;
+    transform: scale(0.92);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
 }
 
-/* Animation for the list */
-@keyframes slideIn {
-    from { opacity: 0; transform: translateX(-20px); }
-    to { opacity: 1; transform: translateX(0); }
+/* Custom visual icon for stores */
+#storeList button::before {
+    content: '🏪';
+    font-size: 32px;
+    margin-bottom: 12px;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
 }
 
-/* Staggered Delay for first 5 stores */
-#storeList button:nth-child(1) { animation-delay: 0.1s; }
-#storeList button:nth-child(2) { animation-delay: 0.15s; }
-#storeList button:nth-child(3) { animation-delay: 0.2s; }
-#storeList button:nth-child(4) { animation-delay: 0.25s; }
+@keyframes popIn {
+    0% { opacity: 0; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
+}
 
-/* Trolley Slide Panel */
-.trolley-panel {
+/* Bottom Sheet */
+.bottom-sheet {
     position: fixed;
     bottom: 0;
     left: 0;
-    right: 0;
+    width: 100%;
     background: white;
-    padding: 20px 25px 40px;
-    border-radius: 30px 30px 0 0;
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
-    z-index: 200;
-    animation: panelUp 0.4s ease-out;
+    border-radius: 32px 32px 0 0;
+    padding: 20px 24px 50px;
+    box-shadow: 0 -20px 40px rgba(0,0,0,0.1);
+    z-index: 1000;
 }
 
-.btn-grand {
+.sheet-handle {
+    width: 40px;
+    height: 5px;
+    background: #e2e8f0;
+    border-radius: 10px;
+    margin: 0 auto 20px;
+}
+
+.btn-action {
     background: #0f172a;
     color: white;
     width: 100%;
     padding: 18px;
-    border-radius: 18px;
+    border-radius: 20px;
     font-weight: 700;
-    border: none;
-    margin-top: 15px;
     font-size: 16px;
-}
-
-@keyframes panelUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
+    border: none;
+    margin-top: 20px;
 }

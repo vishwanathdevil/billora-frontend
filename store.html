@@ -2,53 +2,57 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Billora | Select Store</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Billora | Discover Stores</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="./style/global.css">
     <link rel="stylesheet" href="./style/store.css">
 </head>
 <body>
 
-    <div class="page-container">
-        <header class="store-header">
-            <button class="icon-btn" onclick="goHome()">
-                <i data-lucide="arrow-left"></i>
-            </button>
-            <div class="header-text">
-                <h1>Select Store</h1>
-                <p>Find a Billora partner near you</p>
+    <div class="app-shell">
+        <header class="grand-header">
+            <div class="top-nav">
+                <button class="blur-btn" onclick="goHome()"><i data-lucide="chevron-left"></i></button>
+                <div class="brand-logo">Billora</div>
+                <button class="blur-btn"><i data-lucide="bell"></i></button>
+            </div>
+            <div class="welcome-section">
+                <h1>Ready to <span class="text-gradient">Shop?</span></h1>
+                <p>Select a partner store to begin your seamless checkout journey.</p>
             </div>
         </header>
 
-        <main class="content-area">
-            <div class="search-container">
-                <i data-lucide="search" class="search-icon"></i>
-                <input type="text" placeholder="Search for stores..." id="storeSearch">
+        <main class="store-container">
+            <div class="search-glass">
+                <i data-lucide="search"></i>
+                <input type="text" id="storeSearch" placeholder="Search by name or location...">
             </div>
 
-            <div id="storeList" class="store-grid">
-                </div>
-
-            <div id="trolleySection" class="trolley-panel" style="display:none;">
-                <div class="drag-handle"></div>
-                <h3>Enter Trolley Number</h3>
-                <div class="input-wrapper">
-                    <i data-lucide="shopping-cart"></i>
-                    <input type="text" id="trolleyNumber" placeholder="e.g. T-102">
-                </div>
-                <button class="btn-grand" onclick="startShopping()">
-                    Confirm & Start <span>→</span>
-                </button>
+            <div class="section-label">
+                <span>Partner Stores</span>
+                <div class="badge">Nearby</div>
             </div>
+
+            <div id="storeList" class="grand-grid">
+                </div>
         </main>
+
+        <div id="trolleySection" class="bottom-sheet" style="display:none;">
+            <div class="sheet-handle"></div>
+            <div class="sheet-body">
+                <h3><i data-lucide="shopping-bag"></i> Link your Trolley</h3>
+                <p>Scan or enter the ID on your smart trolley.</p>
+                <div class="input-glow">
+                    <input type="text" id="trolleyNumber" placeholder="Enter ID (e.g., BT-09)">
+                </div>
+                <button class="btn-action" onclick="startShopping()">Start Shopping</button>
+            </div>
+        </div>
     </div>
 
-    <script>
-        // Initialize the icons after the page loads
-        lucide.createIcons();
-    </script>
+    <script>lucide.createIcons();</script>
     <script src="js/app.js"></script>
 </body>
 </html>
