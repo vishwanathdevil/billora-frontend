@@ -55,7 +55,6 @@ function login() {
 
     if (!username || !password) return showToast("Enter details");
 
-    // 🔥 UI START
     btn.disabled = true;
     btn.innerText = "⏳ Logging in...";
     showLoader(true);
@@ -66,27 +65,32 @@ function login() {
         body: JSON.stringify({ username, password })
     })
     .then(async res => {
-        const data = await res.json().catch(() => null);
+
+        const text = await res.text(); // 🔥 IMPORTANT FIX
 
         if (!res.ok) {
-            throw new Error(data || "Login failed");
+            throw new Error(text || "Login failed"); // now shows backend message
         }
 
-        return data;
+        return JSON.parse(text); // success case
     })
-    .then(user => {
+    .then(data => {
 
-        localStorage.setItem("user", JSON.stringify(user));
-        localStorage.setItem("storeId", user.storeId);
+    const user = data.user;
+    const token = data.token;
 
-        if (user.role === "ADMIN") {
-            window.location.href = "admin.html";
-        } else if (user.role === "CASHIER") {
-            window.location.href = "cashier.html";
-        } else {
-            window.location.href = "home.html";
-        }
-    })
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("storeId", user.storeId);
+
+    if (user.role === "ADMIN") {
+        window.location.href = "admin.html";
+    } else if (user.role === "CASHIER") {
+        window.location.href = "cashier.html";
+    } else {
+        window.location.href = "home.html";
+    }
+})
     .catch(err => {
         showToast("❌ " + err.message);
     })
