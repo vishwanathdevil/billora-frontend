@@ -2,11 +2,16 @@
 <html>
 <head>
     <title>Cashier Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="stylesheet" href="style/cashier.css">
 
-    <!-- ✅ REQUIRED -->
+    <!-- ✅ WebSocket -->
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+
+    <!-- ✅ QR SCANNER (better CDN) -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
 </head>
 <body>
 
@@ -14,9 +19,11 @@
 
     <div id="ordersContainer"></div>
 
+    <!-- 🔥 CAMERA ERROR MESSAGE -->
+    <p id="cameraError" style="color:red; text-align:center;"></p>
+
     <button onclick="logout()">Logout</button>
 
-    <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="js/cashier.js"></script>
 
 </body>
