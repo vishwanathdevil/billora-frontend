@@ -13,17 +13,17 @@ const container = document.getElementById("ordersContainer");
 
 let html5QrCode = null;
 let currentBillId = null;
-let lastScanTime = 0; // ✅ FIXED (global)
+let lastScanTime = 0;
 
-// 📷 START QR SCANNER
+
+// 📷 START QR SCANNER (🔥 UPGRADED FOR LAPTOP)
 function startCashierScanner() {
 
     container.innerHTML = `
         <h3>📷 Scan Customer QR</h3>
-        <div id="reader"></div>
+        <div id="reader" style="width:300px;margin:auto;"></div>
     `;
 
-    // clean previous instance
     if (html5QrCode) {
         html5QrCode.stop().catch(() => {});
         html5QrCode.clear().catch(() => {});
@@ -32,82 +32,96 @@ function startCashierScanner() {
 
     html5QrCode = new Html5Qrcode("reader");
 
-    html5QrCode.start(
-        { facingMode: "environment" },
-        {
-            fps: 10, // ✅ optimized
-            qrbox: { width: 250, height: 250 }
-        },
+    // 🔥 GET CAMERA LIST (IMPORTANT FOR LAPTOP)
+    Html5Qrcode.getCameras().then(devices => {
 
-        async (decodedText) => {
+        if (devices && devices.length) {
 
-            // 🚫 prevent multiple scans
-            if (Date.now() - lastScanTime < 2000) return;
-            lastScanTime = Date.now();
+            // 👉 Prefer back camera, fallback to any
+            const cameraId = devices.find(d => d.label.toLowerCase().includes("back"))?.id || devices[0].id;
 
-            console.log("QR:", decodedText);
+            html5QrCode.start(
+                cameraId,
+                {
+                    fps: 15,
+                    qrbox: { width: 300, height: 300 },
+                    aspectRatio: 1.0,
+                    disableFlip: false // 🔥 IMPORTANT FOR SCREEN QR
+                },
 
-            let billId;
+                async (decodedText) => {
 
-            try {
-                // ✅ FIXED parsing (robust)
-                if (decodedText.includes("id=")) {
-                    const match = decodedText.match(/id=(\d+)/);
-                    billId = match ? match[1] : null;
-                } else {
-                    billId = decodedText;
-                }
-            } catch {
-                alert("Invalid QR ❌");
-                resetScanner();
-                return;
-            }
+                    if (Date.now() - lastScanTime < 2000) return;
+                    lastScanTime = Date.now();
 
-            if (!billId) {
-                alert("Invalid QR ❌");
-                resetScanner();
-                return;
-            }
+                    console.log("QR:", decodedText);
 
-            currentBillId = billId;
+                    let billId;
 
-            try {
-                const res = await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${billId}`);
+                    try {
+                        if (decodedText.includes("id=")) {
+                            const match = decodedText.match(/id=(\d+)/);
+                            billId = match ? match[1] : null;
+                        } else {
+                            billId = decodedText;
+                        }
+                    } catch {
+                        alert("Invalid QR ❌");
+                        resetScanner();
+                        return;
+                    }
 
-                if (!res.ok) throw new Error();
+                    if (!billId) {
+                        alert("Invalid QR ❌");
+                        resetScanner();
+                        return;
+                    }
 
-                const bill = await res.json();
+                    currentBillId = billId;
 
-                // 🏬 STORE VALIDATION
-                if (bill.storeId !== storeId) {
-                    alert("This bill does not belong to your store ❌");
-                    resetScanner();
-                    return;
-                }
+                    try {
+                        const res = await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${billId}`);
 
-                // ✅ STOP CAMERA PROPERLY
-                if (html5QrCode) {
-                    await html5QrCode.stop();
-                    await html5QrCode.clear(); // 🔥 IMPORTANT
-                    html5QrCode = null;
-                }
+                        if (!res.ok) throw new Error();
 
-                showBill(bill);
+                        const bill = await res.json();
 
-            } catch (err) {
-                console.error(err);
-                alert("Bill not found ❌");
-                resetScanner();
-            }
-        },
+                        if (bill.storeId !== storeId) {
+                            alert("This bill does not belong to your store ❌");
+                            resetScanner();
+                            return;
+                        }
 
-        () => {} // ignore scan errors
-    );
+                        if (html5QrCode) {
+                            await html5QrCode.stop();
+                            await html5QrCode.clear();
+                            html5QrCode = null;
+                        }
+
+                        showBill(bill);
+
+                    } catch (err) {
+                        console.error(err);
+                        alert("Bill not found ❌");
+                        resetScanner();
+                    }
+                },
+
+                () => {}
+            );
+
+        } else {
+            document.getElementById("reader").innerText = "No camera found ❌";
+        }
+
+    }).catch(err => {
+        console.error(err);
+        document.getElementById("reader").innerText = "Camera access denied ❌";
+    });
 }
 
 
-
-// 🔁 RESET SCANNER SAFELY
+// 🔁 RESET SCANNER
 function resetScanner() {
 
     currentBillId = null;
@@ -122,8 +136,9 @@ function resetScanner() {
 
     setTimeout(() => {
         startCashierScanner();
-    }, 1500); // ✅ FIXED delay
+    }, 1500);
 }
+
 
 // 🧾 SHOW BILL
 function showBill(bill) {
@@ -155,39 +170,30 @@ function showBill(bill) {
     `;
 }
 
-function showWaitingUI(id) {
-    container.innerHTML = `
-        <h2>🧾 Bill #${id}</h2>
-        <h3 style="color:orange;">Waiting for customer payment ⏳</h3>
-
-        <button onclick="cancelUPI()">❌ Cancel & Switch to Cash</button>
-    `;
-}
-
-function cancelUPI() {
-    alert("UPI Cancelled → Use Cash");
-    restartScanner();
-}
 
 // 📱 UPI PAYMENT
 async function payOnline(id) {
-
     try {
-
         await fetch(`https://billora-backend-9kyk.onrender.com/api/payment/start/${id}`, {
             method: "POST"
         });
 
         alert("Waiting for customer payment ⏳");
-
         showWaitingUI(id);
         startPaymentListener(id);
 
     } catch (err) {
-        console.error(err);
         alert("UPI Error ❌");
     }
 }
+
+function showWaitingUI(id) {
+    container.innerHTML = `
+        <h2>🧾 Bill #${id}</h2>
+        <h3 style="color:orange;">Waiting for customer payment ⏳</h3>
+    `;
+}
+
 
 // polling
 function startPaymentListener(id) {
@@ -199,38 +205,32 @@ function startPaymentListener(id) {
             const bill = await res.json();
 
             if (bill.status === "PAID") {
-
                 clearInterval(interval);
-
                 alert("Payment Successful ✅");
-
                 resetFlow();
             }
 
-        } catch (err) {
-            console.error("Polling error:", err);
-        }
+        } catch {}
 
     }, 2000);
 }
 
+
 // 💵 CASH PAYMENT
 async function payCash(id) {
-
     try {
         await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/${id}/pay/CASH`, {
             method: "PUT"
         });
 
         alert("Cash Payment Done ✅");
-
         resetFlow();
 
-    } catch (err) {
-        console.error(err);
+    } catch {
         alert("Cash Payment Failed ❌");
     }
 }
+
 
 // 🔁 RESET FLOW
 function resetFlow() {
@@ -243,6 +243,7 @@ function resetFlow() {
         startCashierScanner();
     }, 1500);
 }
+
 
 // 🔁 RESTART
 function restartScanner() {
@@ -258,14 +259,17 @@ function restartScanner() {
     }, 1000);
 }
 
+
 // 🚪 LOGOUT
 function logout() {
     localStorage.removeItem("user");
     window.location.href = "index.html";
 }
 
-// 🚀 AUTO START
+
+// 🚀 START
 startCashierScanner();
+
 
 // ===== WEBSOCKET =====
 let stompClient = null;
@@ -276,8 +280,6 @@ function connectWebSocket() {
     stompClient = Stomp.over(socket);
 
     stompClient.connect({}, function () {
-
-        console.log("Connected to WebSocket ✅");
 
         stompClient.subscribe("/topic/bills", function (message) {
 
