@@ -1,8 +1,4 @@
 console.log("APP JS LOADED");
-console.log("JS FILE LOADED");
-console.log("APP JS LOADED");
-
-let selectedStoreId = localStorage.getItem("storeId") || 1;
 
 /* ================================
    🔐 AUTH + SESSION
@@ -43,15 +39,13 @@ function goHome() { window.location.href = "home.html"; }
 function goToStore() { window.location.href = "store.html"; }
 function goToScanner() { window.location.href = "scanner.html"; }
 function goToCart() { window.location.href = "cart.html"; }
-function goToPayment() { window.location.href = "payment.html"; }
 function goToBills() { window.location.href = "bills.html"; }
 
 /* ================================
-   🏬 STORE (FROM BACKEND)
+   🏬 STORE
 ================================ */
 
 function loadStores() {
-
     fetch("https://billora-backend-9kyk.onrender.com/api/stores")
         .then(res => res.json())
         .then(stores => {
@@ -71,25 +65,41 @@ function loadStores() {
         });
 }
 
-function selectStore(id) {
-    localStorage.setItem("storeId", id);
+// 🔥 LEADER STORE SELECT → ACTIVATE SESSION
+function selectStore(storeId) {
+
+    const sessionId = localStorage.getItem("sessionId");
+
+    // update backend session
+    if (sessionId) {
+        fetch("https://billora-backend-9kyk.onrender.com/api/session/start", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                sessionId: sessionId,
+                storeId: storeId
+            })
+        });
+    }
+
+    localStorage.setItem("selectedStoreId", storeId);
+
     window.location.href = "scanner.html";
 }
 
-// Auto load stores
 if (currentPage === "store.html") loadStores();
 
 /* ================================
-   🛒 CART
+   🛒 ADD TO SHARED CART
 ================================ */
 
 function addToCart(code) {
 
-    const sessionId = localStorage.getItem("sessionId"); // 🔥 shared cart
+    const sessionId = localStorage.getItem("sessionId");
     const storeId = localStorage.getItem("selectedStoreId");
 
     if (!sessionId) {
-        alert("No active cart session ❌");
+        alert("Join or create group first ❌");
         return;
     }
 
@@ -100,7 +110,6 @@ function addToCart(code) {
         })
         .then(product => {
 
-            // 🔥 send directly to backend (shared cart)
             return fetch("https://billora-backend-9kyk.onrender.com/api/cart", {
                 method: "POST",
                 headers: {
@@ -112,7 +121,7 @@ function addToCart(code) {
                     price: product.price,
                     quantity: 1,
                     storeId: storeId,
-                    sessionId: sessionId   // 🔥 IMPORTANT
+                    sessionId: sessionId
                 })
             });
         })
@@ -121,85 +130,57 @@ function addToCart(code) {
             alert("Added to shared cart ✅");
         })
         .catch(() => {
-            console.log("Product not found or add failed");
             alert("Product not found ❌");
         });
 }
 
+/* ================================
+   🛒 LOAD SHARED CART
+================================ */
+
 function loadCart() {
 
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const sessionId = localStorage.getItem("sessionId");
 
-    const cartItems = document.getElementById("cartItems");
-    const cartTotal = document.getElementById("cartTotal");
-
-    if (!cartItems) return;
-
-    cartItems.innerHTML = "";
-
-    let total = 0;
-
-    cart.forEach((item, index) => {
-
-        const price = Number(item.price);
-        const qty = Number(item.quantity);
-
-        const itemTotal = price * qty;
-        total += itemTotal;
-
-        cartItems.innerHTML += `
-            <div>
-                <h4>${item.name}</h4>
-                <p>₹ ${price}</p>
-
-                <div>
-                    <button onclick="decreaseCartQty(${index})">-</button>
-                    <span>${qty}</span>
-                    <button onclick="increaseCartQty(${index})">+</button>
-                </div>
-
-                <p>Subtotal: ₹ ${itemTotal}</p>
-            </div><hr>
-        `;
-    });
-
-    cartTotal.innerText = total;
-}
-window.increaseCartQty = function (index) {
-
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-    cart[index].quantity++;
-
-    localStorage.setItem("cart", JSON.stringify(cart));
-
-    loadCart(); // 🔥 refresh UI
-};
-
-window.decreaseCartQty = function (index) {
-
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-    if (cart[index].quantity > 1) {
-        cart[index].quantity--;
-    } else {
-        // remove item if qty = 1
-        cart.splice(index, 1);
+    if (!sessionId) {
+        alert("No active cart ❌");
+        return;
     }
 
-    localStorage.setItem("cart", JSON.stringify(cart));
+    fetch(`https://billora-backend-9kyk.onrender.com/api/cart/${sessionId}`)
+        .then(res => res.json())
+        .then(cart => {
 
-    loadCart(); // 🔥 refresh UI
-};
+            const cartItems = document.getElementById("cartItems");
+            const cartTotal = document.getElementById("cartTotal");
 
+            if (!cartItems) return;
 
-function clearCart() {
-    localStorage.removeItem("cart");
-    alert("Cart cleared");
-    window.location.reload();
+            cartItems.innerHTML = "";
+
+            let total = 0;
+
+            cart.forEach(item => {
+
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+
+                cartItems.innerHTML += `
+                    <div>
+                        <h4>${item.name}</h4>
+                        <p>₹ ${item.price}</p>
+                        <p>Qty: ${item.quantity}</p>
+                        <p>Subtotal: ₹ ${itemTotal}</p>
+                    </div><hr>
+                `;
+            });
+
+            cartTotal.innerText = total;
+        });
 }
 
 if (currentPage === "cart.html") loadCart();
+
 /* ================================
    🧾 BILL HISTORY
 ================================ */
@@ -221,13 +202,17 @@ function loadBills() {
                         <h3>Bill #${bill.id}</h3>
                         <p>Total: ₹${bill.total}</p>
                         <p>
-${bill.items.map(i => `${i.name} x${i.quantity}`).join(", ")}
-</p>
+                            ${bill.items.map(i => `${i.name} x${i.quantity}`).join(", ")}
+                        </p>
                     </div><hr>
                 `;
             });
         });
 }
+
+/* ================================
+   🔙 BACK NAVIGATION
+================================ */
 
 function goBack() {
 
@@ -236,46 +221,48 @@ function goBack() {
     if (page.includes("scanner.html")) {
         window.location.href = "store.html";
     }
-
     else if (page.includes("cart.html")) {
         window.location.href = "scanner.html";
     }
-
     else if (page.includes("payment.html")) {
         window.location.href = "cart.html";
     }
-
     else if (page.includes("bills.html")) {
         window.location.href = "home.html";
     }
-
     else {
         window.location.href = "home.html";
     }
 }
 
-function createSession() {
+/* ================================
+   👥 GROUP SESSION (LEADER)
+================================ */
 
-    const user = JSON.parse(localStorage.getItem("user"));
+function createGroupSession() {
 
     fetch("https://billora-backend-9kyk.onrender.com/api/session/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            storeId: localStorage.getItem("selectedStoreId"),
-            createdBy: user.username
-        })
+        method: "POST"
     })
     .then(res => res.json())
     .then(data => {
 
-        localStorage.setItem("sessionId", data.id);
+        const sessionId = data.sessionId || data.id;
 
-        const qrUrl = `${window.location.origin}/join.html?id=${data.id}`;
+        localStorage.setItem("sessionId", sessionId);
 
-        QRCode.toCanvas(qrUrl, function (err, canvas) {
+        const qrUrl = `${window.location.origin}/join.html?id=${sessionId}`;
+
+        const canvas = document.getElementById("qrCanvas");
+
+        if (canvas) {
+            QRCode.toCanvas(canvas, qrUrl);
+        } else {
+            // fallback (your current behavior)
             document.body.innerHTML = "<h3>Share this QR</h3>";
-            document.body.appendChild(canvas);
-        });
+            QRCode.toCanvas(qrUrl, function (err, canvasEl) {
+                document.body.appendChild(canvasEl);
+            });
+        }
     });
 }

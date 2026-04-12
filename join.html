@@ -1,8 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Joining Group</title>
+</head>
+<body>
+
+<h2>Joining group...</h2>
+
 <script>
 const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
+const sessionId = params.get("id");
 
-localStorage.setItem("sessionId", id);
+localStorage.setItem("sessionId", sessionId);
 
-window.location.href = "scanner.html";
+// ⏳ WAIT UNTIL LEADER STARTS
+function waitForStart() {
+
+    fetch(`https://billora-backend-9kyk.onrender.com/api/session/${sessionId}`)
+        .then(res => res.json())
+        .then(data => {
+
+            if (data.status === "ACTIVE") {
+
+                localStorage.setItem("selectedStoreId", data.storeId);
+
+                window.location.href = "scanner.html"; // ✅ go to scan
+            } else {
+                setTimeout(waitForStart, 2000);
+            }
+        });
+}
+
+waitForStart();
 </script>
+
+</body>
+</html>
