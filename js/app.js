@@ -241,28 +241,37 @@ function goBack() {
 
 function createGroupSession() {
 
+    const user = JSON.parse(localStorage.getItem("user"));
+
     fetch("https://billora-backend-9kyk.onrender.com/api/session/create", {
-        method: "POST"
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            createdBy: user.username
+        })
     })
-    .then(res => res.json())
+    .then(res => {
+        if (!res.ok) throw new Error("Session creation failed");
+        return res.json();
+    })
     .then(data => {
 
-        const sessionId = data.sessionId || data.id;
+        const sessionId = data.id || data.sessionId;
 
         localStorage.setItem("sessionId", sessionId);
 
         const qrUrl = `${window.location.origin}/join.html?id=${sessionId}`;
 
-        const canvas = document.getElementById("qrCanvas");
+        document.body.innerHTML = "<h3>Share this QR</h3>";
 
-        if (canvas) {
-            QRCode.toCanvas(canvas, qrUrl);
-        } else {
-            // fallback (your current behavior)
-            document.body.innerHTML = "<h3>Share this QR</h3>";
-            QRCode.toCanvas(qrUrl, function (err, canvasEl) {
-                document.body.appendChild(canvasEl);
-            });
-        }
+        QRCode.toCanvas(qrUrl, function (err, canvas) {
+            document.body.appendChild(canvas);
+        });
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Failed to create group ❌");
     });
 }
