@@ -85,28 +85,43 @@ if (currentPage === "store.html") loadStores();
 
 function addToCart(code) {
 
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const sessionId = localStorage.getItem("sessionId"); // 🔥 shared cart
+    const storeId = localStorage.getItem("selectedStoreId");
 
-    fetch(`https://billora-backend-9kyk.onrender.com/api/products/${code}?storeId=${selectedStoreId}`)
+    if (!sessionId) {
+        alert("No active cart session ❌");
+        return;
+    }
+
+    fetch(`https://billora-backend-9kyk.onrender.com/api/products/${code}?storeId=${storeId}`)
         .then(res => {
             if (!res.ok) throw new Error();
             return res.json();
         })
         .then(product => {
 
-            const existing = cart.find(i => i.code === product.code);
-
-            if (existing) {
-                existing.quantity++;
-            } else {
-                cart.push({ ...product, quantity: 1 });
-            }
-
-            localStorage.setItem("cart", JSON.stringify(cart));
-            alert("Added to cart ✅");
+            // 🔥 send directly to backend (shared cart)
+            return fetch("https://billora-backend-9kyk.onrender.com/api/cart", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: product.name,
+                    code: product.code,
+                    price: product.price,
+                    quantity: 1,
+                    storeId: storeId,
+                    sessionId: sessionId   // 🔥 IMPORTANT
+                })
+            });
+        })
+        .then(res => {
+            if (!res.ok) throw new Error();
+            alert("Added to shared cart ✅");
         })
         .catch(() => {
-            console.log("Product not found once");
+            console.log("Product not found or add failed");
             alert("Product not found ❌");
         });
 }
@@ -237,4 +252,30 @@ function goBack() {
     else {
         window.location.href = "home.html";
     }
+}
+
+function createSession() {
+
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    fetch("https://billora-backend-9kyk.onrender.com/api/session/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            storeId: localStorage.getItem("selectedStoreId"),
+            createdBy: user.username
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        localStorage.setItem("sessionId", data.id);
+
+        const qrUrl = `${window.location.origin}/join.html?id=${data.id}`;
+
+        QRCode.toCanvas(qrUrl, function (err, canvas) {
+            document.body.innerHTML = "<h3>Share this QR</h3>";
+            document.body.appendChild(canvas);
+        });
+    });
 }

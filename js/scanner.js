@@ -80,11 +80,16 @@ window.decreaseQty = function () {
 };
 
 // =======================
-// 🛒 ADD TO CART
+// 🛒 ADD TO CART (UPDATED FOR SHARED CART)
 // =======================
 function addToCart(code) {
 
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const sessionId = localStorage.getItem("sessionId"); // 🔥 IMPORTANT
+
+    if (!sessionId) {
+        alert("Session not found ❌");
+        return;
+    }
 
     fetch(`https://billora-backend-9kyk.onrender.com/api/products/${code}?storeId=${window.selectedStoreId}`)
         .then(res => {
@@ -93,16 +98,28 @@ function addToCart(code) {
         })
         .then(product => {
 
-            const existing = cart.find(i => i.code === product.code);
+            // 🔥 SEND TO BACKEND (NOT localStorage)
+            fetch("https://billora-backend-9kyk.onrender.com/api/cart", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: product.name,
+                    code: product.code,
+                    price: product.price,
+                    quantity: quantity,
+                    storeId: window.selectedStoreId,
+                    sessionId: sessionId   // 🔥 KEY CHANGE
+                })
+            })
+            .then(() => {
+                alert("Added to shared cart ✅");
+            })
+            .catch(() => {
+                alert("Failed to add ❌");
+            });
 
-            if (existing) {
-                existing.quantity+= quantity;
-            } else {
-                cart.push({ ...product, quantity: quantity });
-            }
-
-            localStorage.setItem("cart", JSON.stringify(cart));
-            alert("Added to cart ✅");
         })
         .catch(() => {
             alert("Product not found ❌");
