@@ -133,7 +133,7 @@ function addToCart(code) {
         .then(product => {
 
             return fetch("https://billora-backend-9kyk.onrender.com/api/cart", {
-                method: "POST",
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
