@@ -73,21 +73,40 @@ function selectStore(storeId) {
 
     const sessionId = localStorage.getItem("sessionId");
 
-    // update backend session
     if (sessionId) {
+
         fetch("https://billora-backend-9kyk.onrender.com/api/session/start", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({
                 sessionId: sessionId,
                 storeId: storeId
             })
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("Session start failed");
+            return res.json();
+        })
+        .then(data => {
+            console.log("Session activated:", data);
+
+            // ✅ NOW REDIRECT AFTER SUCCESS
+            localStorage.setItem("selectedStoreId", storeId);
+
+            window.location.href = "scanner.html";
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Failed to start session ❌");
         });
+
+    } else {
+        // normal flow (no group)
+        localStorage.setItem("selectedStoreId", storeId);
+        window.location.href = "scanner.html";
     }
-
-    localStorage.setItem("selectedStoreId", storeId);
-
-    window.location.href = "scanner.html";
 }
 
 if (currentPage === "store.html") loadStores();
