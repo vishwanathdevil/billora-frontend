@@ -40,6 +40,9 @@ function goToStore() { window.location.href = "store.html"; }
 function goToScanner() { window.location.href = "scanner.html"; }
 function goToCart() { window.location.href = "cart.html"; }
 function goToBills() { window.location.href = "bills.html"; }
+function goToGroup() {
+    window.location.href = "group.html";
+}
 
 /* ================================
    🏬 STORE
@@ -121,7 +124,8 @@ function addToCart(code) {
                     price: product.price,
                     quantity: 1,
                     storeId: storeId,
-                    sessionId: sessionId
+                    sessionId: sessionId,
+                    owner: user.username
                 })
             });
         })
@@ -137,10 +141,10 @@ function addToCart(code) {
 /* ================================
    🛒 LOAD SHARED CART
 ================================ */
-
 function loadCart() {
 
     const sessionId = localStorage.getItem("sessionId");
+    const user = JSON.parse(localStorage.getItem("user"));
 
     if (!sessionId) {
         alert("No active cart ❌");
@@ -160,20 +164,80 @@ function loadCart() {
 
             let total = 0;
 
+            // 🧠 GROUP BY OWNER
+            const grouped = {};
+
             cart.forEach(item => {
+                const owner = item.owner || "unknown";
 
-                const itemTotal = item.price * item.quantity;
-                total += itemTotal;
+                if (!grouped[owner]) {
+                    grouped[owner] = [];
+                }
 
-                cartItems.innerHTML += `
-                    <div>
-                        <h4>${item.name}</h4>
-                        <p>₹ ${item.price}</p>
-                        <p>Qty: ${item.quantity}</p>
-                        <p>Subtotal: ₹ ${itemTotal}</p>
-                    </div><hr>
-                `;
+                grouped[owner].push(item);
             });
+
+            // 👑 CHECK IF MAIN MEMBER
+            const sessionCreator = localStorage.getItem("sessionCreator");
+
+            const isMain = user.username === sessionCreator;
+
+            // ===============================
+            // 👨 MAIN MEMBER VIEW
+            // ===============================
+            if (isMain) {
+
+                Object.values(grouped).forEach(memberItems => {
+
+                    let cardTotal = 0;
+
+                    let html = `<div style="
+                        background:#1f1f1f;
+                        padding:10px;
+                        border-radius:10px;
+                        margin-bottom:10px;
+                    ">`;
+
+                    memberItems.forEach(item => {
+
+                        const itemTotal = item.price * item.quantity;
+                        cardTotal += itemTotal;
+                        total += itemTotal;
+
+                        html += `
+                            <p>${item.name} x${item.quantity} - ₹${itemTotal}</p>
+                        `;
+                    });
+
+                    html += `<p><b>Subtotal: ₹${cardTotal}</b></p>`;
+                    html += `</div>`;
+
+                    cartItems.innerHTML += html;
+                });
+            }
+
+            // ===============================
+            // 👦 CHILD MEMBER VIEW
+            // ===============================
+            else {
+
+                const myItems = cart.filter(i => i.owner === user.username);
+
+                myItems.forEach(item => {
+
+                    const itemTotal = item.price * item.quantity;
+                    total += itemTotal;
+
+                    cartItems.innerHTML += `
+                        <div>
+                            <p>${item.name}</p>
+                            <p>₹ ${item.price}</p>
+                            <p>Qty: ${item.quantity}</p>
+                            <p>Subtotal: ₹ ${itemTotal}</p>
+                        </div><hr>
+                    `;
+                });
+            }
 
             cartTotal.innerText = total;
         });
@@ -258,33 +322,38 @@ function createGroupSession() {
     })
     .then(data => {
 
-        const sessionId = data.id || data.sessionId;
+    const sessionId = data.id || data.sessionId;
 
-        // ✅ SAVE SESSION
-        localStorage.setItem("sessionId", sessionId);
+    const user = JSON.parse(localStorage.getItem("user")); // ✅ FIX
 
-        const qrUrl = `${window.location.origin}/join.html?id=${sessionId}`;
+    // ✅ STORE CREATOR (MAIN MEMBER)
+    localStorage.setItem("sessionCreator", user.username);
 
-        // ✅ CLEAN UI (NOT DESTROYING APP)
-        document.body.innerHTML = `
-            <div style="text-align:center; padding:20px;">
-                <h2>📱 Share this QR</h2>
-                <div id="qrBox"></div>
+    // ✅ SAVE SESSION
+    localStorage.setItem("sessionId", sessionId);
 
-                <br><br>
+    const qrUrl = `${window.location.origin}/join.html?id=${sessionId}`;
 
-                <button onclick="startGroupShopping()" 
-                    style="padding:12px 20px; font-size:16px;">
-                    Continue ➡
-                </button>
-            </div>
-        `;
+    // ✅ UI
+    document.body.innerHTML = `
+        <div style="text-align:center; padding:20px;">
+            <h2>📱 Share this QR</h2>
+            <div id="qrBox"></div>
 
-        // ✅ GENERATE QR
-        QRCode.toCanvas(qrUrl, function (err, canvas) {
-            document.getElementById("qrBox").appendChild(canvas);
-        });
-    })
+            <br><br>
+
+            <button onclick="startGroupShopping()" 
+                style="padding:12px 20px; font-size:16px;">
+                Continue ➡
+            </button>
+        </div>
+    `;
+
+    // ✅ QR GENERATION
+    QRCode.toCanvas(qrUrl, function (err, canvas) {
+        document.getElementById("qrBox").appendChild(canvas);
+    });
+})
     .catch(err => {
         console.error(err);
         alert("Failed to create group ❌");
