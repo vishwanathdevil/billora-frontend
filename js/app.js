@@ -81,7 +81,7 @@ function selectStore(storeId) {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                sessionId: sessionId,
+                id: sessionId,
                 storeId: storeId
             })
         })
