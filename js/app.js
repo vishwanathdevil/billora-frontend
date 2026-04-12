@@ -76,7 +76,7 @@ function selectStore(storeId) {
     if (sessionId) {
 
         fetch("https://billora-backend-9kyk.onrender.com/api/session/start", {
-            method: "POST",
+            method: "PUT",
             headers: {
                 "Content-Type": "application/json"
             },
@@ -133,7 +133,7 @@ function addToCart(code) {
         .then(product => {
 
             return fetch("https://billora-backend-9kyk.onrender.com/api/cart", {
-                method: "PUT",
+                method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
