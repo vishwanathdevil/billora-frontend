@@ -260,18 +260,36 @@ function createGroupSession() {
 
         const sessionId = data.id || data.sessionId;
 
+        // ✅ SAVE SESSION
         localStorage.setItem("sessionId", sessionId);
 
         const qrUrl = `${window.location.origin}/join.html?id=${sessionId}`;
 
-        document.body.innerHTML = "<h3>Share this QR</h3>";
+        // ✅ CLEAN UI (NOT DESTROYING APP)
+        document.body.innerHTML = `
+            <div style="text-align:center; padding:20px;">
+                <h2>📱 Share this QR</h2>
+                <div id="qrBox"></div>
 
+                <br><br>
+
+                <button onclick="startGroupShopping()" 
+                    style="padding:12px 20px; font-size:16px;">
+                    Continue ➡
+                </button>
+            </div>
+        `;
+
+        // ✅ GENERATE QR
         QRCode.toCanvas(qrUrl, function (err, canvas) {
-            document.body.appendChild(canvas);
+            document.getElementById("qrBox").appendChild(canvas);
         });
     })
     .catch(err => {
         console.error(err);
         alert("Failed to create group ❌");
     });
+}
+function startGroupShopping() {
+    window.location.href = "store.html";
 }
