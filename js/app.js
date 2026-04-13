@@ -410,3 +410,41 @@ function createGroupSession() {
 function startGroupShopping() {
     window.location.href = "store.html";
 }
+// ===============================
+// 💳 GO TO PAYMENT
+// ===============================
+function goToPayment() {
+
+    const total = document.getElementById("cartTotal").innerText;
+
+    if (!total || total == "0") {
+        alert("Cart is empty ❌");
+        return;
+    }
+
+    window.location.href = "payment.html";
+}
+
+// ===============================
+// 🗑 CLEAR CART (SHARED SESSION)
+// ===============================
+function clearCart() {
+
+    const sessionId = localStorage.getItem("sessionId");
+
+    if (!sessionId) {
+        alert("No active cart ❌");
+        return;
+    }
+
+    fetch(`https://billora-backend-9kyk.onrender.com/api/cart/${sessionId}`, {
+        method: "DELETE"
+    })
+    .then(() => {
+        alert("Cart cleared ✅");
+        window.location.reload();
+    })
+    .catch(() => {
+        alert("Failed to clear cart ❌");
+    });
+}
