@@ -7,7 +7,8 @@
 </head>
 
 <body>
-    <button class="back-btn" onclick="goBack()">⬅ Back</button>
+
+<button class="back-btn" onclick="goBack()">⬅ Back</button>
 
 <div class="container">
     <h2>🧾 Bill</h2>
@@ -20,104 +21,13 @@
     <div class="total">
         Total: ₹<span id="total"></span>
     </div>
+
     <p><b>Status:</b> <span id="status"></span></p>
 </div>
 
-<script>
-const user = JSON.parse(localStorage.getItem("user"));
-const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
-
-const itemsList = document.getElementById("items");
-const usernameEl = document.getElementById("username");
-const totalEl = document.getElementById("total");
-const statusEl = document.getElementById("status");
-
-// 🔥 CASE 1: SINGLE BILL
-if (id) {
-
-    fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${id}`)
-        .then(res => res.json())
-        .then(data => {
-
-            usernameEl.innerText = data.username;
-            totalEl.innerText = data.total;
-            statusEl.innerText = data.status;
-
-            itemsList.innerHTML = "";
-
-            (data.items || []).forEach(item => {
-    const li = document.createElement("li");
-    li.innerText = `${item.name} x${item.quantity} - ₹${item.price * item.quantity}`;
-    itemsList.appendChild(li);
-});
-
-        })
-        .catch(() => alert("Bill not found"));
-}
-
-// 🔥 CASE 2: ALL USER BILLS
-else {
-
-    fetch(`https://billora-backend-9kyk.onrender.com/api/bills/user/${user.username}`)
-        .then(res => res.json())
-        .then(data => {
-
-            usernameEl.innerText = user.username;
-            itemsList.innerHTML = "";
-
-            let total = 0;
-
-            if (!Array.isArray(data)) {
-                console.error("Invalid response:", data);
-                return;
-            }
-
-            data.forEach(bill => {
-
-                total += bill.total;
-
-                const li = document.createElement("li");
-                li.innerText = `Bill #${bill.id} - ₹${bill.total}`;
-                li.style.cursor = "pointer";
-
-                li.onclick = () => {
-                    window.location.href = `bills.html?id=${bill.id}`;
-                };
-
-                itemsList.appendChild(li);
-            });
-
-            totalEl.innerText = total;
-
-        })
-        .catch(err => console.error(err));
-}
-function goBack() {
-
-    const page = window.location.pathname;
-
-    if (page.includes("scanner.html")) {
-        window.location.href = "store.html";
-    }
-
-    else if (page.includes("cart.html")) {
-        window.location.href = "scanner.html";
-    }
-
-    else if (page.includes("payment.html")) {
-        window.location.href = "cart.html";
-    }
-
-    else if (page.includes("bills.html")) {
-        window.location.href = "home.html";
-    }
-
-    else {
-        window.location.href = "home.html";
-    }
-}
-</script>
+<!-- ✅ JS FILES -->
+<script src="js/app.js"></script>
+<script src="js/bills.js"></script>
 
 </body>
 </html>
