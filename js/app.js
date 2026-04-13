@@ -138,9 +138,9 @@ function addToCart(code) {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    name: product.name,
+                    name: product.name || "unknown product",
                     code: product.code,
-                    price: product.price,
+                    price: Number(product.price)>0 ? Number(product.price) : 0,
                     quantity: 1,
                     storeId: storeId,
                     sessionId: sessionId,
@@ -183,22 +183,39 @@ function loadCart() {
 
             let total = 0;
 
+            // 🛑 SAFETY CHECK
+            if (!Array.isArray(cart)) {
+                console.error("Invalid cart data:", cart);
+                cartTotal.innerText = "0";
+                return;
+            }
+
             // 🧠 GROUP BY OWNER
             const grouped = {};
 
             cart.forEach(item => {
+
                 const owner = item.owner || "unknown";
+
+                // ✅ SAFE VALUES
+                const name = item.name || "Unknown Product";
+                const price = Number(item.price) || 0;
+                const quantity = Number(item.quantity) || 1;
 
                 if (!grouped[owner]) {
                     grouped[owner] = [];
                 }
 
-                grouped[owner].push(item);
+                grouped[owner].push({
+                    ...item,
+                    name,
+                    price,
+                    quantity
+                });
             });
 
             // 👑 CHECK IF MAIN MEMBER
             const sessionCreator = localStorage.getItem("sessionCreator");
-
             const isMain = user.username === sessionCreator;
 
             // ===============================
@@ -220,6 +237,7 @@ function loadCart() {
                     memberItems.forEach(item => {
 
                         const itemTotal = item.price * item.quantity;
+
                         cardTotal += itemTotal;
                         total += itemTotal;
 
@@ -240,7 +258,14 @@ function loadCart() {
             // ===============================
             else {
 
-                const myItems = cart.filter(i => i.owner === user.username);
+                const myItems = cart
+                    .map(item => ({
+                        ...item,
+                        name: item.name || "Unknown Product",
+                        price: Number(item.price) || 0,
+                        quantity: Number(item.quantity) || 1
+                    }))
+                    .filter(i => i.owner === user.username);
 
                 myItems.forEach(item => {
 
@@ -258,12 +283,16 @@ function loadCart() {
                 });
             }
 
-            cartTotal.innerText = total;
+            // ✅ FINAL TOTAL SAFE
+            cartTotal.innerText = Number(total) || 0;
+        })
+        .catch(err => {
+            console.error("Cart load error:", err);
+            document.getElementById("cartTotal").innerText = "0";
         });
 }
 
 if (currentPage === "cart.html") loadCart();
-
 /* ================================
    🧾 BILL HISTORY
 ================================ */
