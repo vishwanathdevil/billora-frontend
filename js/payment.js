@@ -1,5 +1,10 @@
 let stompClient = null;
 
+const BASE = "https://billora-backend-9kyk.onrender.com";
+
+// ===============================
+// TOAST
+// ===============================
 function showToast(msg) {
     let toast = document.getElementById("toast");
 
@@ -25,6 +30,18 @@ function showToast(msg) {
     }, 2000);
 }
 
+// ===============================
+// AUTH / ROLE
+// ===============================
+const role = localStorage.getItem("role");
+const sessionId = localStorage.getItem("sessionId");
+const user = JSON.parse(localStorage.getItem("user"));
+
+// ❌ BLOCK CHILD FROM PAYMENT
+if (role !== "MAIN") {
+    alert("Only main user can access payment ❌");
+    window.location.href = "cart.html";
+}
 
 // ===============================
 // GET BILL ID FROM URL
@@ -32,125 +49,122 @@ function showToast(msg) {
 const urlParams = new URLSearchParams(window.location.search);
 let currentBillId = urlParams.get("id");
 
-// STORE ID
-const selectedStoreId = localStorage.getItem("selectedStoreId") || 1;
-
 // ===============================
 // PAYMENT PAGE LOGIC
 // ===============================
 if (document.getElementById("payBtn")) {
 
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const user = JSON.parse(localStorage.getItem("user"));
-
     const qrContainer = document.getElementById("qrContainer");
     const totalEl = document.getElementById("payTotal");
 
-    const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
-    totalEl.innerText = total;
+    // ===============================
+    // FETCH MAIN CART (NO localStorage ❌)
+    // ===============================
+    fetch(`${BASE}/api/cart/main/${sessionId}`)
+    .then(res => res.json())
+    .then(cart => {
 
-    // ===============================
-    // CREATE BILL
-    // ===============================
-    if (!currentBillId) {
-        fetch("https://billora-backend-9kyk.onrender.com/api/bills", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                username: user?.username || "Guest",
-                items: cart.map(i => ({
-                    name: i.name,
-                    quantity: i.quantity,
-                    price: i.price
-                })),
-                total: total,
-                storeId: selectedStoreId
+        let total = 0;
+        cart.forEach(i => total += i.price * i.quantity);
+
+        totalEl.innerText = total;
+
+        // ===============================
+        // CREATE BILL
+        // ===============================
+        if (!currentBillId) {
+            return fetch(`${BASE}/api/bills`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: user?.username || "Guest",
+                    items: cart.map(i => ({
+                        name: i.name,
+                        quantity: i.quantity,
+                        price: i.price,
+                        owner: i.owner
+                    })),
+                    total: total
+                })
             })
-        })
-        .then(res => res.json())
-        .then(bill => {
-
-            currentBillId = bill.id;
-
-            const qrUrl = `${window.location.origin}/payment.html?id=${bill.id}`;
-
-            QRCode.toCanvas(qrUrl, { width: 250 }, function (err, canvas) {
-                qrContainer.innerHTML = "";
-                qrContainer.appendChild(canvas);
+            .then(res => res.json())
+            .then(bill => {
+                currentBillId = bill.id;
+                generateQR(qrContainer);
+                startPolling();
             });
+        } else {
+            generateQR(qrContainer);
+            startPolling();
+        }
 
-            startPolling(); // ✅ fallback
-        });
-    } else {
-        const qrUrl = `${window.location.origin}/payment.html?id=${currentBillId}`;
-        QRCode.toCanvas(qrUrl, { width: 250 }, function (err, canvas) {
-            qrContainer.innerHTML = "";
-            qrContainer.appendChild(canvas);
-        });
+        // ===============================
+        // PAY NOW
+        // ===============================
+        window.payNow = function () {
 
-        startPolling(); // ✅ fallback
-    }
+            const btn = document.getElementById("payBtn");
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+
+            fetch(`${BASE}/api/payment/create-order`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ amount: total })
+            })
+            .then(res => res.json())
+            .then(order => {
+
+                const options = {
+                    key: "rzp_test_SYKrnMrPo4MNDv",
+                    amount: order.amount,
+                    currency: "INR",
+                    order_id: order.id,
+
+                    handler: function (response) {
+
+                        fetch(`${BASE}/api/payment/verify`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                                billId: currentBillId
+                            })
+                        }).catch(() => {
+                            console.log("Verify fallback");
+                        });
+                    }
+                };
+
+                const rzp = new Razorpay(options);
+                rzp.open();
+            })
+            .catch(() => {
+                btn.disabled = false;
+                btn.innerText = "Pay Now";
+                alert("Payment failed ❌");
+            });
+        };
+
+    });
 
     // ===============================
-    // CONNECT WEBSOCKET
+    // SOCKET
     // ===============================
     connectCustomerSocket();
+}
 
-    // ===============================
-    // PAY NOW
-    // ===============================
-    window.payNow = function () {
-
-        const btn = document.getElementById("payBtn");
-        btn.disabled = true;
-        btn.innerText = "Processing...";
-
-        fetch("https://billora-backend-9kyk.onrender.com/api/payment/create-order", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ amount: total })
-        })
-        .then(res => res.json())
-        .then(order => {
-
-            const options = {
-                key: "rzp_test_SYKrnMrPo4MNDv",
-                amount: order.amount,
-                currency: "INR",
-                order_id: order.id,
-
-                handler: function (response) {
-
-                    // 🔥 VERIFY PAYMENT
-                    fetch("https://billora-backend-9kyk.onrender.com/api/payment/verify", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            razorpay_order_id: response.razorpay_order_id,
-                            razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_signature: response.razorpay_signature,
-                            billId: currentBillId
-                        })
-                    })
-                    .then(() => {
-                        // fallback polling will handle success
-                        console.log("Verify sent");
-                    })
-                    .catch(() => {
-                        console.log("Verify failed, polling fallback active");
-                    });
-                }
-            };
-
-            const rzp = new Razorpay(options);
-            rzp.open();
-        })
-        .catch(() => {
-            btn.disabled = false;
-            btn.innerText = "Pay Now";
-            alert("Payment failed ❌");
-        });
-    };
+// ===============================
+// QR GENERATION
+// ===============================
+function generateQR(container) {
+    const qrUrl = `${window.location.origin}/payment.html?id=${currentBillId}`;
+    QRCode.toCanvas(qrUrl, { width: 250 }, function (err, canvas) {
+        container.innerHTML = "";
+        container.appendChild(canvas);
+    });
 }
 
 // ===============================
@@ -158,7 +172,7 @@ if (document.getElementById("payBtn")) {
 // ===============================
 function connectCustomerSocket() {
 
-    const socket = new SockJS("https://billora-backend-9kyk.onrender.com/ws");
+    const socket = new SockJS(`${BASE}/ws`);
     stompClient = Stomp.over(socket);
 
     stompClient.connect({}, function () {
@@ -169,15 +183,16 @@ function connectCustomerSocket() {
 
             const bill = JSON.parse(message.body);
 
-            console.log("Bill update:", bill);
-
             if (bill.id == currentBillId && bill.status === "PAYMENT_PENDING") {
                 document.getElementById("payBtn").disabled = false;
             }
 
             if (bill.id == currentBillId && bill.status === "PAID") {
 
-                localStorage.removeItem("cart");
+                // 🔥 CLEAR ALL CARTS AFTER PAYMENT
+                fetch(`${BASE}/api/cart/session/${sessionId}`, {
+                    method: "DELETE"
+                });
 
                 showToast("Payment Successful ✅");
 
@@ -188,7 +203,7 @@ function connectCustomerSocket() {
 }
 
 // ===============================
-// 🔥 FALLBACK POLLING (CRITICAL FIX)
+// FALLBACK POLLING
 // ===============================
 function startPolling() {
 
@@ -197,12 +212,15 @@ function startPolling() {
         if (!currentBillId) return;
 
         try {
-            const res = await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${currentBillId}`);
+            const res = await fetch(`${BASE}/api/bills/id/${currentBillId}`);
             const bill = await res.json();
 
             if (bill.status === "PAID") {
 
-                localStorage.removeItem("cart");
+                // 🔥 CLEAR CART
+                fetch(`${BASE}/api/cart/session/${sessionId}`, {
+                    method: "DELETE"
+                });
 
                 showToast("Payment Successful ✅");
 

@@ -1,94 +1,73 @@
-console.log("CART JS LOADED");
-
 const BASE = "https://billora-backend-9kyk.onrender.com";
 
-function authHeaders() {
-    return {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + localStorage.getItem("token")
-    };
-}
+const sessionId = localStorage.getItem("sessionId");
+const user = JSON.parse(localStorage.getItem("user"));
 
-function addToCart(code) {
+const isMain = localStorage.getItem("role") === "MAIN";
 
-    const sessionId = localStorage.getItem("sessionId");
-    const storeId = localStorage.getItem("selectedStoreId");
-    const user = JSON.parse(localStorage.getItem("user"));
+if (isMain) loadMain();
+else loadChild();
 
-    if (!sessionId) return alert("Join group first ❌");
-
-    fetch(`${BASE}/api/products/${code}?storeId=${storeId}`)
+function loadMain() {
+    fetch(`${BASE}/api/cart/main/${sessionId}`)
         .then(res => res.json())
-        .then(product => {
-
-            body: JSON.stringify({
-    name: product.name,
-    code: product.code,
-    price: product.price,
-    quantity: 1,
-    sessionId,
-    owner: user.username
-})
-        })
-        .then(() => alert("Added ✅"));
+        .then(cart => render(cart, true));
 }
 
-function loadCart() {
-
-    const sessionId = localStorage.getItem("sessionId");
-    const user = JSON.parse(localStorage.getItem("user"));
-
-    fetch(`${BASE}/api/cart/${sessionId}`)
+function loadChild() {
+    fetch(`${BASE}/api/cart/child/${sessionId}/${user.username}`)
         .then(res => res.json())
-        .then(cart => {
-
-            const cartItems = document.getElementById("cartItems");
-            const cartTotal = document.getElementById("cartTotal");
-
-            cartItems.innerHTML = "";
-
-            let total = 0;
-
-            cart.forEach(item => {
-                const t = item.price * item.quantity;
-                total += t;
-
-                cartItems.innerHTML += `
-                    <div>
-                        <p>${item.name}</p>
-                        <p>₹ ${item.price}</p>
-                        <p>Qty: ${item.quantity}</p>
-                        <p>Total: ₹ ${t}</p>
-                    </div><hr>
-                `;
-            });
-
-            cartTotal.innerText = total;
-        });
+        .then(cart => render(cart, false));
 }
 
-function clearCart() {
+function render(cart, isMain) {
 
-    const sessionId = localStorage.getItem("sessionId");
+    let total = 0;
+    const box = document.getElementById("cartItems");
+    box.innerHTML = "";
 
-    fetch(`${BASE}/api/cart/${sessionId}`, {
-        method: "DELETE",
-        headers: authHeaders()
-    })
-    .then(res => res.text())
-    .then(msg => {
-        alert(msg);
-        location.reload();
+    cart.forEach(i => {
+
+        const t = i.price * i.quantity;
+        total += t;
+
+        box.innerHTML += `
+        <div>
+            <h4>${i.name}</h4>
+            ₹ ${i.price}
+            <br>Qty: ${i.quantity}
+            <br>Total: ₹ ${t}
+
+            ${isMain ? `
+            <button onclick="update(${i.id}, ${i.quantity+1})">+</button>
+            <button onclick="update(${i.id}, ${i.quantity-1})">-</button>
+            <button onclick="removeItem(${i.id})">Remove</button>
+            ` : ""}
+        </div><hr>
+        `;
     });
+
+    document.getElementById("cartTotal").innerText = total;
+
+    if (!isMain) {
+        document.getElementById("payBtn").style.display = "none";
+        document.getElementById("completeBtn").style.display = "block";
+    }
 }
 
-if (window.location.pathname.includes("cart.html")) {
-    loadCart();
+function update(id, qty) {
+    if (qty < 1) return;
+    fetch(`${BASE}/api/cart/update/${id}/${qty}`, { method: "PUT" })
+        .then(() => location.reload());
 }
 
-// PAYMENT
-function goToPayment() {
-    const total = document.getElementById("cartTotal").innerText;
-    if (!total || total == "0") return alert("Cart empty ❌");
-    window.location.href = "payment.html";
+function removeItem(id) {
+    fetch(`${BASE}/api/cart/${id}`, { method: "DELETE" })
+        .then(() => location.reload());
+}
+
+function completeCart() {
+    fetch(`${BASE}/api/cart/complete/${sessionId}/${user.username}`, {
+        method: "PUT"
+    }).then(() => location.reload());
 }
