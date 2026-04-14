@@ -47,10 +47,13 @@ function loadCart() {
         .then(res => res.json())
         .then(cart => {
 
-            const cartItems = document.getElementById("cartItems");
-            const cartTotal = document.getElementById("cartTotal");
+            if(!Array.isArray(cart)) {
+                console.error("Invalid cart response:", cart);
+            }
+            // const cartItems = document.getElementById("cartItems");
+            // const cartTotal = document.getElementById("cartTotal");
 
-            cartItems.innerHTML = "";
+            // cartItems.innerHTML = "";
 
             let total = 0;
 
