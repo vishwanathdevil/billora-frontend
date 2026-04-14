@@ -12,14 +12,25 @@ function addToCart(code) {
     }
 
     fetch(`https://billora-backend-9kyk.onrender.com/api/products/${code}?storeId=${storeId}`)
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                throw new Error("Product not found");
+            }
+            return res.json();
+        })
         .then(product => {
+
+            // ❌ STOP IF INVALID
+            if (!product || !product.name) {
+                alert("Invalid product ❌");
+                return;
+            }
 
             return fetch("https://billora-backend-9kyk.onrender.com/api/cart", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    name: product.name || "Unknown Product",
+                    name: product.name,
                     code: product.code,
                     price: Number(product.price) || 0,
                     quantity: 1,
@@ -29,8 +40,13 @@ function addToCart(code) {
                 })
             });
         })
-        .then(() => alert("Added to cart ✅"))
-        .catch(() => alert("Product not found ❌"));
+        .then(res => {
+            if (res) alert("Added to cart ✅");
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Product not found ❌");
+        });
 }
 
 // LOAD CART (your fixed version)
