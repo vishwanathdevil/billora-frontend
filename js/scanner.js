@@ -109,7 +109,8 @@ function addToCart(code) {
     code: product.code,
     price: product.price,
     quantity: quantity,
-    sessionId
+    sessionId,
+    owner: user?.username
 })
             })
             .then(() => {

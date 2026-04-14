@@ -26,6 +26,8 @@ function render(cart, isMain) {
     const box = document.getElementById("cartItems");
     box.innerHTML = "";
 
+    if(!Array.isArray(cart)) cart=[];
+
     cart.forEach(i => {
 
         const t = i.price * i.quantity;
@@ -69,5 +71,10 @@ function removeItem(id) {
 function completeCart() {
     fetch(`${BASE}/api/cart/complete/${sessionId}/${user.username}`, {
         method: "PUT"
+    }).then(() => location.reload());
+}
+function clearCart() {
+    fetch(`${BASE}/api/cart/session/${sessionId}`, {
+        method: "DELETE"
     }).then(() => location.reload());
 }
