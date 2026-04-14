@@ -105,13 +105,12 @@ function addToCart(code) {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    name: product.name,
-                    code: product.code,
-                    price: product.price,
-                    quantity: quantity,
-                    storeId: window.selectedStoreId,
-                    sessionId: sessionId   // 🔥 KEY CHANGE
-                })
+    name: product.name,
+    code: product.code,
+    price: product.price,
+    quantity: quantity,
+    sessionId
+})
             })
             .then(() => {
                 alert("Added to shared cart ✅");

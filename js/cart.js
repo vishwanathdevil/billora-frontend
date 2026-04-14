@@ -21,19 +21,14 @@ function addToCart(code) {
         .then(res => res.json())
         .then(product => {
 
-            return fetch(`${BASE}/api/cart`, {
-                method: "POST",
-                headers: authHeaders(),
-                body: JSON.stringify({
-                    name: product.name,
-                    code: product.code,
-                    price: product.price,
-                    quantity: 1,
-                    storeId,
-                    sessionId,
-                    owner: user.username
-                })
-            });
+            body: JSON.stringify({
+    name: product.name,
+    code: product.code,
+    price: product.price,
+    quantity: 1,
+    sessionId,
+    owner: user.username
+})
         })
         .then(() => alert("Added ✅"));
 }
@@ -47,13 +42,10 @@ function loadCart() {
         .then(res => res.json())
         .then(cart => {
 
-            if(!Array.isArray(cart)) {
-                console.error("Invalid cart response:", cart);
-            }
-            // const cartItems = document.getElementById("cartItems");
-            // const cartTotal = document.getElementById("cartTotal");
+            const cartItems = document.getElementById("cartItems");
+            const cartTotal = document.getElementById("cartTotal");
 
-            // cartItems.innerHTML = "";
+            cartItems.innerHTML = "";
 
             let total = 0;
 
