@@ -1,6 +1,7 @@
 console.log("AUTH JS LOADED");
 
-const user = JSON.parse(localStorage.getItem("user"));
+window.user = JSON.parse(localStorage.getItem("user"));
+
 const currentPage = window.location.pathname.split("/").pop();
 
 const protectedPages = [
@@ -13,20 +14,19 @@ const protectedPages = [
 ];
 
 // Protect pages
-if (protectedPages.includes(currentPage) && !user) {
+if (protectedPages.includes(currentPage) && !window.user) {
     window.location.href = "index.html";
 }
 
 // Redirect if already logged in
-if (currentPage === "index.html" && user) {
-    window.location.href = user.role === "CASHIER" ? "cashier.html" : "home.html";
+if (currentPage === "index.html" && window.user) {
+    window.location.href = window.user.role === "CASHIER" ? "cashier.html" : "home.html";
 }
 
 function logout() {
     localStorage.clear();
     window.location.href = "index.html";
 }
-
 
 console.log("NAV JS LOADED");
 
