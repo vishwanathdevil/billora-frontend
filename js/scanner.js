@@ -46,6 +46,8 @@ function startScanner() {
                     })
                     .then(product => {
 
+                        currentProduct = product; // 🔥 SAVE CURRENT PRODUCT
+
                         document.getElementById("productName").innerText = product.name;
                         document.getElementById("productPrice").innerText = product.price;
 
@@ -82,57 +84,52 @@ window.decreaseQty = function () {
 // =======================
 // 🛒 ADD TO CART (UPDATED FOR SHARED CART)
 // =======================
-function addToCart(code) {
+let currentProduct = null; // 🔥 ADD AT TOP
 
-    const sessionId = localStorage.getItem("sessionId"); // 🔥 IMPORTANT
+function addToCart() {
+
+    const sessionId = localStorage.getItem("sessionId");
+    const user = JSON.parse(localStorage.getItem("user"));
 
     if (!sessionId) {
         alert("Session not found ❌");
         return;
     }
 
-    fetch(`https://billora-backend-9kyk.onrender.com/api/products/${code}?storeId=${window.selectedStoreId}`)
-        .then(res => {
-            if (!res.ok) throw new Error();
-            return res.json();
-        })
-        .then(product => {
+    if (!currentProduct) {
+        alert("Scan product first ❌");
+        return;
+    }
 
-            // 🔥 SEND TO BACKEND (NOT localStorage)
-            fetch("https://billora-backend-9kyk.onrender.com/api/cart", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-    name: product.name,
-    code: product.code,
-    price: product.price,
-    quantity: quantity,
-    sessionId,
-    owner: user?.username
-})
-            })
-            .then(() => {
-                alert("Added to shared cart ✅");
-            })
-            .catch(() => {
-                alert("Failed to add ❌");
-            });
-
+    fetch("https://billora-backend-9kyk.onrender.com/api/cart", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            name: currentProduct.name,
+            code: currentProduct.code,
+            price: currentProduct.price,
+            quantity: quantity,
+            sessionId,
+            owner: user?.username
         })
-        .catch(() => {
-            alert("Product not found ❌");
-        });
+    })
+    .then(() => {
+        alert("Added to cart ✅");
+    })
+    .catch(() => {
+        alert("Failed ❌");
+    });
 }
-
 
 // =======================
 // 🌐 GLOBAL BUTTON FUNCTIONS
 // =======================
 window.addScannedToCart = function () {
-    if (!scannedCode) return alert("Scan first");
-    addToCart(scannedCode);
+    if (!currentProduct)
+        return alert("Scan first");
+    addToCart();
 };
 
 window.restartScanner = function () {
