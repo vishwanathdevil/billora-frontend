@@ -25,14 +25,15 @@
 <!-- BOTTOM BAR -->
 <div class="action-bar">
     <button onclick="goToScanner()">➕ Add product</button>
-    <button onclick="goToPayment()">💳 Pay</button>
+
+    <button id="payBtn" onclick="goToPayment()">💳 Pay</button>
+
+    <button id="completeBtn" onclick="completeCart()" style="display:none;">
+        📤 Send to Main
+    </button>
+
     <button onclick="clearCart()">🗑 Clear</button>
 </div>
-<button id="completeBtn" onclick="completeCart()" style="display:none;">
-    Complete
-</button>
-
-<button id="payBtn">Pay</button>
 
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 <script src="js/cart.js"></script>

@@ -19,6 +19,7 @@ function createGroupSession() {
 
         localStorage.setItem("sessionCreator", user.username);
         localStorage.setItem("sessionId", sessionId);
+        localStorage.setItem("role", "MAIN");
 
         const qrUrl = `${window.location.origin}/join.html?id=${sessionId}`;
 

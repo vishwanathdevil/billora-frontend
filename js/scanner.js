@@ -112,7 +112,8 @@ function addToCart() {
             price: currentProduct.price,
             quantity: quantity,
             sessionId,
-            owner: user?.username
+            owner: user?.username,
+            role: localStorage.getItem("role") 
         })
     })
     .then(() => {
