@@ -84,7 +84,6 @@ window.decreaseQty = function () {
 // =======================
 // 🛒 ADD TO CART (UPDATED FOR SHARED CART)
 // =======================
-let currentProduct = null; // 🔥 ADD AT TOP
 
 function addToCart() {
 
@@ -112,16 +111,11 @@ function addToCart() {
             price: currentProduct.price,
             quantity: quantity,
             sessionId,
-            owner: user?.username,
-            role: localStorage.getItem("role") 
+            owner: user?.username   // ✅ ONLY THIS
         })
     })
-    .then(() => {
-        alert("Added to cart ✅");
-    })
-    .catch(() => {
-        alert("Failed ❌");
-    });
+    .then(() => alert("Added to cart ✅"))
+    .catch(() => alert("Failed ❌"));
 }
 
 // =======================

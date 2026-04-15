@@ -8,7 +8,7 @@ const user = JSON.parse(localStorage.getItem("user"));
 const sessionCreator = localStorage.getItem("sessionCreator");
 
 // ✅ MAIN USER CHECK
-const isMain = user?.username === sessionCreator;
+const isMain = user && sessionCreator && user.username === sessionCreator;
 
 // ===============================
 // 🚀 LOAD CART
@@ -159,11 +159,5 @@ function goToPayment() {
         alert("Only main user can pay ❌");
         return;
     }
-
-    if (!sessionId) {
-        alert("Session not found ❌");
-        return;
-    }
-
     window.location.href = "payment.html";
 }
