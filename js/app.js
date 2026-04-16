@@ -52,7 +52,6 @@ function goBack() {
         window.location.href = "home.html";
     }
 }
-const user = JSON.parse(localStorage.getItem("user"));
 
 if (!user && protectedPages.includes(currentPage)) {
     window.location.href = "index.html";
