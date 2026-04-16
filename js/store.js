@@ -23,7 +23,9 @@ function selectStore(storeId) {
 
     const sessionId = localStorage.getItem("sessionId");
 
-    if (sessionId) {
+    // ✅ IF GROUP → KEEP
+    if (sessionId && localStorage.getItem("role") === "CHILD") {
+
         fetch("https://billora-backend-9kyk.onrender.com/api/session/start", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -32,16 +34,19 @@ function selectStore(storeId) {
                 storeId: storeId
             })
         })
-        .then(res => {
-            if (!res.ok) throw new Error("Session start failed");
-            return res.json();
-        })
+        .then(res => res.json())
         .then(() => {
             localStorage.setItem("selectedStoreId", storeId);
             window.location.href = "scanner.html";
-        })
-        .catch(() => alert("Failed to start session ❌"));
+        });
+
     } else {
+
+        // 🔥🔥🔥 IMPORTANT FIX (SOLO FLOW)
+        localStorage.removeItem("sessionId");
+        localStorage.removeItem("sessionCreator");
+        localStorage.setItem("role", "MAIN");
+
         localStorage.setItem("selectedStoreId", storeId);
         window.location.href = "scanner.html";
     }
