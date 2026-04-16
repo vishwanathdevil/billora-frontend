@@ -1,7 +1,7 @@
 const BASE = "https://billora-backend-9kyk.onrender.com";
 
 const sessionId = localStorage.getItem("sessionId");
-const user = JSON.parse(localStorage.getItem("user"));
+const user = window.user;
 const role = localStorage.getItem("role");
 
 const isMain = role === "MAIN";

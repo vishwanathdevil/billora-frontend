@@ -50,3 +50,6 @@ function selectStore(storeId) {
 if (window.location.pathname.includes("store.html")) {
     loadStores();
 }
+if (!localStorage.getItem("role")) {
+    localStorage.setItem("role", "MAIN");
+}
