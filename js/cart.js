@@ -1,16 +1,36 @@
 const BASE = "https://billora-backend-9kyk.onrender.com";
 
+// ===============================
+// 🔑 USER + SESSION
+// ===============================
+const user = window.user || JSON.parse(localStorage.getItem("user"));
 const sessionId = localStorage.getItem("sessionId");
-const user = window.user;
 const role = localStorage.getItem("role");
+const sessionCreator = localStorage.getItem("sessionCreator");
 
-const isMain = role === "MAIN";
+// ✅ FIX: detect MAIN correctly
+const isMain =
+    role === "MAIN" ||              // group main
+    !sessionId ||                  // solo user
+    user?.username === sessionCreator;
 
-// LOAD
+// ===============================
+// 🚀 LOAD CART
+// ===============================
 if (isMain) loadMain();
 else loadChild();
 
 function loadMain() {
+
+    // ✅ SOLO USER SUPPORT
+    if (!sessionId) {
+        fetch(`${BASE}/api/cart/user/${user.username}`)
+            .then(res => res.json())
+            .then(cart => render(cart, true))
+            .catch(() => render([], true));
+        return;
+    }
+
     fetch(`${BASE}/api/cart/main/${sessionId}`)
         .then(res => res.json())
         .then(cart => render(cart, true))
@@ -18,13 +38,16 @@ function loadMain() {
 }
 
 function loadChild() {
+
     fetch(`${BASE}/api/cart/child/${sessionId}/${user.username}`)
         .then(res => res.json())
         .then(cart => render(cart, false))
         .catch(() => render([], false));
 }
 
-// RENDER
+// ===============================
+// 🎨 RENDER
+// ===============================
 function render(cart, isMainUser) {
 
     let total = 0;
@@ -36,8 +59,10 @@ function render(cart, isMainUser) {
     let grouped = {};
 
     cart.forEach(i => {
-        if (!grouped[i.owner]) grouped[i.owner] = [];
-        grouped[i.owner].push(i);
+        const owner = i.owner || "You";
+
+        if (!grouped[owner]) grouped[owner] = [];
+        grouped[owner].push(i);
     });
 
     for (let owner in grouped) {
@@ -58,8 +83,8 @@ function render(cart, isMainUser) {
 
                 ${isMainUser ? `
                 <div>
-                    <button onclick="update(${i.id}, ${i.quantity+1})">+</button>
-                    <button onclick="update(${i.id}, ${i.quantity-1})">-</button>
+                    <button onclick="update(${i.id}, ${i.quantity + 1})">+</button>
+                    <button onclick="update(${i.id}, ${i.quantity - 1})">-</button>
                     <button onclick="removeItem(${i.id})">Remove</button>
                 </div>
                 ` : ""}
@@ -75,16 +100,19 @@ function render(cart, isMainUser) {
     const payBtn = document.getElementById("payBtn");
     const completeBtn = document.getElementById("completeBtn");
 
+    // ✅ SAFE UI HANDLING
     if (isMainUser) {
-        payBtn.style.display = "block";
-        completeBtn.style.display = "none";
+        if (payBtn) payBtn.style.display = "block";
+        if (completeBtn) completeBtn.style.display = "none";
     } else {
-        payBtn.style.display = "none";
-        completeBtn.style.display = "block";
+        if (payBtn) payBtn.style.display = "none";
+        if (completeBtn) completeBtn.style.display = "block";
     }
 }
 
-// UPDATE
+// ===============================
+// 🔄 UPDATE
+// ===============================
 function update(id, qty) {
     if (qty < 1) return;
 
@@ -93,15 +121,20 @@ function update(id, qty) {
     }).then(() => location.reload());
 }
 
-// REMOVE
+// ===============================
+// ❌ REMOVE
+// ===============================
 function removeItem(id) {
     fetch(`${BASE}/api/cart/${id}`, {
         method: "DELETE"
     }).then(() => location.reload());
 }
 
-// CHILD → MAIN
+// ===============================
+// 📤 CHILD → MAIN
+// ===============================
 function completeCart() {
+
     fetch(`${BASE}/api/cart/complete/${sessionId}/${user.username}`, {
         method: "PUT"
     })
@@ -111,11 +144,20 @@ function completeCart() {
     });
 }
 
-// CLEAR (ONLY MAIN)
+// ===============================
+// 🧹 CLEAR
+// ===============================
 function clearCart() {
 
     if (!isMain) {
         alert("Only main user can clear ❌");
+        return;
+    }
+
+    if (!sessionId) {
+        fetch(`${BASE}/api/cart/user/${user.username}`, {
+            method: "DELETE"
+        }).then(() => location.reload());
         return;
     }
 
@@ -124,7 +166,9 @@ function clearCart() {
     }).then(() => location.reload());
 }
 
-// PAYMENT
+// ===============================
+// 💳 PAYMENT
+// ===============================
 function goToPayment() {
 
     if (!isMain) {
