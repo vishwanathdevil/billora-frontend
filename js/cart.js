@@ -149,21 +149,24 @@ function completeCart() {
 // ===============================
 function clearCart() {
 
-    if (!isMain) {
-        alert("Only main user can clear ❌");
-        return;
-    }
+    // ✅ GROUP SESSION
+    if (sessionId) {
 
-    if (!sessionId) {
+        // 🔥 OPTION 1: Clear only current user's items (RECOMMENDED)
+        fetch(`${BASE}/api/cart/clear/${sessionId}/${user.username}`, {
+            method: "DELETE"
+        })
+        .then(() => location.reload());
+
+    } 
+    else {
+
+        // ✅ SOLO USER
         fetch(`${BASE}/api/cart/user/${user.username}`, {
             method: "DELETE"
-        }).then(() => location.reload());
-        return;
+        })
+        .then(() => location.reload());
     }
-
-    fetch(`${BASE}/api/cart/session/${sessionId}`, {
-        method: "DELETE"
-    }).then(() => location.reload());
 }
 
 // ===============================
