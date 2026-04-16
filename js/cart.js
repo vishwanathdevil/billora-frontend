@@ -6,7 +6,7 @@ const role = localStorage.getItem("role");
 const sessionCreator = localStorage.getItem("sessionCreator");
 const mode = localStorage.getItem("mode");
 
-// ✅ STRICT MAIN LOGIC
+// ✅ MAIN CHECK
 const isMain =
     mode === "SOLO" ||
     role === "MAIN" ||
@@ -16,8 +16,21 @@ const isMain =
 if (isMain) loadMain();
 else loadChild();
 
+// =======================
+// LOAD MAIN
+// =======================
 function loadMain() {
 
+    // ✅ SOLO
+    if (mode === "SOLO") {
+        fetch(`${BASE}/api/cart/user/${user.username}`)
+            .then(res => res.json())
+            .then(cart => render(cart, true))
+            .catch(() => render([], true));
+        return;
+    }
+
+    // ✅ GROUP
     if (!sessionId) {
         render([], true);
         return;
@@ -29,6 +42,9 @@ function loadMain() {
         .catch(() => render([], true));
 }
 
+// =======================
+// LOAD CHILD
+// =======================
 function loadChild() {
 
     fetch(`${BASE}/api/cart/child/${sessionId}/${user.username}`)
@@ -37,7 +53,9 @@ function loadChild() {
         .catch(() => render([], false));
 }
 
+// =======================
 // RENDER
+// =======================
 function render(cart, isMainUser) {
 
     let total = 0;
@@ -50,7 +68,6 @@ function render(cart, isMainUser) {
 
     cart.forEach(i => {
         const owner = i.owner || "You";
-
         if (!grouped[owner]) grouped[owner] = [];
         grouped[owner].push(i);
     });
@@ -99,7 +116,9 @@ function render(cart, isMainUser) {
     }
 }
 
-// UPDATE
+// =======================
+// ACTIONS
+// =======================
 function update(id, qty) {
     if (qty < 1) return;
 
@@ -108,28 +127,32 @@ function update(id, qty) {
     }).then(() => location.reload());
 }
 
-// REMOVE
 function removeItem(id) {
     fetch(`${BASE}/api/cart/${id}`, {
         method: "DELETE"
     }).then(() => location.reload());
 }
 
-// CHILD → MAIN
 function completeCart() {
     fetch(`${BASE}/api/cart/complete/${sessionId}/${user.username}`, {
         method: "PUT"
     }).then(() => location.reload());
 }
 
-// CLEAR
+// ✅ FIXED CLEAR
 function clearCart() {
-    fetch(`${BASE}/api/cart/session/${sessionId}`, {
-        method: "DELETE"
-    }).then(() => location.reload());
+
+    if (mode === "SOLO") {
+        fetch(`${BASE}/api/cart/user/${user.username}`, {
+            method: "DELETE"
+        }).then(() => location.reload());
+    } else {
+        fetch(`${BASE}/api/cart/session/${sessionId}`, {
+            method: "DELETE"
+        }).then(() => location.reload());
+    }
 }
 
-// PAYMENT
 function goToPayment() {
     window.location.href = "payment.html";
 }

@@ -1,72 +1,100 @@
 // ✅ GLOBAL STORE ID
-window.selectedStoreId = 1;
+window.selectedStoreId = localStorage.getItem("selectedStoreId") || 1;
 
 console.log("ZXING Scanner code loaded");
 
 let scannedCode = null;
 let isScanning = false;
+let currentProduct = null;
+let quantity = 1;
 
 // ✅ ZXING READER
 const codeReader = new ZXing.BrowserMultiFormatReader();
 
-
-// =======================
-// 🚀 START SCANNER
-// =======================
 function startScanner() {
 
     const videoElement = document.getElementById("scanner");
 
-    if (!videoElement) {
-        console.error("Video element not found");
+    if (!videoElement) return;
+
+    codeReader.reset();
+    isScanning = true;
+
+    codeReader.decodeFromVideoDevice(null, videoElement, (result, err) => {
+
+        if (result && isScanning) {
+
+            scannedCode = result.text;
+            isScanning = false;
+            codeReader.reset();
+
+            fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${window.selectedStoreId}`)
+                .then(res => {
+                    if (!res.ok) throw new Error();
+                    return res.json();
+                })
+                .then(product => {
+
+                    currentProduct = product;
+
+                    document.getElementById("productName").innerText = product.name;
+                    document.getElementById("productPrice").innerText = product.price;
+
+                    quantity = 1;
+                    document.getElementById("quantity").innerText = quantity;
+
+                    updateSubtotal();
+                })
+                .catch(() => alert("Product not found ❌"));
+        }
+    });
+}
+
+// =======================
+// 🛒 ADD TO CART (FIXED)
+// =======================
+function addToCart() {
+
+    const user = JSON.parse(localStorage.getItem("user"));
+    const mode = localStorage.getItem("mode");
+    const sessionId = localStorage.getItem("sessionId");
+
+    if (!currentProduct) {
+        alert("Scan product first ❌");
         return;
     }
 
-    codeReader.reset();
+    let payload = {
+        name: currentProduct.name,
+        code: currentProduct.code,
+        price: currentProduct.price,
+        quantity: quantity,
+        owner: user?.username
+    };
 
-    isScanning = true;
+    // ✅ GROUP
+    if (mode === "GROUP") {
+        if (!sessionId) return alert("Session not found ❌");
+        payload.sessionId = sessionId;
+    }
 
-    codeReader.decodeFromVideoDevice(
-        null,
-        videoElement, // ✅ PASS ELEMENT NOT STRING
-        (result, err) => {
+    // ✅ SOLO
+    else {
+        payload.username = user?.username;
+    }
 
-            if (result && isScanning) {
-
-                scannedCode = result.text;
-                console.log("Scanned:", scannedCode);
-
-                isScanning = false;
-                codeReader.reset();
-
-                fetch(`https://billora-backend-9kyk.onrender.com/api/products/${scannedCode}?storeId=${window.selectedStoreId}`)
-                    .then(res => {
-                        if (!res.ok) throw new Error();
-                        return res.json();
-                    })
-                    .then(product => {
-
-                        currentProduct = product; // 🔥 SAVE CURRENT PRODUCT
-
-                        document.getElementById("productName").innerText = product.name;
-                        document.getElementById("productPrice").innerText = product.price;
-
-                        quantity = 1;
-                        document.getElementById("quantity").innerText = quantity;
-
-                        updateSubtotal();
-                    })
-                    .catch(() => {
-                        alert("Product not found ❌");
-                    });
-            }
-
-            if (err && !(err instanceof ZXing.NotFoundException)) {
-                console.error(err);
-            }
-        }
-    );
+    fetch("https://billora-backend-9kyk.onrender.com/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    })
+    .then(() => alert("Added to cart ✅"))
+    .catch(() => alert("Failed ❌"));
 }
+
+// =======================
+// UI
+// =======================
 window.increaseQty = function () {
     quantity++;
     document.getElementById("quantity").innerText = quantity;
@@ -81,165 +109,13 @@ window.decreaseQty = function () {
     }
 };
 
-// =======================
-// 🛒 ADD TO CART (UPDATED FOR SHARED CART)
-// =======================
-function addToCart() {
-
-    const user = JSON.parse(localStorage.getItem("user"));
-    const mode = localStorage.getItem("mode");
-
-    let sessionId = localStorage.getItem("sessionId");
-
-    // 🟢 SOLO → create session automatically
-    if (mode === "SOLO" && !sessionId) {
-        sessionId = Date.now();
-        localStorage.setItem("sessionId", sessionId);
-        localStorage.setItem("role", "MAIN");
-    }
-
-    if (!sessionId) {
-        alert("Session not found ❌");
-        return;
-    }
-
-    if (!currentProduct) {
-        alert("Scan product first ❌");
-        return;
-    }
-
-    fetch("https://billora-backend-9kyk.onrender.com/api/cart", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            name: currentProduct.name,
-            code: currentProduct.code,
-            price: currentProduct.price,
-            quantity: quantity,
-            sessionId,
-            owner: user?.username
-        })
-    })
-    .then(() => alert("Added to cart ✅"))
-    .catch(() => alert("Failed ❌"));
+function updateSubtotal() {
+    const price = parseFloat(document.getElementById("productPrice").innerText) || 0;
+    document.getElementById("subtotal").innerText = price * quantity;
 }
-
-// =======================
-// 🌐 GLOBAL BUTTON FUNCTIONS
-// =======================
-window.addScannedToCart = function () {
-    if (!currentProduct)
-        return alert("Scan first");
-    addToCart();
-};
-
-window.restartScanner = function () {
-    scannedCode = null;
-    isScanning = true;
-    quantity = 1;
-
-    document.getElementById("quantity").innerText = quantity;
-    document.getElementById("subtotal").innerText = "0";
-    document.getElementById("productName").innerText = "Scan a product";
-    document.getElementById("productPrice").innerText = "0";
-
-    startScanner();
-};
 
 window.goToCart = function () {
     window.location.href = "cart.html";
 };
 
-
-// =======================
-// 📦 LOAD CART
-// =======================
-function loadCart() {
-
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-    const cartItems = document.getElementById("cartItems");
-    const cartTotal = document.getElementById("cartTotal");
-
-    if (!cartItems) return;
-
-    cartItems.innerHTML = "";
-
-    let total = 0;
-
-    cart.forEach(item => {
-        total += item.price * item.quantity;
-
-        cartItems.innerHTML += `
-            <div>
-                <h4>${item.name}</h4>
-                <p>₹ ${item.price}</p>
-                <p>Qty: ${item.quantity}</p>
-            </div><hr>
-        `;
-    });
-
-    cartTotal.innerText = total;
-}
-
-function updateSubtotal() {
-    const price = parseFloat(document.getElementById("productPrice").innerText) || 0;
-    const subtotal = price * quantity;
-
-    document.getElementById("subtotal").innerText = subtotal;
-}
-
-
-// =======================
-// 🧹 CLEAR CART
-// =======================
-function clearCart() {
-    localStorage.removeItem("cart");
-    alert("Cart cleared");
-    window.location.reload();
-}
-
-
-// =======================
-// 🚀 AUTO START
-// =======================
-document.addEventListener("DOMContentLoaded", function () {
-
-    console.log("DOM loaded, starting scanner");
-
-    startScanner();
-
-    // detect current page safely
-    const currentPage = window.location.pathname.split("/").pop();
-
-    if (currentPage === "cart.html") {
-        loadCart();
-    }
-});
-
-function goBack() {
-
-    const page = window.location.pathname;
-
-    if (page.includes("scanner.html")) {
-        window.location.href = "store.html";
-    }
-
-    else if (page.includes("cart.html")) {
-        window.location.href = "scanner.html";
-    }
-
-    else if (page.includes("payment.html")) {
-        window.location.href = "cart.html";
-    }
-
-    else if (page.includes("bills.html")) {
-        window.location.href = "home.html";
-    }
-
-    else {
-        window.location.href = "home.html";
-    }
-}
+document.addEventListener("DOMContentLoaded", startScanner);
