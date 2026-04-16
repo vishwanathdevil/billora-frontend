@@ -1,3 +1,10 @@
+const role = localStorage.getItem("role");
+
+if (role !== "MAIN") {
+    alert("Only main user can access payment ❌");
+    window.location.href = "cart.html";
+}
+
 let stompClient = null;
 
 const BASE = "https://billora-backend-9kyk.onrender.com";
@@ -217,15 +224,20 @@ function startPolling() {
 
             if (bill.status === "PAID") {
 
-                // 🔥 CLEAR CART
-                fetch(`${BASE}/api/cart/session/${sessionId}`, {
-                    method: "DELETE"
-                });
+    fetch(`${BASE}/api/cart/session/${sessionId}`, {
+        method: "DELETE"
+    });
 
-                showToast("Payment Successful ✅");
+    showToast("Payment Successful ✅");
 
-                window.location.href = `bills.html?id=${currentBillId}`;
-            }
+    const role = localStorage.getItem("role");
+
+    if (role === "MAIN") {
+        window.location.href = `bills.html?id=${currentBillId}`;
+    } else {
+        window.location.href = "home.html";
+    }
+}
 
         } catch (err) {
             console.log("Polling retry...");

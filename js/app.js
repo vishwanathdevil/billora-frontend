@@ -52,3 +52,15 @@ function goBack() {
         window.location.href = "home.html";
     }
 }
+const user = JSON.parse(localStorage.getItem("user"));
+
+if (!user && protectedPages.includes(currentPage)) {
+    window.location.href = "index.html";
+}
+
+// 🔥 ADD THIS
+if (user && currentPage === "index.html") {
+    if (user.role === "ADMIN") window.location.href = "admin.html";
+    else if (user.role === "CASHIER") window.location.href = "cashier.html";
+    else window.location.href = "home.html";
+}
