@@ -17,6 +17,7 @@ if (!user) {
 
 // ✅ SAVE SESSION
 localStorage.setItem("sessionId", sessionId);
+localStorage.setItem("mode", "GROUP");
 localStorage.setItem("role", "CHILD");
 
 // ⏳ WAIT LOOP

@@ -1,17 +1,18 @@
 const BASE = "https://billora-backend-9kyk.onrender.com";
 
 // ===============================
-// 🔑 USER + SESSION
+// 🔑 USER + MODE + SESSION
 // ===============================
 const user = window.user || JSON.parse(localStorage.getItem("user"));
 const sessionId = localStorage.getItem("sessionId");
 const role = localStorage.getItem("role");
 const sessionCreator = localStorage.getItem("sessionCreator");
+const mode = localStorage.getItem("mode");
 
-// ✅ FIX: detect MAIN correctly
+// ✅ FINAL MAIN DETECTION (CLEAN)
 const isMain =
-    role === "MAIN" ||              // group main
-    !sessionId ||                  // solo user
+    mode === "SOLO" || 
+    role === "MAIN" || 
     user?.username === sessionCreator;
 
 // ===============================
@@ -22,12 +23,8 @@ else loadChild();
 
 function loadMain() {
 
-    // ✅ SOLO USER SUPPORT
     if (!sessionId) {
-        fetch(`${BASE}/api/cart/user/${user.username}`)
-            .then(res => res.json())
-            .then(cart => render(cart, true))
-            .catch(() => render([], true));
+        render([], true);
         return;
     }
 
@@ -100,8 +97,8 @@ function render(cart, isMainUser) {
     const payBtn = document.getElementById("payBtn");
     const completeBtn = document.getElementById("completeBtn");
 
-    // ✅ SAFE UI HANDLING
-    if (isMainUser) {
+    // ✅ FINAL BUTTON LOGIC
+    if (mode === "SOLO" || isMainUser) {
         if (payBtn) payBtn.style.display = "block";
         if (completeBtn) completeBtn.style.display = "none";
     } else {
@@ -145,28 +142,20 @@ function completeCart() {
 }
 
 // ===============================
-// 🧹 CLEAR
+// 🧹 CLEAR CART (FOR ALL USERS)
 // ===============================
 function clearCart() {
 
-    // ✅ GROUP SESSION
-    if (sessionId) {
-
-        // 🔥 OPTION 1: Clear only current user's items (RECOMMENDED)
-        fetch(`${BASE}/api/cart/clear/${sessionId}/${user.username}`, {
-            method: "DELETE"
-        })
-        .then(() => location.reload());
-
-    } 
-    else {
-
-        // ✅ SOLO USER
-        fetch(`${BASE}/api/cart/user/${user.username}`, {
-            method: "DELETE"
-        })
-        .then(() => location.reload());
+    if (!sessionId) {
+        alert("No active cart ❌");
+        return;
     }
+
+    // ✅ CLEAR ENTIRE SESSION (simple & clean)
+    fetch(`${BASE}/api/cart/session/${sessionId}`, {
+        method: "DELETE"
+    })
+    .then(() => location.reload());
 }
 
 // ===============================
@@ -174,7 +163,7 @@ function clearCart() {
 // ===============================
 function goToPayment() {
 
-    if (!isMain) {
+    if (!(mode === "SOLO" || isMain)) {
         alert("Only main user can pay ❌");
         return;
     }

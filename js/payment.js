@@ -230,13 +230,14 @@ function startPolling() {
 
     showToast("Payment Successful ✅");
 
+    const mode = localStorage.getItem("mode");
     const role = localStorage.getItem("role");
 
-    if (role === "MAIN") {
-        window.location.href = `bills.html?id=${currentBillId}`;
-    } else {
-        window.location.href = "home.html";
-    }
+if (mode === "GROUP" && role === "MAIN") {
+    window.location.href = `bills.html?id=${currentBillId}`;
+} else {
+    window.location.href = "home.html";
+}
 }
 
         } catch (err) {

@@ -89,15 +89,19 @@ function addToCart() {
 
     const sessionId = localStorage.getItem("sessionId");
     const user = JSON.parse(localStorage.getItem("user"));
-
-    if (!sessionId) {
-        alert("Session not found ❌");
-        return;
-    }
+    const mode = localStorage.getItem("mode");
 
     if (!currentProduct) {
         alert("Scan product first ❌");
         return;
+    }
+
+    // 🟢 SOLO MODE → CREATE TEMP SESSION
+    const finalSessionId = sessionId || Date.now();
+
+    if (!sessionId) {
+        localStorage.setItem("sessionId", finalSessionId);
+        localStorage.setItem("role", "MAIN");
     }
 
     fetch("https://billora-backend-9kyk.onrender.com/api/cart", {
@@ -110,8 +114,8 @@ function addToCart() {
             code: currentProduct.code,
             price: currentProduct.price,
             quantity: quantity,
-            sessionId,
-            owner: user?.username   // ✅ ONLY THIS
+            sessionId: finalSessionId,
+            owner: user?.username
         })
     })
     .then(() => alert("Added to cart ✅"))

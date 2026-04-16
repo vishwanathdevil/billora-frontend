@@ -1,3 +1,5 @@
+localStorage.setItem("mode", "GROUP");
+
 // 📷 MEMBER FLOW
 function scanGroup() {
     window.location.href = "join-scanner.html";

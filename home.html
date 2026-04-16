@@ -27,6 +27,29 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+
+<script>
+function goToStore() {
+    // 🟢 SOLO MODE
+    localStorage.setItem("mode", "SOLO");
+
+    // 🔥 CLEAN GROUP DATA
+    localStorage.removeItem("sessionId");
+    localStorage.removeItem("sessionCreator");
+    localStorage.removeItem("role");
+
+    window.location.href = "store.html";
+}
+
+function goToGroup() {
+    // 🟡 GROUP MODE
+    localStorage.setItem("mode", "GROUP");
+
+    window.location.href = "group.html";
+}
+</script>
+
 <script src="js/app.js"></script>
 
 </body>
