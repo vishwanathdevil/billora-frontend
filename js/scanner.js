@@ -84,24 +84,28 @@ window.decreaseQty = function () {
 // =======================
 // 🛒 ADD TO CART (UPDATED FOR SHARED CART)
 // =======================
-
 function addToCart() {
 
-    const sessionId = localStorage.getItem("sessionId");
     const user = JSON.parse(localStorage.getItem("user"));
     const mode = localStorage.getItem("mode");
+
+    let sessionId = localStorage.getItem("sessionId");
+
+    // 🟢 SOLO → create session automatically
+    if (mode === "SOLO" && !sessionId) {
+        sessionId = Date.now();
+        localStorage.setItem("sessionId", sessionId);
+        localStorage.setItem("role", "MAIN");
+    }
+
+    if (!sessionId) {
+        alert("Session not found ❌");
+        return;
+    }
 
     if (!currentProduct) {
         alert("Scan product first ❌");
         return;
-    }
-
-    // 🟢 SOLO MODE → CREATE TEMP SESSION
-    const finalSessionId = sessionId || Date.now();
-
-    if (!sessionId) {
-        localStorage.setItem("sessionId", finalSessionId);
-        localStorage.setItem("role", "MAIN");
     }
 
     fetch("https://billora-backend-9kyk.onrender.com/api/cart", {
@@ -114,7 +118,7 @@ function addToCart() {
             code: currentProduct.code,
             price: currentProduct.price,
             quantity: quantity,
-            sessionId: finalSessionId,
+            sessionId,
             owner: user?.username
         })
     })

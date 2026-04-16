@@ -31,10 +31,11 @@
 
 <script>
 function goToStore() {
+
     // 🟢 SOLO MODE
     localStorage.setItem("mode", "SOLO");
 
-    // 🔥 CLEAN GROUP DATA
+    // 🔥 HARD RESET
     localStorage.removeItem("sessionId");
     localStorage.removeItem("sessionCreator");
     localStorage.removeItem("role");
@@ -43,6 +44,7 @@ function goToStore() {
 }
 
 function goToGroup() {
+
     // 🟡 GROUP MODE
     localStorage.setItem("mode", "GROUP");
 
