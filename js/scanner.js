@@ -30,3 +30,34 @@ function addToCart() {
     .then(() => alert("Added to cart ✅"))
     .catch(() => alert("Failed ❌"));
 }
+// ✅ ADD TO CART
+window.addScannedToCart = function () {
+    addToCart();
+};
+
+// ✅ RESTART
+window.restartScanner = function () {
+    scannedCode = null;
+    isScanning = true;
+    quantity = 1;
+
+    document.getElementById("quantity").innerText = quantity;
+    document.getElementById("subtotal").innerText = "0";
+    document.getElementById("productName").innerText = "Scan a product";
+    document.getElementById("productPrice").innerText = "0";
+
+    startScanner();
+};
+
+// ✅ GO TO CART
+window.goToCart = function () {
+    window.location.href = "cart.html";
+};
+
+// ✅ BACK
+window.goBack = function () {
+    window.location.href = "store.html";
+};
+document.addEventListener("DOMContentLoaded", function () {
+    startScanner();
+});
