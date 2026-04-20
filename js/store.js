@@ -1,7 +1,7 @@
-console.log("STORE JS LOADED");
+const BASE = "https://billora-backend-9kyk.onrender.com";
 
 function loadStores() {
-    fetch("https://billora-backend-9kyk.onrender.com/api/stores")
+    fetch(`${BASE}/api/stores`)
         .then(res => res.json())
         .then(stores => {
             const container = document.getElementById("storeList");
@@ -21,41 +21,17 @@ function loadStores() {
 
 function selectStore(storeId) {
 
-    const mode = localStorage.getItem("mode");
-    const sessionId = localStorage.getItem("sessionId");
+    // ✅ ALWAYS CREATE NEW SESSION (SOLO)
+    const sessionId = Date.now();
 
-    // ✅ GROUP FLOW
-    if (mode === "GROUP" && sessionId) {
+    localStorage.setItem("sessionId", sessionId);
+    localStorage.setItem("role", "MAIN");
 
-        fetch("https://billora-backend-9kyk.onrender.com/api/session/start", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                id: sessionId,
-                storeId: storeId
-            })
-        })
-        .then(() => {
-            localStorage.setItem("selectedStoreId", storeId);
-            window.location.href = "scanner.html";
-        });
+    localStorage.setItem("selectedStoreId", storeId);
 
-    } else {
-
-        // ✅ SOLO CLEAN FLOW
-        localStorage.setItem("mode", "SOLO");
-        localStorage.removeItem("sessionId");
-        localStorage.setItem("role", "MAIN");
-
-        localStorage.setItem("selectedStoreId", storeId);
-        window.location.href = "scanner.html";
-    }
+    window.location.href = "scanner.html";
 }
 
 if (window.location.pathname.includes("store.html")) {
     loadStores();
-}
-
-if (!localStorage.getItem("role")) {
-    localStorage.setItem("role", "MAIN");
 }
