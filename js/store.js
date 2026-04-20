@@ -45,7 +45,6 @@ function selectStore(storeId) {
         // ✅ SOLO CLEAN FLOW
         localStorage.setItem("mode", "SOLO");
         localStorage.removeItem("sessionId");
-        localStorage.removeItem("sessionCreator");
         localStorage.setItem("role", "MAIN");
 
         localStorage.setItem("selectedStoreId", storeId);

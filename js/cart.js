@@ -21,14 +21,15 @@ else loadChild();
 // =======================
 function loadMain() {
 
-    // ✅ SOLO
-    if (mode === "SOLO") {
-        fetch(`${BASE}/api/cart/user/${user.username}`)
-            .then(res => res.json())
-            .then(cart => render(cart, true))
-            .catch(() => render([], true));
+    if (!sessionId) {
+        render([], true);
         return;
     }
+
+    fetch(`${BASE}/api/cart/main/${sessionId}`)
+        .then(res => res.json())
+        .then(cart => render(cart, true))
+        .catch(() => render([], true));
 
     // ✅ GROUP
     if (!sessionId) {

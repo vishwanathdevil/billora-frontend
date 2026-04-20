@@ -56,37 +56,33 @@ function startScanner() {
 function addToCart() {
 
     const user = JSON.parse(localStorage.getItem("user"));
-    const mode = localStorage.getItem("mode");
-    const sessionId = localStorage.getItem("sessionId");
+    let sessionId = localStorage.getItem("sessionId");
+
+    // ✅ SOLO → AUTO CREATE SESSION
+    if (!sessionId) {
+        sessionId = Date.now();
+        localStorage.setItem("sessionId", sessionId);
+        localStorage.setItem("role", "MAIN");
+        localStorage.setItem("mode", "SOLO");
+    }
 
     if (!currentProduct) {
         alert("Scan product first ❌");
         return;
     }
 
-    let payload = {
-        name: currentProduct.name,
-        code: currentProduct.code,
-        price: currentProduct.price,
-        quantity: quantity,
-        owner: user?.username
-    };
-
-    // ✅ GROUP
-    if (mode === "GROUP") {
-        if (!sessionId) return alert("Session not found ❌");
-        payload.sessionId = sessionId;
-    }
-
-    // ✅ SOLO
-    else {
-        payload.username = user?.username;
-    }
-
     fetch("https://billora-backend-9kyk.onrender.com/api/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+            name: currentProduct.name,
+            code: currentProduct.code,
+            price: currentProduct.price,
+            quantity: quantity,
+            sessionId: Number(sessionId),   // ✅ ALWAYS SEND
+            owner: user?.username,
+            role: "MAIN"                   // ✅ SOLO = MAIN
+        })
     })
     .then(() => alert("Added to cart ✅"))
     .catch(() => alert("Failed ❌"));
