@@ -16,8 +16,22 @@ let currentBillId = null;
 let lastScanTime = 0;
 
 
+async function stopScannerSafe() {
+    if (html5QrCode) {
+        try {
+            await html5QrCode.stop();
+        } catch (e) {}
+        try {
+            await html5QrCode.clear();
+        } catch (e) {}
+        html5QrCode = null;
+    }
+}
+
 // 📷 START QR SCANNER (🔥 UPGRADED FOR LAPTOP)
-function startCashierScanner() {
+async function startCashierScanner() {
+
+    await stopScannerSafe();
 
     container.innerHTML = `
         <div class="glass-card text-center mb-3">
@@ -25,12 +39,6 @@ function startCashierScanner() {
             <div id="reader" style="width:100%; max-width:300px; margin:auto; border-radius:12px; overflow:hidden; border:2px solid var(--accent-primary);"></div>
         </div>
     `;
-
-    if (html5QrCode) {
-        html5QrCode.stop().catch(() => {});
-        html5QrCode.clear().catch(() => {});
-        html5QrCode = null;
-    }
 
     html5QrCode = new Html5Qrcode("reader");
 
@@ -94,11 +102,7 @@ function startCashierScanner() {
                             return;
                         }
 
-                        if (html5QrCode) {
-                            await html5QrCode.stop();
-                            await html5QrCode.clear();
-                            html5QrCode = null;
-                        }
+                        await stopScannerSafe();
 
                         showBill(bill);
 
@@ -124,15 +128,11 @@ function startCashierScanner() {
 
 
 // 🔁 RESET SCANNER
-function resetScanner() {
+async function resetScanner() {
 
     currentBillId = null;
 
-    if (html5QrCode) {
-        html5QrCode.stop().catch(() => {});
-        html5QrCode.clear().catch(() => {});
-        html5QrCode = null;
-    }
+    await stopScannerSafe();
 
     container.innerHTML = "<h3>🔄 Restarting scanner...</h3>";
 
@@ -229,6 +229,11 @@ function startPaymentListener(id) {
 
     const interval = setInterval(async () => {
 
+        if (currentBillId != id) {
+            clearInterval(interval);
+            return;
+        }
+
         try {
             const res = await fetch(`https://billora-backend-9kyk.onrender.com/api/bills/id/${id}`);
             const bill = await res.json();
@@ -280,13 +285,9 @@ function resetFlow() {
 
 
 // 🔁 RESTART
-function restartScanner() {
+async function restartScanner() {
 
-    if (html5QrCode) {
-        html5QrCode.stop().catch(() => {});
-        html5QrCode.clear().catch(() => {});
-        html5QrCode = null;
-    }
+    await stopScannerSafe();
 
     setTimeout(() => {
         startCashierScanner();
@@ -319,7 +320,7 @@ function connectWebSocket() {
 
             const bill = JSON.parse(message.body);
 
-            if (bill.status === "PAID") {
+            if (currentBillId && parseInt(bill.id) === parseInt(currentBillId) && bill.status === "PAID") {
                 alert("Customer Paid ✅");
                 resetFlow();
             }
