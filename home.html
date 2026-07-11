@@ -21,13 +21,21 @@
     <div class="grid-2 mt-2">
         <div class="glass-card text-center" style="cursor: pointer;" onclick="goToStore()">
             <div style="background: rgba(59, 130, 246, 0.1); width: 60px; height: 60px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
-                <i data-lucide="shopping-bag" style="color: var(--accent-primary); width: 30px; height: 30px;"></i>
+                <i data-lucide="user" style="color: var(--accent-primary); width: 30px; height: 30px;"></i>
             </div>
-            <h3>Start Shopping</h3>
-            <p style="font-size: 14px;">Scan & pay in store</p>
+            <h3>Solo Shopping</h3>
+            <p style="font-size: 14px;">Scan & pay for yourself</p>
         </div>
 
-        <div class="glass-card text-center" style="cursor: pointer;" onclick="goToBills()">
+        <div class="glass-card text-center" style="cursor: pointer;" onclick="goToGroup()">
+            <div style="background: rgba(16, 185, 129, 0.1); width: 60px; height: 60px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                <i data-lucide="users" style="color: var(--accent-success); width: 30px; height: 30px;"></i>
+            </div>
+            <h3>Group Shopping</h3>
+            <p style="font-size: 14px;">Shop with your family</p>
+        </div>
+        
+        <div class="glass-card text-center" style="cursor: pointer; grid-column: 1 / -1;" onclick="goToBills()">
             <div style="background: rgba(139, 92, 246, 0.1); width: 60px; height: 60px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
                 <i data-lucide="receipt" style="color: var(--accent-secondary); width: 30px; height: 30px;"></i>
             </div>
@@ -60,11 +68,8 @@ function goToStore() {
 }
 
 function goToGroup() {
-
-    // 🟡 GROUP MODE
     localStorage.setItem("mode", "GROUP");
-
-    window.location.href = "group.html";
+    window.location.href = "group-setup.html";
 }
 </script>
 

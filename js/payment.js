@@ -9,7 +9,16 @@ async function loadPayment() {
 
     try {
 
-        const res = await fetch(`${BASE}/api/cart/user/${user.username}`);
+        const mode = localStorage.getItem("mode");
+        const role = mode === "GROUP" ? localStorage.getItem("groupRole") : "SOLO";
+        
+        let url = `${BASE}/api/cart/user/${user.username}`;
+        if (mode === "GROUP" && role === "MAIN") {
+            const sessionId = localStorage.getItem("sessionId");
+            url = `${BASE}/api/cart/session/${sessionId}`;
+        }
+        
+        const res = await fetch(url);
         const cart = await res.json();
 
         let total = 0;
@@ -78,7 +87,13 @@ async function loadPayment() {
                         });
 
                         // ✅ CLEAR CART
-                        await fetch(`${BASE}/api/cart/user/${user.username}`, {
+                        let clearUrl = `${BASE}/api/cart/user/${user.username}`;
+                        if (mode === "GROUP" && role === "MAIN") {
+                            const sessionId = localStorage.getItem("sessionId");
+                            clearUrl = `${BASE}/api/cart/session/${sessionId}`;
+                        }
+                        
+                        await fetch(clearUrl, {
                             method: "DELETE"
                         });
 

@@ -8,22 +8,35 @@ loadCart();
 // LOAD CART
 // ===============================
 function loadCart() {
+    const mode = localStorage.getItem("mode");
+    const role = mode === "GROUP" ? localStorage.getItem("groupRole") : "SOLO";
+    
+    // Hide Pay button for children
+    if (role === "CHILD") {
+        document.getElementById("payBtn").style.display = "none";
+    }
 
-    fetch(`${BASE}/api/cart/user/${user.username}`)
+    let url = `${BASE}/api/cart/user/${user.username}`;
+    
+    // Parent sees the whole session cart
+    if (mode === "GROUP" && role === "MAIN") {
+        const sessionId = localStorage.getItem("sessionId");
+        url = `${BASE}/api/cart/session/${sessionId}`;
+    }
+
+    fetch(url)
         .then(res => res.json())
-        .then(cart => render(cart))
-        .catch(() => render([]));
+        .then(cart => render(cart, role))
+        .catch(() => render([], role));
 }
 
 // ===============================
 // RENDER
 // ===============================
-function render(cart) {
+function render(cart, role) {
 
     let total = 0;
-
     const box = document.getElementById("cartItems");
-
     box.innerHTML = "";
 
     if (!Array.isArray(cart)) cart = [];
@@ -31,13 +44,16 @@ function render(cart) {
     cart.forEach(i => {
 
         const t = i.price * i.quantity;
-
         total += t;
+        
+        const ownerTag = (role === "MAIN" && localStorage.getItem("mode") === "GROUP") 
+            ? `<div style="display:inline-block; margin-bottom: 5px; background: rgba(59, 130, 246, 0.15); color: var(--accent-primary); padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700;"><i data-lucide="user" style="width:10px; height:10px; margin-right:3px; vertical-align:middle;"></i>${i.owner}</div>` 
+            : ``;
 
-        box.innerHTML += `
         box.innerHTML += `
         <div class="item-card">
             <div style="flex: 1;">
+                ${ownerTag}
                 <h4 style="margin: 0 0 5px 0;">${i.name}</h4>
                 <div style="font-size: 13px; color: var(--text-secondary);">₹${i.price} &times; ${i.quantity}</div>
                 <div style="font-weight: 700; color: var(--accent-success); margin-top: 5px;">₹${t}</div>
@@ -64,8 +80,7 @@ function render(cart) {
         window.lucide.createIcons();
     }
 
-    document.getElementById("cartTotal").innerText =
-        total;
+    document.getElementById("cartTotal").innerText = total;
 }
 
 // ===============================
@@ -97,7 +112,18 @@ function removeItem(id) {
 // ===============================
 function clearCart() {
 
-    fetch(`${BASE}/api/cart/user/${user.username}`, {
+    const mode = localStorage.getItem("mode");
+    const role = mode === "GROUP" ? localStorage.getItem("groupRole") : "SOLO";
+    
+    let url = `${BASE}/api/cart/user/${user.username}`;
+    
+    // Parent clears the whole session cart
+    if (mode === "GROUP" && role === "MAIN") {
+        const sessionId = localStorage.getItem("sessionId");
+        url = `${BASE}/api/cart/session/${sessionId}`;
+    }
+
+    fetch(url, {
         method: "DELETE"
     })
     .then(() => loadCart());

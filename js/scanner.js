@@ -71,6 +71,10 @@ function addToCart() {
         return;
     }
 
+    const mode = localStorage.getItem("mode");
+    const sessionId = mode === "GROUP" ? localStorage.getItem("sessionId") : null;
+    const role = mode === "GROUP" ? localStorage.getItem("groupRole") : "SOLO";
+
     fetch(`${BASE}/api/cart`, {
         method: "POST",
         headers: {
@@ -81,7 +85,9 @@ function addToCart() {
             code: currentProduct.code,
             price: currentProduct.price,
             quantity: quantity,
-            owner: user.username
+            owner: user.username,
+            sessionId: sessionId,
+            role: role
         })
     })
     .then(() => {
