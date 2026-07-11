@@ -46,8 +46,7 @@
             </div>
         </div>
 
-        <!-- MENU ITEMS -->
-        <div class="glass-card" style="padding: 0;">
+        <div class="glass-card" style="padding: 0; margin-top: 20px;">
             <div class="menu-item" onclick="goToBills()">
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <i data-lucide="receipt" style="color: var(--accent-secondary);"></i>
@@ -55,38 +54,7 @@
                 </div>
                 <i data-lucide="chevron-right" style="color: var(--text-secondary);"></i>
             </div>
-            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); margin: 0;">
-            
-            <div class="menu-item" onclick="showHelp()">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <i data-lucide="help-circle" style="color: var(--accent-primary);"></i>
-                    <span style="font-weight: 600;">Help & FAQ</span>
-                </div>
-                <i data-lucide="chevron-right" style="color: var(--text-secondary);"></i>
-            </div>
-            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); margin: 0;">
-
-            <div class="menu-item" onclick="showContact()">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <i data-lucide="headphones" style="color: #10b981;"></i>
-                    <span style="font-weight: 600;">Contact Us</span>
-                </div>
-                <i data-lucide="chevron-right" style="color: var(--text-secondary);"></i>
-            </div>
-            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); margin: 0;">
-
-            <div class="menu-item" onclick="logout()">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <i data-lucide="log-out" style="color: #ef4444;"></i>
-                    <span style="font-weight: 600;">Log Out</span>
-                </div>
-            </div>
         </div>
-
-        <button class="btn btn-secondary mt-3" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3);" onclick="deleteAccountLocal()">
-            <i data-lucide="trash-2"></i> Delete Account (Clear Device)
-        </button>
-
     </div>
 
     <!-- PROFILE MODAL -->
@@ -110,6 +78,37 @@
                 <i data-lucide="mail"></i>
                 <input type="text" id="profileEmail" class="input-field" disabled style="color: var(--text-primary);">
             </div>
+
+            <!-- PROFILE MENU -->
+            <div style="margin-top: 20px;">
+                <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 10px 0;">
+                
+                <div class="menu-item" onclick="showHelp()" style="padding: 10px 5px;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <i data-lucide="help-circle" style="color: var(--accent-primary); width: 20px;"></i>
+                        <span style="font-weight: 600;">Help & FAQ</span>
+                    </div>
+                </div>
+
+                <div class="menu-item" onclick="showContact()" style="padding: 10px 5px;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <i data-lucide="headphones" style="color: #10b981; width: 20px;"></i>
+                        <span style="font-weight: 600;">Contact Us</span>
+                    </div>
+                </div>
+
+                <div class="menu-item" onclick="logout()" style="padding: 10px 5px;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <i data-lucide="log-out" style="color: #ef4444; width: 20px;"></i>
+                        <span style="font-weight: 600;">Log Out</span>
+                    </div>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 10px 0;">
+                <button class="btn btn-secondary mt-2" style="width: 100%; color: #ef4444; border-color: rgba(239, 68, 68, 0.3);" onclick="deleteAccountLocal()">
+                    <i data-lucide="trash-2"></i> Wipe Device Data
+                </button>
+            </div>
         </div>
     </div>
 
@@ -131,7 +130,7 @@
         
         /* Light mode toggle variables */
         body.light-mode {
-            --bg-color: #f8fafc;
+            background: #f8fafc;
             --bg-glass: rgba(255, 255, 255, 0.9);
             --text-primary: #0f172a;
             --text-secondary: #64748b;
@@ -151,6 +150,6 @@
     <script>
         lucide.createIcons();
     </script>
-    <script src="js/app.js?v=4"></script>
+    <script src="js/app.js?v=5"></script>
 </body>
 </html>

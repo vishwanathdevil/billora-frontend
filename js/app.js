@@ -118,17 +118,19 @@ function showContact() {
 }
 
 function deleteAccountLocal() {
+    closeProfile(); // Hide profile modal first
     if (window.Swal) {
         Swal.fire({
             title: 'Wipe Device Data?',
-            text: "This will remove your account from this device. You can get all your data back anytime by re-registering with the exact same mobile number!",
+            text: "This removes your account from this device. You MUST re-register with your mobile number to log back in!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#3b82f6',
             confirmButtonText: 'Yes, wipe it!',
             background: 'var(--bg-glass)',
-            color: 'var(--text-primary)'
+            color: 'var(--text-primary)',
+            backdrop: `rgba(0,0,0,0.85)`
         }).then((result) => {
             if (result.isConfirmed) {
                 localStorage.clear();
@@ -136,7 +138,7 @@ function deleteAccountLocal() {
             }
         });
     } else {
-        if(confirm("Wipe device data? You can restore it later by entering your number again.")) {
+        if(confirm("Wipe device data? You must register again to restore it.")) {
             localStorage.clear();
             window.location.href = "index.html";
         }
