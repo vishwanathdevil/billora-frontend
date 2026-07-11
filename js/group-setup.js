@@ -10,43 +10,13 @@ let html5QrCode = null;
 // ===============================
 // PARENT FLOW
 // ===============================
-async function startAsParent() {
-    document.getElementById("roleSelection").style.display = "none";
-    document.getElementById("parentView").style.display = "block";
-    
+function startAsParent() {
     // Set modes
     localStorage.setItem("mode", "GROUP");
     localStorage.setItem("groupRole", "MAIN");
     
-    try {
-        const res = await fetch(`${BASE}/api/session/create`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                createdBy: user.username,
-                status: "CREATED"
-            })
-        });
-        
-        const session = await res.json();
-        localStorage.setItem("sessionId", session.id);
-        
-        document.getElementById("sessionIdDisplay").innerText = session.id;
-        
-        // Generate QR code
-        const qrContainer = document.getElementById("sessionQrContainer");
-        qrContainer.innerHTML = "";
-        
-        QRCode.toCanvas(`SESSION:${session.id}`, { width: 180 }, function (err, canvas) {
-            if (!err) {
-                qrContainer.appendChild(canvas);
-            }
-        });
-        
-    } catch (err) {
-        console.error(err);
-        alert("Failed to create session.");
-    }
+    // Parent selects store FIRST
+    window.location.href = "store.html";
 }
 
 // ===============================

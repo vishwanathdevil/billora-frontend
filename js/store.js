@@ -35,19 +35,21 @@ function selectStore(storeId) {
 
     const mode = localStorage.getItem("mode");
     const role = localStorage.getItem("groupRole");
-    const sessionId = localStorage.getItem("sessionId");
 
-    if (mode === "GROUP" && role === "MAIN" && sessionId) {
-        // Update session with storeId
-        fetch(`${BASE}/api/session/start`, {
+    if (mode === "GROUP" && role === "MAIN") {
+        // Parent creates session WITH storeId
+        fetch(`${BASE}/api/session/create`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                id: sessionId,
-                storeId: storeId
+                createdBy: user.username,
+                storeId: storeId,
+                status: "ACTIVE"
             })
-        }).then(() => {
-            window.location.href = "scanner.html";
+        }).then(res => res.json())
+          .then(session => {
+            localStorage.setItem("sessionId", session.id);
+            window.location.href = "group-qr.html"; // Show QR code page
         }).catch(err => {
             console.error(err);
             alert("Failed to start group session for this store.");
