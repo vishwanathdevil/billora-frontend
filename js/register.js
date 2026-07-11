@@ -53,10 +53,15 @@ async function sendOtp() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ number })
         });
+
+        const text = await res.text();
+        let data;
+        try { data = JSON.parse(text); } catch { data = text; }
         
-        const data = await res.json();
-        
-        if (!res.ok) throw new Error(data.message || "Failed to send OTP");
+        if (!res.ok) {
+            const errorMsg = (data && data.message) ? data.message : (typeof data === 'string' ? data : "Failed to send OTP");
+            throw new Error(errorMsg);
+        }
 
         // Hide send button, show OTP form
         btn.style.display = "none";
@@ -99,10 +104,13 @@ async function verifyAndRegister() {
             body: JSON.stringify({ name, username, email, password, number, otp })
         });
         
-        const data = await res.json();
+        const text = await res.text();
+        let data;
+        try { data = JSON.parse(text); } catch { data = text; }
         
         if (!res.ok) {
-            throw new Error(data || "Registration failed");
+            const errorMsg = (data && data.message) ? data.message : (typeof data === 'string' ? data : "Registration failed");
+            throw new Error(errorMsg);
         }
 
         // Successfully registered or restored!
