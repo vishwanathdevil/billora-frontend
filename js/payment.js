@@ -53,8 +53,31 @@ async function loadPayment() {
 
         const pendingBill = await billRes.json();
 
+        // 🔒 LOCK SESSION IF GROUP SHOPPING
+        if (mode === "GROUP" && role === "MAIN") {
+            const sessionId = localStorage.getItem("sessionId");
+            if (sessionId) {
+                await fetch(`${BASE}/api/session/${sessionId}/status/CHECKOUT`, {
+                    method: "PUT"
+                }).catch(e => console.error("Failed to lock session", e));
+            }
+        }
+
         // GENERATE CASHIER QR (ID)
         generateQR(pendingBill.id);
+
+        // ===============================
+        // HANDLE BACK BUTTON (CANCEL PAYMENT)
+        // ===============================
+        window.cancelPayment = async function() {
+            try {
+                // Cancel bill
+                await fetch(`${BASE}/api/bills/${pendingBill.id}/cancel`, { method: "PUT" });
+            } catch (e) {
+                console.error("Failed to cancel bill", e);
+            }
+            window.location.href = "cart.html";
+        };
 
         const btn = document.getElementById("payBtn");
         btn.disabled = true;

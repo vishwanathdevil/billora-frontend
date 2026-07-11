@@ -193,6 +193,50 @@ function updateSubtotal() {
 }
 
 // =======================
+// SESSION LOCK POLLING
+// =======================
+function startSessionPolling() {
+    const mode = localStorage.getItem("mode");
+    const role = localStorage.getItem("groupRole");
+    const sessionId = localStorage.getItem("sessionId");
+
+    if (mode === "GROUP" && role === "CHILD" && sessionId) {
+        setInterval(async () => {
+            try {
+                const res = await fetch(`${BASE}/api/session/${sessionId}?t=${Date.now()}`, { cache: "no-store" });
+                const session = await res.json();
+                
+                if (session.status === "CHECKOUT") {
+                    isScanning = false;
+                    codeReader.reset();
+                    
+                    if (window.Swal) {
+                        Swal.fire({
+                            title: 'Parent Checkout in Progress',
+                            text: 'Your parent is currently paying for the cart. You cannot scan items.',
+                            icon: 'warning',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            showConfirmButton: false,
+                            background: 'var(--bg-glass)',
+                            color: 'var(--text-primary)'
+                        });
+                    } else {
+                        document.body.innerHTML = "<h2 style='text-align:center; padding-top: 50px; color:red;'>Parent is checking out. Scanner is locked.</h2>";
+                    }
+                } else if (session.status === "ACTIVE" && !isScanning && window.Swal) {
+                    // In case the parent cancels, they might unfreeze.
+                    // But right now we don't revert to ACTIVE automatically. Just a safety net.
+                }
+            } catch (e) {
+                console.error("Polling error", e);
+            }
+        }, 3000);
+    }
+}
+
+// =======================
 document.addEventListener("DOMContentLoaded", () => {
     startScanner();
+    startSessionPolling();
 });

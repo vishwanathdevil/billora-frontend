@@ -102,6 +102,12 @@ async function startCashierScanner() {
                             return;
                         }
 
+                        if (bill.status === "CANCELLED") {
+                            alert("This checkout was cancelled by the customer ❌");
+                            resetScanner();
+                            return;
+                        }
+
                         await stopScannerSafe();
 
                         showBill(bill);
@@ -242,6 +248,10 @@ function startPaymentListener(id) {
                 clearInterval(interval);
                 alert("Payment Successful ✅");
                 resetFlow();
+            } else if (bill.status === "CANCELLED") {
+                clearInterval(interval);
+                alert("Customer cancelled checkout ❌");
+                resetFlow();
             }
 
         } catch {}
@@ -320,9 +330,14 @@ function connectWebSocket() {
 
             const bill = JSON.parse(message.body);
 
-            if (currentBillId && parseInt(bill.id) === parseInt(currentBillId) && bill.status === "PAID") {
-                alert("Customer Paid ✅");
-                resetFlow();
+            if (currentBillId && parseInt(bill.id) === parseInt(currentBillId)) {
+                if (bill.status === "PAID") {
+                    alert("Customer Paid ✅");
+                    resetFlow();
+                } else if (bill.status === "CANCELLED") {
+                    alert("Customer cancelled checkout ❌");
+                    resetFlow();
+                }
             }
         });
     });
