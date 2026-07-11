@@ -100,32 +100,71 @@ function update(id, qty) {
 // REMOVE
 // ===============================
 function removeItem(id) {
-
-    fetch(`${BASE}/api/cart/${id}`, {
-        method: "DELETE"
-    })
-    .then(() => loadCart());
+    if (window.Swal) {
+        Swal.fire({
+            title: 'Remove Item?',
+            text: "Are you sure you want to remove this product?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: 'var(--accent-danger)',
+            cancelButtonColor: 'var(--bg-glass)',
+            confirmButtonText: 'Yes, remove it',
+            background: 'var(--bg-glass)',
+            color: 'var(--text-primary)',
+            customClass: { popup: 'glass-card' }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`${BASE}/api/cart/${id}`, { method: "DELETE" })
+                .then(() => loadCart());
+            }
+        });
+    } else {
+        fetch(`${BASE}/api/cart/${id}`, { method: "DELETE" }).then(() => loadCart());
+    }
 }
 
 // ===============================
 // CLEAR
 // ===============================
 function clearCart() {
+    
+    // Check if empty before asking
+    const cartItems = document.getElementById("cartItems").children;
+    if (cartItems.length === 0) return;
 
+    if (window.Swal) {
+        Swal.fire({
+            title: 'Clear Cart?',
+            text: "This will remove all items from the cart.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: 'var(--accent-danger)',
+            cancelButtonColor: 'var(--bg-glass)',
+            confirmButtonText: 'Yes, clear it',
+            background: 'var(--bg-glass)',
+            color: 'var(--text-primary)',
+            customClass: { popup: 'glass-card' }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                executeClear();
+            }
+        });
+    } else {
+        executeClear();
+    }
+}
+
+function executeClear() {
     const mode = localStorage.getItem("mode");
     const role = mode === "GROUP" ? localStorage.getItem("groupRole") : "SOLO";
     
     let url = `${BASE}/api/cart/user/${user.username}`;
-    
-    // Parent clears the whole session cart
     if (mode === "GROUP" && role === "MAIN") {
         const sessionId = localStorage.getItem("sessionId");
         url = `${BASE}/api/cart/session/${sessionId}`;
     }
 
-    fetch(url, {
-        method: "DELETE"
-    })
+    fetch(url, { method: "DELETE" })
     .then(() => loadCart());
 }
 
@@ -133,5 +172,23 @@ function clearCart() {
 // PAYMENT
 // ===============================
 function goToPayment() {
+    const total = parseFloat(document.getElementById("cartTotal").innerText);
+    if (total === 0) {
+        if (window.Swal) {
+            Swal.fire({
+                title: 'Cart is Empty',
+                text: "Please add some items to your cart before paying.",
+                icon: 'info',
+                confirmButtonColor: 'var(--accent-primary)',
+                background: 'var(--bg-glass)',
+                color: 'var(--text-primary)',
+                customClass: { popup: 'glass-card' }
+            });
+        } else {
+            alert("Cart is empty!");
+        }
+        return;
+    }
+    
     window.location.href = "payment.html";
 }
