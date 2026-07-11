@@ -154,7 +154,17 @@ function startAdminScanner() {
 
                 })
                 .catch(() => {
-                    // no alert → smooth UX
+                    // Product not found locally. Try fetching from OpenFoodFacts API.
+                    fetch(`https://world.openfoodfacts.org/api/v0/product/${scannedCode}.json`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status === 1 && data.product && data.product.product_name) {
+                                document.getElementById("name").value = data.product.product_name;
+                                // Highlight price field for the admin to type
+                                document.getElementById("price").focus();
+                            }
+                        })
+                        .catch(err => console.error("External lookup failed", err));
                 });
 
             codeReader.reset();
