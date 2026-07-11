@@ -72,10 +72,25 @@ function startAsChild() {
                     if (decodedText.startsWith("SESSION:")) {
                         const sessionId = decodedText.split(":")[1];
                         
-                        html5QrCode.stop().then(() => {
+                        html5QrCode.stop().then(async () => {
                             localStorage.setItem("sessionId", sessionId);
-                            alert("Successfully joined session " + sessionId);
-                            window.location.href = "store.html";
+                            
+                            try {
+                                const res = await fetch(`${BASE}/api/session/${sessionId}`);
+                                const session = await res.json();
+                                
+                                if (session.storeId) {
+                                    localStorage.setItem("selectedStoreId", session.storeId);
+                                    alert("Successfully joined session " + sessionId);
+                                    window.location.href = "scanner.html";
+                                } else {
+                                    alert("Parent hasn't selected a store yet. Please wait and scan again!");
+                                    startAsChild(); // restart scanner
+                                }
+                            } catch (err) {
+                                alert("Failed to join session. Please try again.");
+                                startAsChild();
+                            }
                         });
                     }
                 },

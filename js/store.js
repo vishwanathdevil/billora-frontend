@@ -31,12 +31,30 @@ function loadStores() {
 
 function selectStore(storeId) {
 
-    localStorage.setItem(
-        "selectedStoreId",
-        storeId
-    );
+    localStorage.setItem("selectedStoreId", storeId);
 
-    window.location.href = "scanner.html";
+    const mode = localStorage.getItem("mode");
+    const role = localStorage.getItem("groupRole");
+    const sessionId = localStorage.getItem("sessionId");
+
+    if (mode === "GROUP" && role === "MAIN" && sessionId) {
+        // Update session with storeId
+        fetch(`${BASE}/api/session/start`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                id: sessionId,
+                storeId: storeId
+            })
+        }).then(() => {
+            window.location.href = "scanner.html";
+        }).catch(err => {
+            console.error(err);
+            alert("Failed to start group session for this store.");
+        });
+    } else {
+        window.location.href = "scanner.html";
+    }
 }
 
 loadStores();
