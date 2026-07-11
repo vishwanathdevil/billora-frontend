@@ -73,7 +73,7 @@ async function loadPayment() {
                 const updatedBill = await statusRes.json();
                 
                 // If Cashier authorized Online Payment
-                if (updatedBill.status === "WAITING" && btn.disabled) {
+                if ((updatedBill.status === "WAITING" || updatedBill.status === "PAYMENT_PENDING") && btn.disabled) {
                     btn.disabled = false;
                     btn.innerText = "Pay Online";
                 }
