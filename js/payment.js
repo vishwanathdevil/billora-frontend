@@ -69,7 +69,7 @@ async function loadPayment() {
             if (paymentTriggered) return; // Stop polling if Razorpay is open
             
             try {
-                const statusRes = await fetch(`${BASE}/api/bills/id/${pendingBill.id}`);
+                const statusRes = await fetch(`${BASE}/api/bills/id/${pendingBill.id}?t=${new Date().getTime()}`, { cache: 'no-store' });
                 const updatedBill = await statusRes.json();
                 
                 // If Cashier authorized Online Payment
