@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billora | Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="./style/global.css">
+</head>
+<body>
+
+    <div id="loader">
+        <div class="spinner"></div>
+        <p>Connecting to server...</p>
+    </div>
+
+    <div class="flex-center" style="padding: 20px;">
+        <div class="glass-card text-center" style="width: 100%; max-width: 400px; padding: 30px 20px;">
+
+            <div class="mb-3">
+                <h2 style="margin: 0; background: linear-gradient(90deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Join Billora</h2>
+                <p style="font-size: 14px; color: var(--text-secondary);">Create an account or login</p>
+            </div>
+
+            <!-- REGISTRATION FORM -->
+            <div id="registrationForm">
+                <div class="input-group mb-2">
+                    <i data-lucide="user"></i>
+                    <input type="text" id="name" class="input-field" placeholder="Full Name (optional)">
+                </div>
+                <div class="input-group mb-2">
+                    <i data-lucide="at-sign"></i>
+                    <input type="text" id="username" class="input-field" placeholder="Username">
+                </div>
+                <div class="input-group mb-2">
+                    <i data-lucide="mail"></i>
+                    <input type="email" id="email" class="input-field" placeholder="Email Address (optional)">
+                </div>
+                <div class="input-group mb-2">
+                    <i data-lucide="lock"></i>
+                    <input type="password" id="password" class="input-field" placeholder="Create Password">
+                </div>
+                <div class="input-group mb-3">
+                    <i data-lucide="lock"></i>
+                    <input type="password" id="confirmPassword" class="input-field" placeholder="Re-enter Password">
+                </div>
+                <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px;">
+                <div class="input-group mb-3">
+                    <i data-lucide="smartphone"></i>
+                    <input type="tel" id="number" class="input-field" placeholder="Mobile Number (e.g. 9876543210)">
+                </div>
+
+                <button id="sendOtpBtn" class="btn btn-secondary" onclick="sendOtp()">
+                    <i data-lucide="send"></i> Send OTP
+                </button>
+            </div>
+
+            <!-- OTP FORM (HIDDEN INITIALLY) -->
+            <div id="otpForm" style="display: none;">
+                <p style="font-size: 14px; color: var(--accent-success); margin-bottom: 15px;">OTP sent successfully!</p>
+                <div class="input-group mb-3">
+                    <i data-lucide="key"></i>
+                    <input type="text" id="otp" class="input-field" placeholder="Enter 4-digit OTP" maxlength="4" style="text-align: center; font-size: 20px; letter-spacing: 5px;">
+                </div>
+                
+                <button id="registerBtn" class="btn btn-primary" onclick="verifyAndRegister()">
+                    <i data-lucide="check-circle"></i> Verify & Register
+                </button>
+            </div>
+
+            <p style="margin-top: 20px; font-size: 14px; color: var(--text-secondary);">
+                Already have an account? <a href="index.html" style="color: var(--accent-primary); text-decoration: none;">Login here</a>
+            </p>
+
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+    <script src="js/register.js"></script>
+</body>
+</html>

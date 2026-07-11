@@ -1,5 +1,17 @@
 console.log("LOGIN JS LOADED");
 
+// ================================
+// 🚀 AUTO-LOGIN
+// ================================
+document.addEventListener("DOMContentLoaded", () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user) {
+        if (user.role === "ADMIN") window.location.href = "admin.html";
+        else if (user.role === "CASHIER") window.location.href = "cashier.html";
+        else window.location.href = "home.html";
+    }
+});
+
 /* ================================
    🔔 TOAST
 ================================ */

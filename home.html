@@ -1,59 +1,156 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>Billora - Dashboard</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="./style/global.css">
 </head>
-<body>
+<body class="dashboard-body">
 
-<div class="app-container">
+    <!-- TOP NAV -->
+    <nav class="app-header flex-between" style="padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <h2 style="margin: 0; background: linear-gradient(90deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Billora</h2>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-icon" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                <i data-lucide="moon" id="themeIcon"></i>
+            </button>
+            <button class="btn-icon" onclick="showProfile()" title="Profile">
+                <i data-lucide="user"></i>
+            </button>
+        </div>
+    </nav>
 
-    <div class="app-header">
-        <h2>👋 Welcome to Billora</h2>
-        <button class="btn-icon" onclick="logout()" title="Logout">
-            <i data-lucide="log-out"></i>
+    <div class="app-container" style="padding-top: 20px;">
+        <h2 id="welcomeText" class="mb-3">👋 Welcome back!</h2>
+
+        <!-- SHOPPING OPTIONS -->
+        <div class="grid-2 mb-3">
+            <div class="glass-card text-center" style="cursor: pointer;" onclick="goToStore()">
+                <div style="background: rgba(59, 130, 246, 0.1); width: 60px; height: 60px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                    <i data-lucide="scan-line" style="color: var(--accent-primary); width: 30px; height: 30px;"></i>
+                </div>
+                <h3>Solo Shopping</h3>
+                <p style="font-size: 14px;">Scan & pay for yourself</p>
+            </div>
+
+            <div class="glass-card text-center" style="cursor: pointer;" onclick="goToGroup()">
+                <div style="background: rgba(16, 185, 129, 0.1); width: 60px; height: 60px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                    <i data-lucide="users" style="color: var(--accent-success); width: 30px; height: 30px;"></i>
+                </div>
+                <h3>Group Shopping</h3>
+                <p style="font-size: 14px;">Shop with your family</p>
+            </div>
+        </div>
+
+        <!-- MENU ITEMS -->
+        <div class="glass-card" style="padding: 0;">
+            <div class="menu-item" onclick="goToBills()">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i data-lucide="receipt" style="color: var(--accent-secondary);"></i>
+                    <span style="font-weight: 600;">View Bills</span>
+                </div>
+                <i data-lucide="chevron-right" style="color: var(--text-secondary);"></i>
+            </div>
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); margin: 0;">
+            
+            <div class="menu-item" onclick="showHelp()">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i data-lucide="help-circle" style="color: var(--accent-primary);"></i>
+                    <span style="font-weight: 600;">Help & FAQ</span>
+                </div>
+                <i data-lucide="chevron-right" style="color: var(--text-secondary);"></i>
+            </div>
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); margin: 0;">
+
+            <div class="menu-item" onclick="showContact()">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i data-lucide="headphones" style="color: #10b981;"></i>
+                    <span style="font-weight: 600;">Contact Us</span>
+                </div>
+                <i data-lucide="chevron-right" style="color: var(--text-secondary);"></i>
+            </div>
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); margin: 0;">
+
+            <div class="menu-item" onclick="logout()">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i data-lucide="log-out" style="color: #ef4444;"></i>
+                    <span style="font-weight: 600;">Log Out</span>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-secondary mt-3" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3);" onclick="deleteAccountLocal()">
+            <i data-lucide="trash-2"></i> Delete Account (Clear Device)
         </button>
+
     </div>
 
-    <div class="grid-2 mt-2">
-        <div class="glass-card text-center" style="cursor: pointer;" onclick="goToStore()">
-            <div style="background: rgba(59, 130, 246, 0.1); width: 60px; height: 60px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
-                <i data-lucide="user" style="color: var(--accent-primary); width: 30px; height: 30px;"></i>
+    <!-- PROFILE MODAL -->
+    <div id="profileModal" class="modal-overlay" style="display: none;">
+        <div class="glass-card modal-content" style="position: relative; text-align: left; max-width: 350px;">
+            <button class="btn-icon" onclick="closeProfile()" style="position: absolute; top: 15px; right: 15px;">
+                <i data-lucide="x"></i>
+            </button>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="background: rgba(255,255,255,0.1); width: 80px; height: 80px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                    <i data-lucide="user" style="width: 40px; height: 40px; color: var(--text-primary);"></i>
+                </div>
+                <h3 id="profileName" style="margin:0;">John Doe</h3>
+                <p id="profileUsername" style="color: var(--text-secondary); margin: 5px 0 0;">@johndoe</p>
             </div>
-            <h3>Solo Shopping</h3>
-            <p style="font-size: 14px;">Scan & pay for yourself</p>
+            <div class="input-group mb-2" style="background: rgba(0,0,0,0.2);">
+                <i data-lucide="smartphone"></i>
+                <input type="text" id="profileNumber" class="input-field" disabled style="color: var(--text-primary);">
+            </div>
+            <div class="input-group" style="background: rgba(0,0,0,0.2);">
+                <i data-lucide="mail"></i>
+                <input type="text" id="profileEmail" class="input-field" disabled style="color: var(--text-primary);">
+            </div>
         </div>
+    </div>
 
-        <div class="glass-card text-center" style="cursor: pointer;" onclick="goToGroup()">
-            <div style="background: rgba(16, 185, 129, 0.1); width: 60px; height: 60px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
-                <i data-lucide="users" style="color: var(--accent-success); width: 30px; height: 30px;"></i>
-            </div>
-            <h3>Group Shopping</h3>
-            <p style="font-size: 14px;">Shop with your family</p>
-        </div>
+    <style>
+        .menu-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 20px; cursor: pointer; transition: 0.2s;
+        }
+        .menu-item:hover { background: rgba(255,255,255,0.05); }
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+            display: flex; align-items: center; justify-content: center; z-index: 100;
+        }
+        .modal-content {
+            width: 90%; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
-        <div class="glass-card text-center" style="cursor: pointer; grid-column: 1 / -1;" onclick="goToBills()">
-            <div style="background: rgba(139, 92, 246, 0.1); width: 60px; height: 60px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
-                <i data-lucide="receipt" style="color: var(--accent-secondary); width: 30px; height: 30px;"></i>
-            </div>
-            <h3>View Bills</h3>
-            <p style="font-size: 14px;">Past purchases</p>
-        </div>
-    </div>
+        /* Light mode toggle variables */
+        body.light-mode {
+            --bg-color: #f8fafc;
+            --bg-glass: rgba(255, 255, 255, 0.9);
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+        }
+        body.light-mode .glass-card {
+            background: var(--bg-glass);
+            border: 1px solid rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        body.light-mode .input-group { background: #f1f5f9; border-color: #e2e8f0; }
+        body.light-mode .input-field { color: #0f172a; }
+        body.light-mode .input-field::placeholder { color: #94a3b8; }
+        body.light-mode .btn-icon { color: #0f172a; background: rgba(0,0,0,0.05); }
+        body.light-mode .btn-secondary { background: #f1f5f9; color: #0f172a; border-color: #e2e8f0; }
+    </style>
 
-</div>
-
-<script>
-    lucide.createIcons();
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-
-
-<script src="js/app.js?v=3"></script>
-
+    <script>
+        lucide.createIcons();
+    </script>
+    <script src="js/app.js?v=4"></script>
 </body>
 </html>

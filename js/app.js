@@ -74,3 +74,71 @@ if (user && currentPage === "index.html") {
     else if (user.role === "CASHIER") window.location.href = "cashier.html";
     else window.location.href = "home.html";
 }
+
+/* ================================
+   🌙 THEME & UI LOGIC FOR HOME
+================================ */
+document.addEventListener("DOMContentLoaded", () => {
+    if (currentPage === "home.html" && window.user) {
+        document.getElementById("welcomeText").innerText = `👋 Welcome back, ${window.user.name || window.user.username}!`;
+        
+        // Setup Profile
+        document.getElementById("profileName").innerText = window.user.name || "Customer";
+        document.getElementById("profileUsername").innerText = "@" + window.user.username;
+        document.getElementById("profileNumber").value = window.user.number || "Not provided";
+        document.getElementById("profileEmail").value = window.user.email || "Not provided";
+        
+        // Load Theme
+        if (localStorage.getItem("theme") === "light") {
+            document.body.classList.add("light-mode");
+            document.getElementById("themeIcon").setAttribute("data-lucide", "sun");
+        }
+        if (window.lucide) lucide.createIcons();
+    }
+});
+
+function toggleTheme() {
+    const isLight = document.body.classList.toggle("light-mode");
+    localStorage.setItem("theme", isLight ? "light" : "dark");
+    document.getElementById("themeIcon").setAttribute("data-lucide", isLight ? "sun" : "moon");
+    lucide.createIcons();
+}
+
+function showProfile() { document.getElementById("profileModal").style.display = "flex"; }
+function closeProfile() { document.getElementById("profileModal").style.display = "none"; }
+
+function showHelp() {
+    if (window.Swal) Swal.fire({ title: 'Help & FAQ', text: 'For help with shopping, simply scan the barcodes of items. If you need assistance, please approach the cashier.', icon: 'info', background: 'var(--bg-glass)', color: 'var(--text-primary)' });
+    else alert("Help: Scan barcodes to shop!");
+}
+
+function showContact() {
+    if (window.Swal) Swal.fire({ title: 'Contact Us', html: '<p>Email: support@billora.com</p><p>Phone: +1 800 BILLORA</p>', icon: 'success', background: 'var(--bg-glass)', color: 'var(--text-primary)' });
+    else alert("Contact: support@billora.com");
+}
+
+function deleteAccountLocal() {
+    if (window.Swal) {
+        Swal.fire({
+            title: 'Wipe Device Data?',
+            text: "This will remove your account from this device. You can get all your data back anytime by re-registering with the exact same mobile number!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#3b82f6',
+            confirmButtonText: 'Yes, wipe it!',
+            background: 'var(--bg-glass)',
+            color: 'var(--text-primary)'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                localStorage.clear();
+                window.location.href = "index.html";
+            }
+        });
+    } else {
+        if(confirm("Wipe device data? You can restore it later by entering your number again.")) {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+    }
+}
