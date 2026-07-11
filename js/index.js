@@ -3,21 +3,23 @@ console.log("LOGIN JS LOADED");
 /* ================================
    🔔 TOAST
 ================================ */
-function showToast(msg) {
-    let toast = document.getElementById("toast");
-
-    if (!toast) {
-        toast = document.createElement("div");
-        toast.id = "toast";
-        document.body.appendChild(toast);
+function showPopup(title, text, icon) {
+    if (window.Swal) {
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: icon,
+            confirmButtonColor: 'var(--accent-primary)',
+            confirmButtonText: 'Okay',
+            background: 'var(--bg-glass)',
+            color: 'var(--text-primary)',
+            customClass: {
+                popup: 'glass-card'
+            }
+        });
+    } else {
+        alert(title + ": " + text);
     }
-
-    toast.innerText = msg;
-    toast.style.display = "block";
-
-    setTimeout(() => {
-        toast.style.display = "none";
-    }, 2000);
 }
 
 /* ================================
@@ -27,7 +29,7 @@ function register() {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value.trim();
 
-    if (!username || !password) return showToast("Enter details");
+    if (!username || !password) return showPopup("Missing Details", "Please enter both username and password.", "warning");
 
     showLoader(true);
 
@@ -36,12 +38,25 @@ function register() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password })
     })
-    .then(res => res.json())
+    .then(async res => {
+        const text = await res.text();
+        if (!res.ok) {
+            throw new Error(text || "Registration failed");
+        }
+        return JSON.parse(text);
+    })
     .then(data => {
         localStorage.setItem("user", JSON.stringify(data));
         window.location.href = "home.html";
     })
-    .catch(() => showToast("Registration failed"))
+    .catch(err => {
+        const msg = err.message.toLowerCase();
+        if (msg.includes("already") || msg.includes("exists") || msg.includes("constraint")) {
+            showPopup("Already Registered", "This username is already taken. Please try logging in instead.", "info");
+        } else {
+            showPopup("Registration Failed", err.message, "error");
+        }
+    })
     .finally(() => showLoader(false));
 }
 
@@ -53,7 +68,7 @@ function login() {
     const password = document.getElementById("password").value.trim();
     const btn = document.getElementById("loginBtn");
 
-    if (!username || !password) return showToast("Enter details");
+    if (!username || !password) return showPopup("Missing Details", "Please enter both username and password.", "warning");
 
     btn.disabled = true;
     btn.innerText = "⏳ Logging in...";
@@ -65,34 +80,35 @@ function login() {
         body: JSON.stringify({ username, password })
     })
     .then(async res => {
-
-        const text = await res.text(); // 🔥 IMPORTANT FIX
-
+        const text = await res.text();
         if (!res.ok) {
-            throw new Error(text || "Login failed"); // now shows backend message
+            throw new Error(text || "Login failed");
         }
-
-        return JSON.parse(text); // success case
+        return JSON.parse(text);
     })
     .then(data => {
+        const user = data.user;
+        const token = data.token;
 
-    const user = data.user;
-    const token = data.token;
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("storeId", user.storeId);
 
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
-    localStorage.setItem("storeId", user.storeId);
-
-    if (user.role === "ADMIN") {
-        window.location.href = "admin.html";
-    } else if (user.role === "CASHIER") {
-        window.location.href = "cashier.html";
-    } else {
-        window.location.href = "home.html";
-    }
-})
+        if (user.role === "ADMIN") {
+            window.location.href = "admin.html";
+        } else if (user.role === "CASHIER") {
+            window.location.href = "cashier.html";
+        } else {
+            window.location.href = "home.html";
+        }
+    })
     .catch(err => {
-        showToast("❌ " + err.message);
+        const msg = err.message.toLowerCase();
+        if (msg.includes("not found") || msg.includes("bad credentials") || msg.includes("invalid")) {
+            showPopup("Not Registered?", "We couldn't find an account with those details. Please register first!", "question");
+        } else {
+            showPopup("Login Failed", err.message, "error");
+        }
     })
     .finally(() => {
         btn.disabled = false;
