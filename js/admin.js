@@ -141,7 +141,7 @@ function startAdminScanner() {
 
             document.getElementById("code").value = scannedCode;
 
-            fetch(`${API}/${scannedCode}?storeId=${storeId}`)
+            fetch(`${API}/${scannedCode}?storeId=${storeId}&source=admin`)
                 .then(res => {
                     if (!res.ok) throw new Error();
                     return res.json();

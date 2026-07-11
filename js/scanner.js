@@ -6,7 +6,7 @@ window.selectedStoreId =
     localStorage.getItem("selectedStoreId") || 1;
 
 let scannedCode = null;
-let isScanning = false;
+let isScanning = true;
 let currentProduct = null;
 let quantity = 1;
 
