@@ -31,11 +31,22 @@ function logout() {
 console.log("NAV JS LOADED");
 
 function goHome() { window.location.href = "home.html"; }
-function goToStore() { window.location.href = "store.html"; }
 function goToScanner() { window.location.href = "scanner.html"; }
 function goToCart() { window.location.href = "cart.html"; }
 function goToBills() { window.location.href = "bills.html"; }
-function goToGroup() { window.location.href = "group.html"; }
+
+function goToStore() { 
+    localStorage.setItem("mode", "SOLO");
+    localStorage.removeItem("sessionId");
+    localStorage.removeItem("sessionCreator");
+    localStorage.removeItem("role");
+    window.location.href = "store.html"; 
+}
+
+function goToGroup() { 
+    localStorage.setItem("mode", "GROUP");
+    window.location.href = "group-setup.html"; 
+}
 
 function goBack() {
     const page = window.location.pathname;
