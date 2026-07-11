@@ -123,10 +123,32 @@ window.restartScanner = function () {
 };
 
 window.goToCart = function () {
+    const role = localStorage.getItem("mode") === "GROUP" ? localStorage.getItem("groupRole") : "SOLO";
+    if (role === "CHILD") {
+        if (window.Swal) {
+            Swal.fire({
+                title: 'Cart Access Denied',
+                text: 'Only the Parent can view the full cart.',
+                icon: 'info',
+                confirmButtonColor: 'var(--accent-primary)',
+                background: 'var(--bg-glass)',
+                color: 'var(--text-primary)',
+                customClass: { popup: 'glass-card' }
+            });
+        } else {
+            alert("Only the Parent can view the full cart.");
+        }
+        return;
+    }
     window.location.href = "cart.html";
 };
 
 window.goBack = function () {
+    const role = localStorage.getItem("mode") === "GROUP" ? localStorage.getItem("groupRole") : "SOLO";
+    if (role === "CHILD") {
+        window.location.href = "home.html"; // Children go home, not store
+        return;
+    }
     window.location.href = "store.html";
 };
 

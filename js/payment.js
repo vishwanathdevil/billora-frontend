@@ -21,69 +21,71 @@ async function loadPayment() {
         const res = await fetch(url);
         const cart = await res.json();
 
-        let total = 0;
+        if (!cart || cart.length === 0) {
+            alert("Cart is empty!");
+            window.location.href = "cart.html";
+            return;
+        }
 
+        let total = 0;
         cart.forEach(item => {
             total += item.price * item.quantity;
         });
 
         document.getElementById("payTotal").innerText = total;
 
-        generateQR(total);
+        // 🔥 CREATE PENDING BILL IMMEDIATELY
+        const billRes = await fetch(`${BASE}/api/bills`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                username: user.username,
+                total: total,
+                storeId: window.selectedStoreId || localStorage.getItem("selectedStoreId") || 1,
+                items: cart.map(i => ({
+                    name: i.name,
+                    code: i.code,
+                    price: i.price,
+                    quantity: i.quantity
+                }))
+            })
+        });
+
+        const pendingBill = await billRes.json();
+
+        // GENERATE CASHIER QR (ID)
+        generateQR(pendingBill.id);
 
         // ===============================
-        // PAY BUTTON
+        // PAY ONLINE BUTTON (Razorpay)
         // ===============================
         window.payNow = async function () {
 
             const btn = document.getElementById("payBtn");
-
             btn.disabled = true;
             btn.innerText = "Processing...";
 
             try {
-
                 const orderRes = await fetch(`${BASE}/api/payment/create-order`, {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        amount: total
-                    })
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ amount: total })
                 });
 
                 const order = await orderRes.json();
 
                 const options = {
-
                     key: "rzp_test_SYKrnMrPo4MNDv",
-
                     amount: order.amount,
-
                     currency: "INR",
-
                     order_id: order.id,
-
                     name: "Billora",
-
                     description: "Bill Payment",
-
                     handler: async function (response) {
 
-                        // ✅ SAVE BILL
-                        await fetch(`${BASE}/api/bills`, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({
-                                username: user.username,
-                                total: total,
-                                paymentId: response.razorpay_payment_id,
-                                paymentMode: "ONLINE",
-                                status: "PAID"
-                            })
+                        // ✅ UPDATE EXISTING BILL
+                        await fetch(`${BASE}/api/bills/${pendingBill.id}/pay/ONLINE`, {
+                            method: "PUT"
                         });
 
                         // ✅ CLEAR CART
@@ -93,39 +95,29 @@ async function loadPayment() {
                             clearUrl = `${BASE}/api/cart/session/${sessionId}`;
                         }
                         
-                        await fetch(clearUrl, {
-                            method: "DELETE"
-                        });
+                        await fetch(clearUrl, { method: "DELETE" });
 
                         alert("Payment Successful ✅");
-
-                        window.location.href = "bills.html";
+                        window.location.href = `bills.html?id=${pendingBill.id}`;
                     }
-
                 };
 
                 const rzp = new Razorpay(options);
-
                 rzp.open();
 
                 btn.disabled = false;
-                btn.innerText = "Pay Now";
+                btn.innerText = "Pay Online";
 
             } catch (err) {
-
                 console.log(err);
-
                 btn.disabled = false;
-                btn.innerText = "Pay Now";
-
+                btn.innerText = "Pay Online";
                 alert("Payment Failed ❌");
             }
         };
 
     } catch (err) {
-
         console.log(err);
-
         alert("Failed to load payment ❌");
     }
 }
@@ -133,17 +125,14 @@ async function loadPayment() {
 // ===============================
 // QR GENERATOR
 // ===============================
-function generateQR(total) {
-
+function generateQR(billId) {
     const qrContainer = document.getElementById("qrContainer");
-
     qrContainer.innerHTML = "";
 
     QRCode.toCanvas(
-        `upi://pay?pa=test@upi&pn=Billora&am=${total}&cu=INR`,
+        `id=${billId}`,
         { width: 220 },
         function (err, canvas) {
-
             if (!err) {
                 qrContainer.appendChild(canvas);
             }

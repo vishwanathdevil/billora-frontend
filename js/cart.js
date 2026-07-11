@@ -11,9 +11,25 @@ function loadCart() {
     const mode = localStorage.getItem("mode");
     const role = mode === "GROUP" ? localStorage.getItem("groupRole") : "SOLO";
     
-    // Hide Pay button for children
+    // Block child access completely
     if (role === "CHILD") {
-        document.getElementById("payBtn").style.display = "none";
+        if (window.Swal) {
+            Swal.fire({
+                title: 'Access Denied',
+                text: 'Only the Parent can view and manage the cart.',
+                icon: 'error',
+                confirmButtonColor: 'var(--accent-primary)',
+                background: 'var(--bg-glass)',
+                color: 'var(--text-primary)',
+                customClass: { popup: 'glass-card' }
+            }).then(() => {
+                window.location.href = "scanner.html";
+            });
+        } else {
+            alert("Only the Parent can view the cart!");
+            window.location.href = "scanner.html";
+        }
+        return;
     }
 
     let url = `${BASE}/api/cart/user/${user.username}`;
