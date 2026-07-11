@@ -56,12 +56,66 @@ async function loadPayment() {
         // GENERATE CASHIER QR (ID)
         generateQR(pendingBill.id);
 
+        const btn = document.getElementById("payBtn");
+        btn.disabled = true;
+        btn.innerText = "Waiting for Cashier...";
+        
+        let paymentTriggered = false;
+
+        // ===============================
+        // POLL BILL STATUS
+        // ===============================
+        const interval = setInterval(async () => {
+            if (paymentTriggered) return; // Stop polling if Razorpay is open
+            
+            try {
+                const statusRes = await fetch(`${BASE}/api/bills/id/${pendingBill.id}`);
+                const updatedBill = await statusRes.json();
+                
+                // If Cashier authorized Online Payment
+                if (updatedBill.status === "WAITING" && btn.disabled) {
+                    btn.disabled = false;
+                    btn.innerText = "Pay Online";
+                }
+                
+                // If Cashier received Cash
+                if (updatedBill.status === "PAID") {
+                    clearInterval(interval);
+                    
+                    // ✅ CLEAR CART
+                    let clearUrl = `${BASE}/api/cart/user/${user.username}`;
+                    if (mode === "GROUP" && role === "MAIN") {
+                        const sessionId = localStorage.getItem("sessionId");
+                        clearUrl = `${BASE}/api/cart/session/${sessionId}`;
+                    }
+                    await fetch(clearUrl, { method: "DELETE" });
+
+                    if (window.Swal) {
+                        Swal.fire({
+                            title: 'Payment Successful',
+                            text: 'Your payment was confirmed by the cashier.',
+                            icon: 'success',
+                            confirmButtonColor: 'var(--accent-primary)',
+                            background: 'var(--bg-glass)',
+                            color: 'var(--text-primary)'
+                        }).then(() => {
+                            window.location.href = `bills.html?id=${pendingBill.id}`;
+                        });
+                    } else {
+                        alert("Payment Confirmed by Cashier ✅");
+                        window.location.href = `bills.html?id=${pendingBill.id}`;
+                    }
+                }
+            } catch (e) {
+                console.error("Polling error", e);
+            }
+        }, 2000);
+
         // ===============================
         // PAY ONLINE BUTTON (Razorpay)
         // ===============================
         window.payNow = async function () {
-
-            const btn = document.getElementById("payBtn");
+            paymentTriggered = true;
             btn.disabled = true;
             btn.innerText = "Processing...";
 
@@ -97,8 +151,21 @@ async function loadPayment() {
                         
                         await fetch(clearUrl, { method: "DELETE" });
 
-                        alert("Payment Successful ✅");
-                        window.location.href = `bills.html?id=${pendingBill.id}`;
+                        if (window.Swal) {
+                            Swal.fire({
+                                title: 'Payment Successful',
+                                text: 'Your online payment was successful.',
+                                icon: 'success',
+                                confirmButtonColor: 'var(--accent-primary)',
+                                background: 'var(--bg-glass)',
+                                color: 'var(--text-primary)'
+                            }).then(() => {
+                                window.location.href = `bills.html?id=${pendingBill.id}`;
+                            });
+                        } else {
+                            alert("Payment Successful ✅");
+                            window.location.href = `bills.html?id=${pendingBill.id}`;
+                        }
                     }
                 };
 
@@ -110,6 +177,7 @@ async function loadPayment() {
 
             } catch (err) {
                 console.log(err);
+                paymentTriggered = false;
                 btn.disabled = false;
                 btn.innerText = "Pay Online";
                 alert("Payment Failed ❌");
