@@ -34,7 +34,15 @@ function loadSingleBill(billId) {
                 const price = Number(item.price) || 0;
 
                 const li = document.createElement("li");
-                li.innerText = `${name} x${qty} - ₹${price * qty}`;
+                li.innerHTML = `
+                    <div class="item-card mb-1">
+                        <div style="flex: 1;">
+                            <h4 style="margin: 0 0 5px 0;">${name}</h4>
+                            <div style="font-size: 13px; color: var(--text-secondary);">₹${price} &times; ${qty}</div>
+                        </div>
+                        <div style="font-weight: 700; color: var(--accent-success);">₹${price * qty}</div>
+                    </div>
+                `;
                 itemsList.appendChild(li);
             });
         })
@@ -65,8 +73,18 @@ function loadAllBills() {
                 total += Number(bill.total) || 0;
 
                 const li = document.createElement("li");
-                li.innerText = `Bill #${bill.id} - ₹${bill.total}`;
-                li.style.cursor = "pointer";
+                li.innerHTML = `
+                    <div class="item-card mb-2" style="cursor: pointer;">
+                        <div>
+                            <h4 style="margin: 0 0 5px 0;">Bill #${bill.id}</h4>
+                            <div style="font-size: 12px; color: var(--text-secondary);">${bill.status}</div>
+                        </div>
+                        <div class="flex-row">
+                            <span style="font-weight: 700; color: var(--accent-success);">₹${bill.total}</span>
+                            <i data-lucide="chevron-right" style="width: 18px; color: var(--text-secondary);"></i>
+                        </div>
+                    </div>
+                `;
 
                 li.onclick = () => {
                     window.location.href = `bills.html?id=${bill.id}`;
@@ -77,6 +95,10 @@ function loadAllBills() {
 
             totalEl.innerText = total;
             statusEl.innerText = "All Bills";
+            
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
         })
         .catch(err => console.error(err));
 }

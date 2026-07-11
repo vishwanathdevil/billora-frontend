@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Cashier Dashboard</title>
+    <title>Billora - Cashier</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" href="style/cashier.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style/global.css">
 
     <!-- ✅ WebSocket -->
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
@@ -15,13 +16,29 @@
 </head>
 <body>
 
-    <h1>🧑‍💼 Cashier Dashboard</h1>
+<div class="app-container">
 
-    <div id="ordersContainer"></div>
+    <div class="app-header">
+        <h2>🧑‍💼 Cashier Terminal</h2>
+        <button class="btn-icon" onclick="logout()" title="Logout">
+            <i data-lucide="log-out"></i>
+        </button>
+    </div>
 
-    <p id="cameraError" style="color:red; text-align:center;"></p>
+    <p id="cameraError" style="color: var(--accent-danger); text-align: center; font-weight: 600; background: rgba(239, 68, 68, 0.1); border-radius: var(--radius-sm); padding: 10px; display: none;"></p>
 
-    <button onclick="logout()">Logout</button>
+    <div id="ordersContainer" class="mt-2" style="display: flex; flex-direction: column; gap: 15px;"></div>
+
+</div>
+
+<script>
+    lucide.createIcons();
+    
+    function logout() {
+        localStorage.clear();
+        window.location.href = "index.html";
+    }
+</script>
 
     <!-- ✅ IMPORTANT: LOAD AFTER LIBRARY -->
     <script src="js/cashier.js"></script>

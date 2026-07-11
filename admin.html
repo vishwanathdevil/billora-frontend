@@ -1,46 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Panel</title>
-    <link rel="stylesheet" href="style/admin.css">
+    <title>Billora - Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://unpkg.com/@zxing/library@latest"></script>
+    <link rel="stylesheet" href="style/global.css">
 </head>
 <body>
 
-<div class="container">
+<div class="app-container">
 
-    <div class="header">
+    <div class="app-header">
         <h2>🏪 Admin Panel</h2>
-        <button onclick="logout()" class="logout-btn">Logout</button>
+        <button class="btn-icon" onclick="logout()" title="Logout">
+            <i data-lucide="log-out"></i>
+        </button>
     </div>
 
     <!-- 🔥 PRODUCT CARD -->
-    <div class="form-section">
+    <div class="glass-card mb-3">
 
-        <h3>Scan or Add Product</h3>
+        <h3 class="mb-2">Scan or Add Product</h3>
 
-        <div class="scanner-box">
-            <video id="adminScanner"></video>
-            <button onclick="startAdminScanner()">📷 Scan Barcode</button>
+        <div class="scanner-container mb-3" style="max-height: 250px; border-radius: 12px;">
+            <video id="adminScanner" style="width: 100%; display: block; object-fit: cover; height: 100%;"></video>
+            <div style="text-align: center; margin-top: 10px;">
+                <button class="btn btn-secondary" onclick="startAdminScanner()">
+                    <i data-lucide="scan-barcode"></i> Scan Barcode
+                </button>
+            </div>
         </div>
 
-        <div class="product-card">
-            <input type="text" id="name" placeholder="Product Name">
-            <input type="text" id="code" placeholder="Barcode">
-            <input type="number" id="price" placeholder="Price">
-            <input type="number" id="stock" placeholder="Stock">
+        <div class="form-grid">
+            <input type="text" id="name" class="input-simple" placeholder="Product Name">
+            <input type="text" id="code" class="input-simple" placeholder="Barcode">
+            
+            <div class="grid-2">
+                <input type="number" id="price" class="input-simple" placeholder="Price (₹)">
+                <input type="number" id="stock" class="input-simple" placeholder="Stock Qty">
+            </div>
 
-            <button onclick="addProduct()">Save Product</button>
+            <button class="btn btn-primary mt-2" onclick="addProduct()">Save Product</button>
         </div>
 
     </div>
 
     <div class="product-section">
-        <h3>Products</h3>
+        <h3 class="mb-2">Product Inventory</h3>
         <div id="productList"></div>
     </div>
 
 </div>
+
+<script>
+    lucide.createIcons();
+</script>
 
 <script src="js/admin.js"></script>
 

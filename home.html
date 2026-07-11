@@ -1,27 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Billora - Home</title>
+    <title>Billora - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="./style/global.css">
-    <link rel="stylesheet" href="./style/home.css">
 </head>
 <body>
 
-<div class="container">
+<div class="app-container">
 
-    <h2>👋 Welcome to Billora</h2>
-
-    <div class="card">
-        <button onclick="goToStore()">🛒 Start Shopping</button>
-        <br><br>
-
-        <button onclick="goToBills()">🧾 View Bills</button>
-        <br><br>
+    <div class="app-header">
+        <h2>👋 Welcome to Billora</h2>
+        <button class="btn-icon" onclick="logout()" title="Logout">
+            <i data-lucide="log-out"></i>
+        </button>
     </div>
 
-    <button onclick="logout()">Logout</button>
+    <div class="grid-2 mt-2">
+        <div class="glass-card text-center" style="cursor: pointer;" onclick="goToStore()">
+            <div style="background: rgba(59, 130, 246, 0.1); width: 60px; height: 60px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                <i data-lucide="shopping-bag" style="color: var(--accent-primary); width: 30px; height: 30px;"></i>
+            </div>
+            <h3>Start Shopping</h3>
+            <p style="font-size: 14px;">Scan & pay in store</p>
+        </div>
+
+        <div class="glass-card text-center" style="cursor: pointer;" onclick="goToBills()">
+            <div style="background: rgba(139, 92, 246, 0.1); width: 60px; height: 60px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                <i data-lucide="receipt" style="color: var(--accent-secondary); width: 30px; height: 30px;"></i>
+            </div>
+            <h3>View Bills</h3>
+            <p style="font-size: 14px;">Past purchases</p>
+        </div>
+    </div>
 
 </div>
+
+<script>
+    lucide.createIcons();
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 

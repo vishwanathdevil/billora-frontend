@@ -14,11 +14,18 @@ function loadStores() {
             stores.forEach(store => {
 
                 container.innerHTML += `
-                    <button onclick="selectStore(${store.id})">
-                        ${store.name}
-                    </button>
+                    <div class="glass-card text-center" style="cursor: pointer; padding: 20px;" onclick="selectStore(${store.id})">
+                        <div style="background: rgba(59, 130, 246, 0.1); width: 50px; height: 50px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto 10px auto;">
+                            <i data-lucide="store" style="color: var(--accent-primary); width: 24px; height: 24px;"></i>
+                        </div>
+                        <h4 style="margin:0; font-size: 16px;">${store.name}</h4>
+                    </div>
                 `;
             });
+            // Re-initialize icons for newly added elements
+            if(window.lucide) {
+                window.lucide.createIcons();
+            }
         });
 }
 

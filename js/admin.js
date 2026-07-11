@@ -65,24 +65,33 @@ function loadProducts() {
             data.forEach(p => {
 
                 container.innerHTML += `
-                <div class="product-item">
-                    <h4>${p.name}</h4>
-                    <p>Code: ${p.code}</p>
+                <div class="item-card" style="display: flex; flex-direction: column; align-items: stretch; gap: 10px;">
+                    <div class="flex-between">
+                        <h4 style="margin: 0; font-size: 16px;">${p.name}</h4>
+                        <button class="btn-icon" style="width: 32px; height: 32px; border-color: rgba(239, 68, 68, 0.2); color: var(--accent-danger);" onclick="deleteProduct(${p.id})">
+                            <i data-lucide="trash-2" style="width: 16px;"></i>
+                        </button>
+                    </div>
+                    
+                    <div style="font-size: 12px; color: var(--text-secondary);">Code: ${p.code}</div>
 
-                    <p>
-                        Price:
-                        <input value="${p.price}" onchange="updateField(${p.id}, this.value, 'price')">
-                    </p>
-
-                    <p>
-                        Stock:
-                        <input value="${p.stock}" onchange="updateField(${p.id}, this.value, 'stock')">
-                    </p>
-
-                    <button onclick="deleteProduct(${p.id})">Delete</button>
+                    <div class="grid-2 mt-1">
+                        <div>
+                            <label style="font-size: 12px; color: var(--text-secondary);">Price (₹)</label>
+                            <input type="number" class="input-simple" style="margin-bottom:0; padding: 10px;" value="${p.price}" onchange="updateField(${p.id}, this.value, 'price')">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px; color: var(--text-secondary);">Stock</label>
+                            <input type="number" class="input-simple" style="margin-bottom:0; padding: 10px;" value="${p.stock}" onchange="updateField(${p.id}, this.value, 'stock')">
+                        </div>
+                    </div>
                 </div>
                 `;
             });
+
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
         });
 }
 

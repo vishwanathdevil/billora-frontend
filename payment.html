@@ -1,27 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Payment</title>
-    <link rel="stylesheet" href="./style/payment.css">
+    <title>Billora - Payment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="./style/global.css">
 </head>
 <body>
 
-    <h2>Scan QR to Pay</h2>
+<div class="app-container flex-center">
 
-    <div class="container">
+    <div class="app-header flex-between" style="width: 100%; border: none;">
+        <button class="btn-icon" onclick="goBack()" title="Back">
+            <i data-lucide="arrow-left"></i>
+        </button>
+        <h2 style="margin: 0;">💳 Payment</h2>
+        <div style="width: 45px;"></div> <!-- Spacer -->
+    </div>
+
+    <div class="glass-card text-center mt-2" style="width: 100%; max-width: 350px;">
+        <h3 class="mb-3">Scan QR to Pay</h3>
 
         <!-- QR Display -->
-        <div id="qrContainer" style="width:300px; margin:auto;"></div>
+        <div id="qrContainer" style="width: 200px; height: 200px; margin: 0 auto; background: white; padding: 10px; border-radius: 12px; display: flex; justify-content: center; align-items: center;"></div>
 
-        <br>
+        <h2 style="margin-top: 25px; font-size: 32px; color: var(--accent-success);">₹ <span id="payTotal"></span></h2>
 
-        <h3>Total: ₹ <span id="payTotal"></span></h3>
-
-        <br>
-
-        <button id="payBtn" onclick="payNow()" disabled>Pay Now</button>
-
+        <button id="payBtn" class="btn btn-primary mt-3" onclick="payNow()" disabled>
+            <i data-lucide="check-circle"></i> Pay Now
+        </button>
     </div>
+
+</div>
+
+<script>
+    lucide.createIcons();
+    
+    // Fallback back function just in case
+    function goBack() {
+        window.history.back();
+    }
+</script>
 
     <!-- QR Library -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>

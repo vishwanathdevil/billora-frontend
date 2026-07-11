@@ -5,48 +5,69 @@
     <title>Scanner - Billora</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./style/scanner.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="./style/global.css">
 </head>
 
 <body>
 
-<!-- HEADER -->
-<div class="header">
-    <button class="back-btn" onclick="goBack()">⬅</button>
-    <h2>Scan Product</h2>
-</div>
+<div class="app-container" style="padding-bottom: 100px;">
 
-<!-- MAIN -->
-<div class="scanner-container">
-
-    <!-- CAMERA SECTION -->
-    <div class="camera-box">
-        <video id="scanner"></video>
-        <div class="scan-overlay"></div>
+    <!-- HEADER -->
+    <div class="app-header">
+        <h2>📷 Scan Product</h2>
+        <button class="btn-icon" onclick="goBack()" title="Back">
+            <i data-lucide="arrow-left"></i>
+        </button>
     </div>
 
-    <!-- PRODUCT CARD -->
-    <div class="product-card">
-        <h3 id="productName">Scan a product</h3>
-        <p class="price">₹ <span id="productPrice">0</span></p>
-
-        <div class="qty-row">
-            <button onclick="decreaseQty()">−</button>
-            <span id="quantity">1</span>
-            <button onclick="increaseQty()">+</button>
+    <!-- MAIN -->
+    <div>
+        <!-- CAMERA SECTION -->
+        <div class="scanner-container mb-3" style="max-height: 350px; background: #000;">
+            <video id="scanner" style="width: 100%; display: block;"></video>
+            <div class="scanner-overlay"></div>
         </div>
 
-        <p class="subtotal">Subtotal: ₹ <span id="subtotal">0</span></p>
-    </div>
+        <!-- PRODUCT CARD -->
+        <div class="glass-card text-center mt-2">
+            <h3 id="productName">Scan a product</h3>
+            <p style="font-size: 24px; font-weight: 800; color: var(--accent-success); margin: 10px 0;">₹ <span id="productPrice">0</span></p>
 
+            <div class="flex-row" style="background: rgba(0,0,0,0.2); border-radius: 20px; padding: 5px; width: fit-content; margin: 15px auto;">
+                <button class="btn-icon" style="width: 40px; height: 40px;" onclick="decreaseQty()">
+                    <i data-lucide="minus"></i>
+                </button>
+                <span id="quantity" style="font-weight: 700; width: 40px; font-size: 20px;">1</span>
+                <button class="btn-icon" style="width: 40px; height: 40px;" onclick="increaseQty()">
+                    <i data-lucide="plus"></i>
+                </button>
+            </div>
+
+            <p style="font-weight: 600;">Subtotal: ₹ <span id="subtotal">0</span></p>
+        </div>
+    </div>
 </div>
 
 <!-- BOTTOM ACTION BAR -->
-<div class="action-bar">
-    <button onclick="addScannedToCart()">Add to cart</button>
-    <button onclick="restartScanner()">Scan again</button>
-    <button onclick="goToCart()">Go to Cart</button>
+<div class="action-bar-bottom">
+    <button class="btn btn-secondary" onclick="restartScanner()" style="flex: 1;" title="Rescan">
+        <i data-lucide="refresh-cw"></i>
+    </button>
+
+    <button class="btn btn-primary" onclick="addScannedToCart()" style="flex: 2;">
+        <i data-lucide="shopping-bag"></i> Add
+    </button>
+    
+    <button class="btn btn-success" onclick="goToCart()" style="flex: 2;">
+        Cart <i data-lucide="arrow-right"></i>
+    </button>
 </div>
+
+<script>
+    lucide.createIcons();
+</script>
 
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="js/scanner.js"></script>

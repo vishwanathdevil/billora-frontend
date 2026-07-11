@@ -1,31 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Select Store</title>
-    <link rel="stylesheet" href="./style/store.css">
+    <title>Billora - Select Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="./style/global.css">
 </head>
 <body>
 
-    <h2>Select Store</h2>
-
-    <div class="container">
-
-        <!-- 🏬 Store Buttons -->
-        <div id="storeList">
-        </div>
-
-        <br>
-
-        <!-- 🛒 Trolley Section (hidden initially) -->
-        <div id="trolleySection" style="display:none;">
-            <input type="text" id="trolleyNumber" placeholder="Enter Trolley Number (optional)">
-            <button onclick="startShopping()">Start Shopping</button>
-        </div>
-
-        <br>
-        <button onclick="goHome()">Back</button>
-
+<div class="app-container">
+    
+    <div class="app-header">
+        <h2>🏬 Select Store</h2>
+        <button class="btn-icon" onclick="goHome()" title="Back">
+            <i data-lucide="arrow-left"></i>
+        </button>
     </div>
+
+    <!-- 🏬 Store Buttons -->
+    <div id="storeList" class="grid-2">
+    </div>
+
+    <!-- 🛒 Trolley Section (hidden initially) -->
+    <div id="trolleySection" style="display:none;" class="mt-3">
+        <div class="input-group">
+            <i data-lucide="shopping-cart"></i>
+            <input type="text" id="trolleyNumber" class="input-field" placeholder="Enter Trolley Number (optional)">
+        </div>
+        <button class="btn btn-primary" onclick="startShopping()">Start Shopping</button>
+    </div>
+
+</div>
+
+<script>
+    lucide.createIcons();
+</script>
 
     <script src="js/store.js"></script>
     <script src="js/app.js"></script>
