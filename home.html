@@ -127,24 +127,6 @@
             width: 90%; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        /* Light mode toggle variables */
-        body.light-mode {
-            background: #f8fafc;
-            --bg-glass: rgba(255, 255, 255, 0.9);
-            --text-primary: #0f172a;
-            --text-secondary: #64748b;
-        }
-        body.light-mode .glass-card {
-            background: var(--bg-glass);
-            border: 1px solid rgba(0,0,0,0.1);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-        }
-        body.light-mode .input-group { background: #f1f5f9; border-color: #e2e8f0; }
-        body.light-mode .input-field { color: #0f172a; }
-        body.light-mode .input-field::placeholder { color: #94a3b8; }
-        body.light-mode .btn-icon { color: #0f172a; background: rgba(0,0,0,0.05); }
-        body.light-mode .btn-secondary { background: #f1f5f9; color: #0f172a; border-color: #e2e8f0; }
     </style>
 
     <script>

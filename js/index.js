@@ -1,9 +1,13 @@
 console.log("LOGIN JS LOADED");
 
 // ================================
-// 🚀 AUTO-LOGIN
+// 🚀 AUTO-LOGIN & THEME
 // ================================
 document.addEventListener("DOMContentLoaded", () => {
+    if (localStorage.getItem("theme") === "light") {
+        document.body.classList.add("light-mode");
+    }
+
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) {
         if (user.role === "ADMIN") window.location.href = "admin.html";

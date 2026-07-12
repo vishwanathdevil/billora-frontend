@@ -76,9 +76,14 @@ if (user && currentPage === "index.html") {
 }
 
 /* ================================
-   🌙 THEME & UI LOGIC FOR HOME
+   🌙 THEME & UI LOGIC
 ================================ */
 document.addEventListener("DOMContentLoaded", () => {
+    // Load Theme Globally for all pages that include app.js
+    if (localStorage.getItem("theme") === "light") {
+        document.body.classList.add("light-mode");
+    }
+
     if (currentPage === "home.html" && window.user) {
         document.getElementById("welcomeText").innerText = `👋 Welcome back, ${window.user.name || window.user.username}!`;
         
@@ -88,10 +93,9 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("profileNumber").value = window.user.number || "Not provided";
         document.getElementById("profileEmail").value = window.user.email || "Not provided";
         
-        // Load Theme
-        if (localStorage.getItem("theme") === "light") {
-            document.body.classList.add("light-mode");
-            document.getElementById("themeIcon").setAttribute("data-lucide", "sun");
+        const themeIcon = document.getElementById("themeIcon");
+        if (themeIcon) {
+            themeIcon.setAttribute("data-lucide", localStorage.getItem("theme") === "light" ? "sun" : "moon");
         }
         if (window.lucide) lucide.createIcons();
     }

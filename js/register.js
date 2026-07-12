@@ -1,5 +1,11 @@
 const BASE_URL = "https://billora-backend-9kyk.onrender.com";
 
+document.addEventListener("DOMContentLoaded", () => {
+    if (localStorage.getItem("theme") === "light") {
+        document.body.classList.add("light-mode");
+    }
+});
+
 function showPopup(title, text, icon) {
     if (window.Swal) {
         Swal.fire({
