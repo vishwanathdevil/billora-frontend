@@ -31,6 +31,7 @@
    LIGHT MODE OVERRIDES
 ========================================= */
 body.light-mode {
+    background: var(--bg-main);
     --bg-main: #f8fafc;
     --bg-secondary: #f1f5f9;
     --text-primary: #0f172a;
