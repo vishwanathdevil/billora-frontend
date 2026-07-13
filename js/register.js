@@ -30,6 +30,33 @@ function showLoader(state) {
     }
 }
 
+let otpTimerInterval = null;
+
+function startOtpTimer() {
+    let timeLeft = 180; // 3 minutes in seconds
+    const timerElement = document.getElementById("otpTimer");
+    const resendBtn = document.getElementById("resendOtpBtn");
+    
+    // Reset UI
+    timerElement.parentElement.style.display = "block";
+    resendBtn.style.display = "none";
+    
+    clearInterval(otpTimerInterval);
+    
+    otpTimerInterval = setInterval(() => {
+        timeLeft--;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerElement.innerText = `0${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        
+        if (timeLeft <= 0) {
+            clearInterval(otpTimerInterval);
+            timerElement.parentElement.style.display = "none";
+            resendBtn.style.display = "flex";
+        }
+    }, 1000);
+}
+
 async function sendOtp() {
     const number = document.getElementById("number").value.trim();
     const username = document.getElementById("username").value.trim();
@@ -72,6 +99,9 @@ async function sendOtp() {
         // Hide send button, show OTP form
         btn.style.display = "none";
         document.getElementById("otpForm").style.display = "block";
+        
+        // Start Timer
+        startOtpTimer();
         
         // Show OTP to user for easy testing
         showPopup("OTP Sent", `Since live SMS requires billing setup, your mock OTP is: ${data.otp}`, "info");
@@ -126,6 +156,8 @@ async function verifyAndRegister() {
         
         showPopup("Success", "Account verified successfully!", "success");
         
+        clearInterval(otpTimerInterval);
+
         setTimeout(() => {
             window.location.href = "home.html";
         }, 1500);

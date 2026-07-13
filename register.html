@@ -68,6 +68,14 @@
                 <button id="registerBtn" class="btn btn-primary" onclick="verifyAndRegister()">
                     <i data-lucide="check-circle"></i> Verify & Register
                 </button>
+
+                <div id="otpTimerContainer" style="margin-top: 15px; font-size: 14px; color: var(--text-secondary);">
+                    OTP expires in <span id="otpTimer" style="font-weight: bold; color: var(--accent-danger);">03:00</span>
+                </div>
+                
+                <button id="resendOtpBtn" class="btn btn-secondary mt-2" style="display: none;" onclick="sendOtp()">
+                    <i data-lucide="refresh-cw"></i> Resend OTP
+                </button>
             </div>
 
             <p style="margin-top: 20px; font-size: 14px; color: var(--text-secondary);">
