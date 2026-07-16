@@ -116,21 +116,32 @@ async function sendOtp() {
     }
 }
 
+function onOtpInput() {
+    const otpInput = document.getElementById("otp");
+    const otpError = document.getElementById("otpError");
+    
+    // Hide error when user types
+    otpError.style.display = "none";
+    
+    if (otpInput.value.trim().length === 4) {
+        verifyAndRegister();
+    }
+}
+
 async function verifyAndRegister() {
     const name = document.getElementById("name").value.trim();
     const username = document.getElementById("username").value.trim();
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
     const number = document.getElementById("number").value.trim();
-    const otp = document.getElementById("otp").value.trim();
+    const otpInput = document.getElementById("otp");
+    const otp = otpInput.value.trim();
+    const otpError = document.getElementById("otpError");
 
     if (!otp || otp.length < 4) {
-        return showPopup("Invalid OTP", "Please enter the 4-digit OTP.", "warning");
+        return; // Wait for full 4 digits
     }
 
-    const btn = document.getElementById("registerBtn");
-    btn.disabled = true;
-    btn.innerText = "Verifying...";
     showLoader(true);
 
     try {
@@ -163,10 +174,11 @@ async function verifyAndRegister() {
         }, 1500);
         
     } catch (err) {
-        showPopup("Error", err.message || "Failed to verify OTP", "error");
-        btn.disabled = false;
-        btn.innerHTML = `<i data-lucide="check-circle"></i> Verify & Register`;
-        if (window.lucide) lucide.createIcons();
+        // Show inline error and clear box instead of popup
+        otpError.innerText = err.message.includes("OTP") ? "Entered OTP is wrong" : err.message;
+        otpError.style.display = "block";
+        otpInput.value = "";
+        otpInput.focus();
     } finally {
         showLoader(false);
     }
